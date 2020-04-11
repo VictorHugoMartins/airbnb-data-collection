@@ -4,7 +4,6 @@
 *~
 *.log
 *.out
-*.config
 *.zip
 *.pyc
 *.bat
