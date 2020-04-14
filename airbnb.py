@@ -151,6 +151,30 @@ def db_ping(config):
         logging.exception("Connection test failed")
 
 
+def update_city(config, city):
+    """ Update cities in a room in the database. Raise an error if it fails.
+    Return number of rows affected."""
+    try:
+        rowcount = 0
+        conn = config.connect()
+        cur = conn.cursor()
+        sql = """
+            update room set city = %s where substring(address, 1, %s) = %s
+            """
+        update_args = (
+            city, len(city), city
+            )
+        cur.execute(sql, update_args)
+        rowcount = cur.rowcount
+        cur.close()
+        conn.commit()
+        print(str(rowcount) + " rooms updated")
+        return rowcount
+    except psycopg2.Error as pge:
+        logging.error("Failed to update cities")
+        raise
+
+
 def db_add_survey(config, search_area):
     """
     Add a survey entry to the database, so the survey can be run.
@@ -487,6 +511,9 @@ def parse_args():
                        version='%(prog)s, version ' +
                        str(SCRIPT_VERSION_NUMBER))
     group.add_argument('-?', action='help')
+    group.add_argument('-uc', '--update_cities',
+                       metavar='city_name', type=str,
+                       help="""update cities from a room""")
 
     args = parser.parse_args()
     return (parser, args)
@@ -555,6 +582,9 @@ def main():
         elif args.printsearch_by_zipcode:
             survey = ABSurveyByZipcode(ab_config, args.printsearch_by_zipcode)
             survey.search(ab_config.FLAGS_PRINT)
+        elif args.update_cities:
+            update_city(ab_config, args.update_cities)
+            exit(0)
         else:
             parser.print_help()
     except (SystemExit, KeyboardInterrupt):
