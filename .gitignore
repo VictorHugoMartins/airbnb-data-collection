@@ -2,6 +2,8 @@
 =======
 *.swp
 *~
+*.config
+*.html
 *.log
 *.out
 *.zip

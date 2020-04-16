@@ -176,7 +176,7 @@ def export_city_data(ab_config, city, project, format, start_date):
     if project == "gis":
         sql = """
         select room_id, host_id, room_type,
-            borough, neighborhood,
+            address, borough, neighborhood,
             reviews, overall_satisfaction,
             accommodates, bedrooms, bathrooms,
             price, minstay,
@@ -189,7 +189,7 @@ def export_city_data(ab_config, city, project, format, start_date):
     elif project == "hvs":
         sql = """
         select room_id, host_id, room_type,
-            borough, neighborhood,
+            address, borough, neighborhood,
             reviews, overall_satisfaction,
             accommodates, bedrooms, bathrooms,
             price, minstay,
@@ -202,7 +202,7 @@ def export_city_data(ab_config, city, project, format, start_date):
     else:
         sql = """
         select room_id, host_id, room_type,
-            city, neighborhood,
+            address, city, neighborhood,
             reviews, overall_satisfaction,
             accommodates, bedrooms, bathrooms,
             price, minstay,
