@@ -10,6 +10,7 @@ from lxml import html
 import psycopg2
 import json
 import airbnb_ws
+from airbnb_geocoding import Location
 
 logger = logging.getLogger()
 
@@ -55,8 +56,8 @@ class ABListing():
         # rate_type (str) - "nightly" or other?
         self.rate_type = None
         """ """
+        self.location_id = None
         logger.setLevel(config.log_level)
-
 
     def status_check(self):
         # if sufficient of the values are None or don't exist, the room 
@@ -136,6 +137,7 @@ class ABListing():
                 if (rowcount == 0 or
                         insert_replace_flag == self.config.FLAGS_INSERT_NO_REPLACE):
                     try:
+                        self.get_location_id()
                         self.__insert()
                         return True
                     except psycopg2.IntegrityError:
@@ -276,14 +278,14 @@ class ABListing():
                     accommodates, bedrooms, bathrooms, price, deleted,
                     minstay, latitude, longitude, survey_id,
                     coworker_hosted, extra_host_languages, name,
-                    property_type, currency, rate_type
+                    property_type, currency, rate_type, location_id
 
                 )
                 """
             sql += """
                 values (%s, %s, %s, %s, %s, %s, %s, %s, %s,
                 %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s, %s
+                %s, %s, %s, %s, %s, %s, %s
                 )"""
             insert_args = (
                 self.room_id, self.host_id, self.room_type, self.country,
@@ -292,7 +294,7 @@ class ABListing():
                 self.bathrooms, self.price, self.deleted, self.minstay,
                 self.latitude, self.longitude, self.survey_id,
                 self.coworker_hosted, self.extra_host_languages, self.name,
-                self.property_type, self.currency, self.rate_type
+                self.property_type, self.currency, self.rate_type, self.location_id
                 )
             cur.execute(sql, insert_args)
             cur.close()
@@ -399,7 +401,7 @@ class ABListing():
         try:
             temp = tree.xpath("//meta"
                               "[contains(@property,"
-                              "'airbedandbreakfast:location:latitude')]"
+                              "'airbedandbreakfast:location:lat')]"
                               "/@content")
             if len(temp) > 0:
                 self.latitude = temp[0]
@@ -727,6 +729,7 @@ class ABListing():
             self.__get_bathrooms(tree)
             self.__get_minstay(tree)
             self.__get_price(tree)
+            self.__get_location()
             self.deleted = 0
 
             # NOT FILLING HERE, but maybe should? have to write helper methods:
@@ -757,3 +760,10 @@ class ABListing():
         except Exception:
             logger.exception("Error parsing web page.")
             raise
+    
+    def get_location_id(self):
+        """ pensar melhor """
+        location = Location(self.latitude, self.longitude) # initialize a location with coordinates
+        location.reverse_geocode(self.config) # find atributes for location with google api key
+        self.location_id = location.insert_in_table_location(self.config)
+        location.insert_in_search_area(self.config)

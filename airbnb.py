@@ -26,6 +26,7 @@ from airbnb_config import ABConfig
 from airbnb_survey import ABSurveyByBoundingBox
 from airbnb_survey import ABSurveyByNeighborhood, ABSurveyByZipcode
 from airbnb_listing import ABListing
+from airbnb_geocoding import BoundingBox
 import airbnb_ws
 
 # ============================================================================
@@ -308,7 +309,7 @@ def db_get_room_to_fill(config, survey_id):
     return None
 
 
-def db_add_search_area(config, search_area, flag):
+def db_add_search_area(config, search_area, flag): # version of tom slee
     """
     Add a search_area to the database.
     """
@@ -547,7 +548,9 @@ def main():
         elif args.fill is not None:
             fill_loop_by_room(ab_config, args.fill)
         elif args.addsearcharea:
-            db_add_search_area(ab_config, args.addsearcharea, ab_config.FLAGS_ADD)
+            bounding_box = BoundingBox.from_google(ab_config, args.addsearcharea)
+            bounding_box.add_search_area(ab_config, args.addsearcharea)
+            # db_add_search_area(ab_config, args.addsearcharea, ab_config.FLAGS_ADD) # tom slee version
         elif args.add_survey:
             db_add_survey(ab_config, args.add_survey)
         elif args.dbping:
@@ -584,7 +587,6 @@ def main():
             survey.search(ab_config.FLAGS_PRINT)
         elif args.update_cities:
             update_city(ab_config, args.update_cities)
-            exit(0)
         else:
             parser.print_help()
     except (SystemExit, KeyboardInterrupt):
@@ -592,6 +594,7 @@ def main():
     except Exception:
         logging.exception("Top level exception handler: quitting.")
         sys.exit(0)
+
 
 if __name__ == "__main__":
     main()
