@@ -762,8 +762,16 @@ class ABListing():
             raise
     
     def get_location_id(self):
-        """ pensar melhor """
         location = Location(self.latitude, self.longitude) # initialize a location with coordinates
         location.reverse_geocode(self.config) # find atributes for location with google api key
         self.location_id = location.insert_in_table_location(self.config)
+        if location.get_country() != "N/A":
+            self.country = location.get_country()
+        if location.get_level2() != "N/A":
+            self.city = location.get_level2()
+        if location.get_neighborhood() != "N/A":
+            self.neighborhood = location.get_neighborhood()
+        if location.get_sublocality() != "N/A":
+            self.sublocality = location.get_neighborhood()
+
         location.insert_in_search_area(self.config)

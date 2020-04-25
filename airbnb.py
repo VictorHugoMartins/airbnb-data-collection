@@ -408,6 +408,43 @@ def fill_loop_by_room(config, survey_id):
             raise
 
 
+def search_sublocaties_by_bounding_box(config, city):
+    try:
+        rowcount = -1
+        logging.info("Initializing search by sublocalities")
+        conn = config.connect()
+        cur = conn.cursor()
+
+        sql = """SELECT name from search_area, sublocality, level2 where
+            level2.level2_name = %s and level2.level2_id = sublocality.level2_id
+            and sublocality.sublocality_name = search_area.name order by name"""
+
+        cur.execute(sql, (city,))
+        rowcount = cur.rowcount
+        results = cur.fetchall()
+
+        if rowcount > 0:
+            # create new super_survey
+            sql = """INSERT into super_survey(city, date) values (%s, current_date) returning ss_id"""
+            cur.execute(sql, (city,))
+            ss_id = cur.fetchone()[0]
+
+            for result in results:
+                logging.info("Search by %s", result[0])
+                survey_id = db_add_survey(config,
+                                          city)
+                # update inserting super_survey_id
+                sql = """UPDATE survey set ss_id = %s where survey_id = %s"""
+                cur.execute(sql, (ss_id, survey_id))
+
+                survey = ABSurveyByBoundingBox(config, survey_id)
+                survey.search(config.FLAGS_ADD)
+    except Exception:
+        logging.error("Failed to search from sublocalities")
+        raise
+
+
+
 def parse_args():
     """
     Read and parse command-line arguments
@@ -507,14 +544,18 @@ def parse_args():
                        metavar='survey_id', type=int,
                        help="""search for rooms using survey_id,
                        by zipcode (NO LONGER SUPPORTED)""")
+    group.add_argument('-uc', '--update_cities',
+                       metavar='city_name', type=str,
+                       help="""update cities from a room""") # by victor
+    group.add_argument('-ss', '--search_sublocalities',
+                       metavar='city_name', type=str,
+                       help="""bounding box search from sublocalities""")
     group.add_argument('-V', '--version',
                        action='version',
                        version='%(prog)s, version ' +
                        str(SCRIPT_VERSION_NUMBER))
     group.add_argument('-?', action='help')
-    group.add_argument('-uc', '--update_cities',
-                       metavar='city_name', type=str,
-                       help="""update cities from a room""")
+    
 
     args = parser.parse_args()
     return (parser, args)
@@ -587,6 +628,8 @@ def main():
             survey.search(ab_config.FLAGS_PRINT)
         elif args.update_cities:
             update_city(ab_config, args.update_cities)
+        elif args.search_sublocalities:
+            search_sublocaties_by_bounding_box(ab_config, args.search_sublocalities)
         else:
             parser.print_help()
     except (SystemExit, KeyboardInterrupt):

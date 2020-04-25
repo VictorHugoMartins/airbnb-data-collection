@@ -46,7 +46,8 @@ class Location():
         Insert or update a location with the required address information
         """
         try:
-            logging.info("Adding location to database")
+            rowcount = -1
+            #logging.info("Adding location to database")
             conn = config.connect()
             cur = conn.cursor()
             
@@ -54,9 +55,10 @@ class Location():
             cur.execute("""
                 select location_id from location where sublocality = %s
             """, (self.sublocality,))
-            ( self.id ) = cur.fetchone()
+            rowcount = cur.rowcount
             
-            if cur.fetchone() is not None:
+            if rowcount > 0:
+                ( self.id ) = cur.fetchone()[0]
                 print("Location {} already exists".format(self.id))
                 return self.id
 
@@ -90,7 +92,6 @@ class Location():
                            self.lat_round,
                            self.lng_round,
                           )
-            print("DDDDDDDDDDDD")
             LOGGER.debug(update_args)
             cur.execute(sql, update_args)
             cur.close()
@@ -157,20 +158,26 @@ class Location():
 
         os.remove('geocode.json')
 
-        print(self.neighborhood)
-        print(self.sublocality)
-        print(self.locality)
-        print(self.level2)
-        print(self.level1)
-        print(self.country)
-
 
     def insert_in_search_area(self, config):
-        country_id = insert_country(self, config)
+        country_id = insert_country(self.country, config)
         level1_id = insert_level1(config, self.level1, country_id, self.country)
         level2_id = insert_level2(config, self.level2, level1_id, self.level1)
         insert_sublocality(config, self.sublocality, level2_id, self.level2)
-        print("Room inserted")
+
+
+    def get_country(self):
+        return self.country
+
+
+    def get_level2(self):
+        return self.level2
+
+    def get_neighborhood(self):
+        return self.neighborhood
+
+    def get_sublocality(self):
+        return self.sublocality
 
 
 class BoundingBox():
@@ -214,8 +221,8 @@ class BoundingBox():
         try:
             gmaps = googlemaps.Client(key=config.GOOGLE_API_KEY)
             results = gmaps.geocode((search_area))
-            print(results)
-            bounds = results[0]["geometry"]["bounds"]
+
+            bounds = results[0]["geometry"]["viewport"]
             bounding_box = (bounds["southwest"]["lat"],
                             bounds["northeast"]["lat"],
                             bounds["southwest"]["lng"],
@@ -241,7 +248,7 @@ class BoundingBox():
 
     def add_search_area(self, config, search_area):
         try:
-            logging.info("Adding search_area to database as new search area")
+            #logging.info("Adding search_area to database as new search area")
             # Add the search_area to the database anyway
             conn = config.connect()
             cur = conn.cursor()
@@ -288,21 +295,24 @@ class BoundingBox():
             raise
 
 
-def insert_country(location, config):
+def insert_country(country, config):
     """
-    Insert or update a location with the required address information
+    Insert a country
     """
     try:
-        logging.info("Adding country to database")
+        rowcount = -1
+        #logging.info("Adding country to database")
         conn = config.connect()
         cur = conn.cursor()
         # check if it exists
-        sql = """ SELECT country_id from country where country_name = %s """
-        cur.execute(sql, (location.country,))
-        ( country_id ) = cur.fetchone()
-        if cur.fetchone() is not None:
-            print("Country {} already exists".format(country_id+1))
-            return country_id
+        sql = """ SELECT country_id from country where country_name = %s limit 1"""
+        cur.execute(sql, (country,))
+        rowcount = cur.rowcount
+        
+        if rowcount > 0:
+            (country_id) = cur.fetchone()[0]
+            print("Country {} already exists".format(country))
+            return country_id + 1
 
         sql = """ SELECT max(country_id) from country limit 1"""
         cur.execute(sql)
@@ -314,7 +324,7 @@ def insert_country(location, config):
             country_id = 0
 
         sql = """ INSERT into country(country_id, country_name) VALUES (%s+1, %s) """
-        insert_args = (country_id, location.country)
+        insert_args = (country_id, country)
         LOGGER.debug(insert_args)
         cur.execute(sql, insert_args)
         cur.close()
@@ -322,8 +332,8 @@ def insert_country(location, config):
         print("Country ", country_id+1, " inserted")
 
         # insert sublocality in the list of search areas
-        bounding_box = BoundingBox.from_google(config, location.country)
-        bounding_box.add_search_area(config, location.country)
+        bounding_box = BoundingBox.from_google(config, country)
+        bounding_box.add_search_area(config, country)
         
         return country_id
     except:
@@ -333,22 +343,25 @@ def insert_country(location, config):
 
 def insert_level1(config, level1, country_id, country):
     """
-    Insert or update a location with the required address information
+    Insert a level1
     """
     try:
-        logging.info("Adding level1 to database")
+        rowcount = -1
+        #logging.info("Adding level1 to database")
         conn = config.connect()
         cur = conn.cursor()
 
         name = level1 + ", " + country
 
         # check if it exists
-        sql = """ SELECT level1_id from level1 where level1_name = %s """
+        sql = """ SELECT level1_id from level1 where level1_name = %s limit 1"""
         cur.execute(sql, (name,))
-        ( level1_id ) = cur.fetchone()
-        if cur.fetchone() is not None:
-            print("Level1 {} already exists".format(level1_id+1))
-            return level1_id
+        rowcount = cur.rowcount
+
+        if rowcount > 0:
+            (level1_id) = cur.fetchone()[0]
+            print("Level1 {} already exists".format(name))
+            return level1_id + 1
 
         sql = """ SELECT max(level1_id) from level1 limit 1"""
         cur.execute(sql)
@@ -371,7 +384,7 @@ def insert_level1(config, level1, country_id, country):
         bounding_box = BoundingBox.from_google(config, name)
         bounding_box.add_search_area(config, name) # for example, "Bauxita, Ouro Preto"
         
-        return level1_id
+        return level1_id + 1
     except:
         LOGGER.exception("Exception in insert_level1")
         raise
@@ -379,22 +392,25 @@ def insert_level1(config, level1, country_id, country):
 
 def insert_level2(config, level2, level1_id, level1):
     """
-    Insert or update a location with the required address information
+    Insert a level1
     """
     try:
-        logging.info("Adding level2 to database")
+        rowcount = -1
+        #logging.info("Adding level2 to database")
         conn = config.connect()
         cur = conn.cursor()
 
         name = level2 + ", " + level1
 
         # check if it exists
-        sql = """ SELECT level2_id from level2 where level2_name = %s """
+        sql = """ SELECT level2_id from level2 where level2_name = %s limit 1"""
         cur.execute(sql, (name,))
-        ( level2_id ) = cur.fetchone()
-        if cur.fetchone() is not None:
-            print("Level2 {} already exists".format(level2_id+1))
-            return level2_id
+        rowcount = cur.rowcount
+
+        if rowcount > 0:
+            ( level2_id ) = cur.fetchone()[0]
+            print("Level2 {} already exists".format(name))
+            return level2_id + 1
 
         sql = """ SELECT max(level2_id) from level2 limit 1"""
         cur.execute(sql)
@@ -417,7 +433,7 @@ def insert_level2(config, level2, level1_id, level1):
         bounding_box = BoundingBox.from_google(config, name)
         bounding_box.add_search_area(config, name) # for example, "Bauxita, Ouro Preto"
         
-        return level2_id
+        return level2_id + 1
     except:
         LOGGER.exception("Exception in insert_level2")
         raise
@@ -425,22 +441,26 @@ def insert_level2(config, level2, level1_id, level1):
 
 def insert_sublocality(config, sublocality, level2_id, level2):
     """
-    Insert or update a location with the required address information
+    Insert a sublocality
     """
     try:
-        logging.info("Adding sublocality to database")
+        rowcount = -1
+
+        #logging.info("Adding sublocality to database")
         conn = config.connect()
         cur = conn.cursor()
 
         name = sublocality + ", " + level2
 
         # check if it exists
-        sql = """ SELECT sublocality_id from sublocality where sublocality_name = %s """
+        sql = """ SELECT sublocality_id from sublocality where sublocality_name = %s limit 1 """
         cur.execute(sql, (name,))
-        ( sublocality_id ) = cur.fetchone()
-        if cur.fetchone() is not None:
-            print("Sublocality {} already exists".format(sublocality_id+1))
-            return sublocality_id
+        rowcount = cur.rowcount
+
+        if rowcount > 0:
+            ( sublocality_id ) = cur.fetchone()[0]
+            print("Level2 {} already exists".format(name))
+            return sublocality_id + 1
 
         sql = """ SELECT max(sublocality_id) from sublocality limit 1"""
         cur.execute(sql)
@@ -463,7 +483,7 @@ def insert_sublocality(config, sublocality, level2_id, level2):
         bounding_box = BoundingBox.from_google(config, name)
         bounding_box.add_search_area(config, name) # for example, "Bauxita, Ouro Preto"
         
-        return sublocality_id
+        return sublocality_id + 1
     except:
         LOGGER.exception("Exception in insert_sublocality")
         raise
