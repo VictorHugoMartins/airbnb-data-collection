@@ -5,6 +5,7 @@ import argparse
 import datetime as dt
 import logging
 from airbnb_config import ABConfig
+import os.path
 
 LOG_LEVEL = logging.INFO
 # Set up logging
@@ -128,8 +129,8 @@ def export_city_summary(ab_config, city, project, start_date):
                  " using project " + project)
     city_bar = city.replace(" ", "_").lower()
     today = dt.date.today().isoformat()
-    xlsxfile = ("./{project}/slee_{project}_{city_bar}_summary_{today}.xlsx"
-                ).format(project=project, city_bar=city_bar, today=today)
+    xlsxfile = directory + ("slee_{project}_{city_bar}_summary_{today}.xlsx"
+            ).format(project=project, city_bar=city_bar, today=today)
     writer = pd.ExcelWriter(xlsxfile, engine="xlsxwriter")
     df = survey_df(ab_config, city, start_date)
     city_view = city_view_name(ab_config, city)
@@ -160,7 +161,7 @@ def export_city_summary(ab_config, city, project, start_date):
     writer.save()
 
 
-def export_city_data(ab_config, city, project, format, start_date):
+def export_city_data(ab_config, city, project, format, start_date, directory):
     logging.info(" ---- Exporting " + format +
                  " for " + city +
                  " using project " + project)
@@ -217,7 +218,7 @@ def export_city_data(ab_config, city, project, format, start_date):
     if format == "csv":
         for survey_id, survey_date in \
                 zip(survey_ids, survey_dates):
-            csvfile = ("./{project}/ts_{city_bar}_{survey_date}.csv").format(
+            csvfile = ("{project}/ts_{city_bar}_{survey_date}.csv").format(
                 project=project, city_bar=city_bar,
                 survey_date=str(survey_date))
             csvfile = csvfile.lower()
@@ -231,8 +232,8 @@ def export_city_data(ab_config, city, project, format, start_date):
             # default encoding is 'utf-8' on Python 3
     else:
         today = dt.date.today().isoformat()
-        xlsxfile = ("./{project}/slee_{project}_{city_bar}_{today}.xlsx"
-                    ).format(project=project, city_bar=city_bar, today=today)
+        xlsxfile = directory + ("slee_{project}_{city_bar}_summary_{today}.xlsx"
+                ).format(project=project, city_bar=city_bar, today=today)
         writer = pd.ExcelWriter(xlsxfile, engine="xlsxwriter")
         logging.info("Spreadsheet name: " + xlsxfile)
         # read surveys
@@ -300,6 +301,42 @@ def export_city_data(ab_config, city, project, format, start_date):
         writer.save()
 
 
+def export_by_sublocalities(config, city, project, format, start_date):
+    # create a directory for all the data for the city
+    directory = ('{project}/{city}/').format(project=project, city=city)
+    if not os.path.isdir(directory): # if directory don't exists, create
+        os.mkdir(directory)
+
+    # first export the data from the city itself
+    export_city_data(config, city, project.lower(),
+                    format, start_date, directory)
+    try:
+        rowcount = -1
+        logging.info("Initializing search by sublocalities")
+        conn = config.connect()
+        cur = conn.cursor()
+
+        sql = """SELECT name from search_area, sublocality, level2 where
+            level2.level2_name = %s and level2.level2_id = sublocality.level2_id
+            and sublocality.sublocality_name = search_area.name
+            and strpos(sublocality_name, 'N/A') = 0
+            order by name""" # pensar melhor #
+            # tratar problema do n/a
+
+        cur.execute(sql, (city,))
+        rowcount = cur.rowcount
+        results = cur.fetchall()
+
+        if rowcount > 0:
+            for result in results:
+                export_city_data(config, result[0], project.lower(),
+                    format, start_date, directory)
+    except Exception:
+        logging.error("Failed to export by sublocalities")
+        raise
+
+
+
 def main():
     parser = \
         argparse.ArgumentParser(
@@ -328,6 +365,9 @@ def main():
     args = parser.parse_args()
     ab_config = ABConfig(args)
 
+    export_by_sublocalities(ab_config, args.city, args.project.lower(),
+                    args.format, args.start_date)
+    exit(0)
     if args.city:
         if args.summary:
             export_city_summary(ab_config, args.city, args.project.lower(),
