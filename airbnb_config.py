@@ -49,6 +49,7 @@ class ABConfig():
         self.HTTP_PROXY_LIST = []
         self.HTTP_PROXY_LIST_COMPLETE = []
         self.GOOGLE_API_KEY = None
+        self.ATTEMPTS_TO_FIND_PAGE = 10
 
         try:
             config = configparser.ConfigParser()
