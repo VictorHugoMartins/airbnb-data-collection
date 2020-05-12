@@ -11,6 +11,14 @@ import psycopg2
 import json
 import airbnb_ws
 from airbnb_geocoding import Location
+import sys
+import random
+import time
+from datetime import date
+from bs4 import BeautifulSoup
+import json
+import airbnb_ws
+from airbnb_reviews import ABReview
 
 logger = logging.getLogger()
 
@@ -32,6 +40,7 @@ class ABListing():
         self.neighborhood = None
         self.address = None
         self.reviews = None
+        self.reviews_text = False
         self.overall_satisfaction = None
         self.accommodates = None
         self.bedrooms = None
@@ -56,7 +65,13 @@ class ABListing():
         # rate_type (str) - "nightly" or other?
         self.rate_type = None
         """ """
-        self.location_id = None
+        self.sublocality = None
+        self.route = None
+        self.is_superhost = None
+        self.max_nights = None
+        self.avg_rating = None
+        self.person_capacity = None
+
         logger.setLevel(config.log_level)
 
     def status_check(self):
@@ -137,7 +152,7 @@ class ABListing():
                 if (rowcount == 0 or
                         insert_replace_flag == self.config.FLAGS_INSERT_NO_REPLACE):
                     try:
-                        self.get_location_id()
+                        # self.get_location()
                         self.__insert()
                         return True
                     except psycopg2.IntegrityError:
@@ -181,7 +196,6 @@ class ABListing():
     def print_from_web_site(self):
         """ What it says, although now nothing printed as the parsing code is
         broken """
-        return
         try:
             print_string = "Room info:"
             print_string += "\n\troom_id:\t" + str(self.room_id)
@@ -206,7 +220,7 @@ class ABListing():
             print_string += "\n\tcoworker_hosted:\t" + str(self.coworker_hosted)
             print_string += "\n\tlanguages:\t" + str(self.extra_host_languages)
             print_string += "\n\tproperty_type:\t" + str(self.property_type)
-            print(print_string)
+            #print(print_string)
         except Exception:
             raise
 
@@ -248,7 +262,7 @@ class ABListing():
             response = airbnb_ws.ws_request_with_repeats(self.config, room_url)
             if response is not None:
                 page = response.text
-                tree = html.fromstring(page)
+                tree = html.fromstring(page)                
                 self.__get_room_info_from_tree(tree, flag)
                 logger.info("Room %s: found", self.room_id)
                 return True
@@ -278,14 +292,12 @@ class ABListing():
                     accommodates, bedrooms, bathrooms, price, deleted,
                     minstay, latitude, longitude, survey_id,
                     coworker_hosted, extra_host_languages, name,
-                    property_type, currency, rate_type, location_id
-
-                )
-                """
-            sql += """
+                    property_type, currency, rate_type,
+                    sublocality, route, is_superhost,
+                    max_nights, avg_rating)
                 values (%s, %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s, %s, %s
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                %s, %s, %s, %s, %s, %s, %s, %s, %s
                 )"""
             insert_args = (
                 self.room_id, self.host_id, self.room_type, self.country,
@@ -294,7 +306,9 @@ class ABListing():
                 self.bathrooms, self.price, self.deleted, self.minstay,
                 self.latitude, self.longitude, self.survey_id,
                 self.coworker_hosted, self.extra_host_languages, self.name,
-                self.property_type, self.currency, self.rate_type, self.location_id
+                self.property_type, self.currency, self.rate_type,
+                self.sublocality, self.route, self.is_superhost,
+                self.max_nights, self.avg_rating
                 )
             cur.execute(sql, insert_args)
             cur.close()
@@ -302,7 +316,7 @@ class ABListing():
             logger.debug("Room " + str(self.room_id) + ": inserted")
             logger.debug("(lat, long) = ({lat:+.5f}, {lng:+.5f})".format(lat=self.latitude, lng=self.longitude))
         except psycopg2.IntegrityError:
-            # logger.info("Room " + str(self.room_id) + ": insert failed")
+            logger.info("Room " + str(self.room_id) + ": insert failed")
             conn.rollback()
             cur.close()
             raise
@@ -526,6 +540,12 @@ class ABListing():
 
     def __get_reviews(self, tree):
         try:
+            # 2020-05-09
+            x = tree.xpath("//*[@id='reviews']/div/div/section/div[1]/div/div[2]/div[1]/div/div/div/div/div/div[3]/span[1]/text()")
+            if x is not None:
+                self.reviews = x[0]
+                return True
+
             # 2016-04-10
             s = tree.xpath("//meta[@id='_bootstrap-listing']/@content")
             # 2015-10-02
@@ -564,6 +584,33 @@ class ABListing():
             logger.exception(e)
             self.reviews = None
 
+    def __get_reviews_text(self, tree):
+        try:
+        
+            # 2020-05-10
+            s = tree.xpath("//script[@id='data-state']/text()")
+            
+            if s is not None:
+                j = json.loads(s[0])
+
+                r = j["bootstrapData"]["reduxData"]["homePDP"]["listingInfo"]["listing"]["sorted_reviews"]
+
+                if int(self.reviews) > 7:
+                    qtd_reviews = 7
+                else:
+                    qtd_reviews = int(self.reviews)
+                for i in range(qtd_reviews):
+                    review = ABReview(self.config, r[i], self.room_id)
+            return True
+        except IndexError:
+            return True
+        except KeyError:
+            logger.info("Page has unexpected structure")
+            return False
+        except Exception as e:
+            logger.exception(e)
+            return False
+ 
     def __get_accommodates(self, tree):
         try:
             # 2016-04-10
@@ -599,6 +646,7 @@ class ABListing():
                 self.accommodates = self.accommodates.split('+')[0]
                 self.accommodates = self.accommodates.split(' ')[0]
             self.accommodates = int(self.accommodates)
+            
         except:
             self.accommodates = None
 
@@ -713,23 +761,38 @@ class ABListing():
             # latitude, room_type, host_id) and so are marked with a
             # warning.  Items coded in <meta
             # property="airbedandbreakfast:*> elements -- country --
-
-            self.__get_country(tree)
-            self.__get_city(tree)
-            self.__get_rating(tree)
-            self.__get_latitude(tree)
-            self.__get_longitude(tree)
-            self.__get_host_id(tree)
-            self.__get_room_type(tree)
-            self.__get_neighborhood(tree)
-            self.__get_address(tree)
-            self.__get_reviews(tree)
-            self.__get_accommodates(tree)
-            self.__get_bedrooms(tree)
-            self.__get_bathrooms(tree)
-            self.__get_minstay(tree)
-            self.__get_price(tree)
-            self.__get_location()
+            
+            if self.country is None:
+                self.__get_country(tree)
+            if self.city is None:
+                self.__get_city(tree)
+            if self.overall_satisfaction is None:
+                self.__get_rating(tree)
+            if self.latitude is None:
+                self.__get_latitude(tree)
+            if self.longitude is None:
+                self.__get_longitude(tree)
+            if self.host_id is None:
+                self.__get_host_id(tree)
+            if self.room_type is None:
+                self.__get_room_type(tree)
+            if self.neighborhood is None:
+                self.__get_neighborhood(tree)
+            if self.address is None:
+                self.__get_address(tree)
+            if self.reviews is None:
+                self.__get_reviews(tree)
+            self.__get_reviews_text(tree)
+            if self.accommodates is None:
+                self.__get_accommodates(tree)
+            if self.bedrooms is None:
+                self.__get_bedrooms(tree)
+            if self.bathrooms is None:
+                self.__get_bathrooms(tree)
+            # self.__get_minstay(tree) # get min_nights in json listing
+            if self.price is None:
+                self.__get_price(tree)
+            # self.__get_location()
             self.deleted = 0
 
             # NOT FILLING HERE, but maybe should? have to write helper methods:
@@ -761,10 +824,10 @@ class ABListing():
             logger.exception("Error parsing web page.")
             raise
     
-    def get_location_id(self):
+    def get_location(self):
         location = Location(self.latitude, self.longitude) # initialize a location with coordinates
         location.reverse_geocode(self.config) # find atributes for location with google api key
-        self.location_id = location.insert_in_table_location(self.config)
+        
         if location.get_country() != "N/A":
             self.country = location.get_country()
         if location.get_level2() != "N/A":
@@ -772,6 +835,42 @@ class ABListing():
         if location.get_neighborhood() != "N/A":
             self.neighborhood = location.get_neighborhood()
         if location.get_sublocality() != "N/A":
-            self.sublocality = location.get_neighborhood()
+            self.sublocality = location.get_sublocality()
+        if location.get_route() != "N/A":
+            self.route = location.get_route()
 
         location.insert_in_search_area(self.config)
+
+    def get_comments(self):
+        """ Get the reviews properties from the web site """
+        try:
+            # initialization
+            logger.info("-" * 70)
+            logger.info("Room " + str(self.room_id) +
+                        ": getting from Airbnb web site")
+            room_url = self.config.URL_ROOM_ROOT + str(self.room_id)
+            response = airbnb_ws.ws_request_with_repeats(self.config, room_url)
+            if response is not None:
+                page = response.text
+                tree = html.fromstring(page)
+
+                if self.__get_reviews(tree) == False:
+                    return False
+                elif self.reviews == 0:
+                    print("No reviews to find")
+                    return True
+                else:
+                    self.__get_reviews_text(tree)
+                
+                logger.info("Room %s: found", self.room_id)
+                return True
+            else:
+                logger.info("Room %s: not found", self.room_id)
+                return False
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except Exception as ex:
+            logger.exception("Room " + str(self.room_id) +
+                             ": failed to retrieve from web site.")
+            logger.error("Exception: " + str(type(ex)))
+            raise

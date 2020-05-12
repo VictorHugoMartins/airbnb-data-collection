@@ -32,6 +32,7 @@ class Location():
         self.level2 = STRING_NA
         self.level1 = STRING_NA
         self.country = STRING_NA
+        self.route = STRING_NA
 
     @classmethod
     def from_db(cls, lat_round, lng_round):
@@ -39,7 +40,6 @@ class Location():
         Get a location (address etc) by reading from the database
         """
         return cls(lat_round, lng_round)
-
 
     def insert_in_table_location(self, config):
         """
@@ -59,7 +59,7 @@ class Location():
             
             if rowcount > 0:
                 ( self.id ) = cur.fetchone()[0]
-                print("Location {} already exists".format(self.id))
+                LOGGER.debug("Location {} already exists".format(self.id))
                 return self.id
 
             sql = """
@@ -96,7 +96,7 @@ class Location():
             cur.execute(sql, update_args)
             cur.close()
             conn.commit()
-            print("Location ", self.id, " inserted")
+            LOGGER.debug("Location ", self.id, " inserted")
             
             return self.id
         except:
@@ -154,30 +154,71 @@ class Location():
                     elif (self.country == STRING_NA
                           and "country" in address_component["types"]):
                         self.country = address_component["long_name"]
-
+                    elif (self.route == STRING_NA
+                          and "route" in address_component["types"]):
+                        self.route = address_component["long_name"]
 
         os.remove('geocode.json')
 
 
     def insert_in_search_area(self, config):
+        # insert country
+        bounding_box = BoundingBox.from_google(config, self.country)
+        bounding_box.add_search_area(config, self.country)
+
+        # insert country
+        bounding_box = BoundingBox.from_google(config, self.level1 + ', ' + self.country)
+        bounding_box.add_search_area(config, self.level1 + ', ' + self.country)
+
+        # insert country
+        bounding_box = BoundingBox.from_google(config, self.level2 + ', ' + self.level1)
+        bounding_box.add_search_area(config, self.level2 + ', ' + self.level1)
+
+        # insert country
+        bounding_box = BoundingBox.from_google(config, self.sublocality + ', ' + self.level2)
+        bounding_box.add_search_area(config, self.sublocality + ', ' + self.level2)
+        '''
         country_id = insert_country(self.country, config)
         level1_id = insert_level1(config, self.level1, country_id, self.country)
         level2_id = insert_level2(config, self.level2, level1_id, self.level1)
-        insert_sublocality(config, self.sublocality, level2_id, self.level2)
+        insert_sublocality(config, self.sublocality, level2_id, self.level2)'''
 
 
     def get_country(self):
         return self.country
 
-
     def get_level2(self):
         return self.level2
+
+    def get_level1(self):
+        return self.level1
 
     def get_neighborhood(self):
         return self.neighborhood
 
     def get_sublocality(self):
         return self.sublocality
+
+    def get_route(self):
+        return self.route
+
+    def get_sublocality_id(self, config):
+        try:
+            rowcount = -1
+            #logging.info("Adding location to database")
+            conn = config.connect()
+            cur = conn.cursor()
+            
+            # check if it exists
+            cur.execute(""" select sublocality_id from sublocality where sublocality_name = %s """, (self.sublocality,))
+            rowcount = cur.rowcount
+            
+            if rowcount > 0:
+                ( sublocality_id ) = cur.fetchone()[0]
+                return sublocality_id
+        except:
+            LOGGER.exception("Exception in get sublocality")
+            raise
 
 
 class BoundingBox():
@@ -222,6 +263,20 @@ class BoundingBox():
             gmaps = googlemaps.Client(key=config.GOOGLE_API_KEY)
             results = gmaps.geocode((search_area))
 
+            bounds = results[0]["geometry"]["bounds"]
+            bounding_box = (bounds["southwest"]["lat"],
+                            bounds["northeast"]["lat"],
+                            bounds["southwest"]["lng"],
+                            bounds["northeast"]["lng"],)
+            return cls(bounding_box)
+        except IndexError:
+            bounds = results[0]["geometry"]["viewport"]
+            bounding_box = (bounds["southwest"]["lat"],
+                            bounds["northeast"]["lat"],
+                            bounds["southwest"]["lng"],
+                            bounds["northeast"]["lng"],)
+            return cls(bounding_box)
+        except KeyError:
             bounds = results[0]["geometry"]["viewport"]
             bounding_box = (bounds["southwest"]["lat"],
                             bounds["northeast"]["lat"],
@@ -231,6 +286,61 @@ class BoundingBox():
         except:
             LOGGER.exception("Exception in BoundingBox_from_google: exiting")
             sys.exit()
+
+    def from_reverse_geocode(config, room_id, lat, lng):
+        try:
+
+            gmaps = googlemaps.Client(key=config.GOOGLE_API_KEY)
+            # Look up an address with reverse geocoding
+            # lat = 41.782
+            # lng = -72.693
+
+            results = gmaps.reverse_geocode((lat, lng))
+
+            # Parsing the result is described at
+            # https://developers.google.com/maps/documentation/geocoding/web-service-best-practices#ParsingJSON
+
+            json_file = open("geocode.json", mode="w", encoding="utf-8")
+            json_file.write(json.dumps(results, indent=4, sort_keys=True))
+            json_file.close()
+
+            if (len(results)) > 0:
+                bounds = results[0]["geometry"]["viewport"]
+                bounding_box = (bounds["southwest"]["lat"],
+                                bounds["northeast"]["lat"],
+                                bounds["southwest"]["lng"],
+                                bounds["northeast"]["lng"],)
+
+                conn = config.connect()
+                cur = conn.cursor()
+
+                sql = """SELECT name, sublocality_id from search_area, sublocality
+                        where bb_s_lat >= %s and bb_n_lat <= %s
+                        and bb_w_lng >= %s and bb_e_lng <= %s
+                        and strpos(sublocality_name, 'N/A') = 0
+                        and strpos(name, 'Ouro Preto') <> 0
+                        limit 1"""
+                args = (bounds["southwest"]["lat"],
+                        bounds["northeast"]["lat"],
+                        bounds["southwest"]["lng"],
+                        bounds["northeast"]["lng"],)
+                cur.execute(sql, (args))
+                results = cur.fetchall()
+                
+                for result in results:
+                    name = result[0]
+                    sublocality_id = result[1]
+
+
+                    ''' sql = """update room set sublocality = %s, sublocality_id = %s where room_id = %s"""
+                    args = (name, sublocality_id, room_id)
+                    cur.execute(sql, (args))
+                    cur.close()
+                    conn.commit()'''
+                    LOGGER.debug("Room " + str(room_id) + " updated. New sublocality: " + name)
+        except:
+            raise
+
 
     @classmethod
     def from_args(cls, config, args):
@@ -256,8 +366,11 @@ class BoundingBox():
             sql = """
             select name
             from search_area
-            where name = %s"""
-            cur.execute(sql, (search_area,))
+            where name = %s and bb_n_lat = %s and bb_e_lng = %s and bb_s_lat = %s and bb_w_lng = %s"""
+            cur.execute(sql, (search_area, self.bb_n_lat,
+                self.bb_e_lng,
+                self.bb_s_lat,
+                self.bb_w_lng))
             if cur.fetchone() is not None:
                 print("Area already exists: {}".format(search_area))
                 return True
@@ -287,6 +400,11 @@ class BoundingBox():
             # city_id = cur.lastrowid
             cur.close()
             conn.commit()
+
+
+            gmaps = googlemaps.Client(key=config.GOOGLE_API_KEY)
+            results = gmaps.geocode((search_area))
+
             print("Search area {} added: search_area_id = {}"
                   .format(search_area, search_area_id))
                    
@@ -299,6 +417,7 @@ def insert_country(country, config):
     """
     Insert a country
     """
+
     try:
         rowcount = -1
         #logging.info("Adding country to database")
@@ -311,7 +430,7 @@ def insert_country(country, config):
         
         if rowcount > 0:
             (country_id) = cur.fetchone()[0]
-            print("Country {} already exists".format(country))
+            LOGGER.debug("Country {} already exists".format(country))
             return country_id + 1
 
         sql = """ SELECT max(country_id) from country limit 1"""
@@ -329,7 +448,7 @@ def insert_country(country, config):
         cur.execute(sql, insert_args)
         cur.close()
         conn.commit()
-        print("Country ", country_id+1, " inserted")
+        LOGGER.debug("Country ", country_id+1, " inserted")
 
         # insert sublocality in the list of search areas
         bounding_box = BoundingBox.from_google(config, country)
@@ -360,7 +479,7 @@ def insert_level1(config, level1, country_id, country):
 
         if rowcount > 0:
             (level1_id) = cur.fetchone()[0]
-            print("Level1 {} already exists".format(name))
+            LOGGER.debug("Level1 {} already exists".format(name))
             return level1_id + 1
 
         sql = """ SELECT max(level1_id) from level1 limit 1"""
@@ -378,7 +497,7 @@ def insert_level1(config, level1, country_id, country):
         cur.execute(sql, insert_args)
         cur.close()
         conn.commit()
-        print("Level1 ", level1_id+1, " inserted")
+        LOGGER.debug("Level1 ", level1_id+1, " inserted")
 
         # insert sublocality in the list of search areas
         bounding_box = BoundingBox.from_google(config, name)
@@ -409,7 +528,7 @@ def insert_level2(config, level2, level1_id, level1):
 
         if rowcount > 0:
             ( level2_id ) = cur.fetchone()[0]
-            print("Level2 {} already exists".format(name))
+            LOGGER.debug("Level2 {} already exists".format(name))
             return level2_id + 1
 
         sql = """ SELECT max(level2_id) from level2 limit 1"""
@@ -427,7 +546,7 @@ def insert_level2(config, level2, level1_id, level1):
         cur.execute(sql, insert_args)
         cur.close()
         conn.commit()
-        print("Level2 ", level2_id+1, " inserted")
+        LOGGER.debug("Level2 ", level2_id+1, " inserted")
 
         # insert sublocality in the list of search areas
         bounding_box = BoundingBox.from_google(config, name)
@@ -459,7 +578,7 @@ def insert_sublocality(config, sublocality, level2_id, level2):
 
         if rowcount > 0:
             ( sublocality_id ) = cur.fetchone()[0]
-            print("Level2 {} already exists".format(name))
+            LOGGER.debug("Level2 {} already exists".format(name))
             return sublocality_id + 1
 
         sql = """ SELECT max(sublocality_id) from sublocality limit 1"""
@@ -477,7 +596,7 @@ def insert_sublocality(config, sublocality, level2_id, level2):
         cur.execute(sql, insert_args)
         cur.close()
         conn.commit()
-        print("Sublocality ", sublocality_id+1, " inserted")
+        LOGGER.debug("Sublocality ", sublocality_id+1, " inserted")
 
         # insert sublocality in the list of search areas
         bounding_box = BoundingBox.from_google(config, name)
@@ -535,8 +654,10 @@ def main():
     if args.update:
         results = select_rooms(config, args.update)
     elif args.lat and args.lng:
+        '''BoundingBox.from_reverse_geocode(config, 0, args.lat, args.lng)
+        exit(0)'''
         location = Location(args.lat, args.lng)
-        location.reverse_geocode(location)
+        location.reverse_geocode(config)
         location.insert_in_table_location(config)
     elif args.insert:
         bounding_box = BoundingBox.from_google(config, args.insert)
@@ -556,4 +677,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-# notes by victor: add loggers
+# selecionar route, sublocality e tal só quando for exportar os dados

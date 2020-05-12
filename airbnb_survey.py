@@ -164,8 +164,8 @@ class ABSurvey():
             else:
                 listing.coworker_hosted = None
             # The extra_host_language item is missing or elsewhere
-            if "extra_host_languages" in json_listing:
-                ehl = json_listing["extra_host_languages"]
+            if "host_languages" in json_listing:
+                ehl = json_listing["host_languages"]
                 if len(ehl) > 254:
                     listing.extra_host_languages = ehl[:254]
                 else:
@@ -180,14 +180,23 @@ class ABSurvey():
                     listing.name = lname
             else:
                 listing.name = None
-            if "property_type" in json_listing:
-                pt = json_listing["property_type"]
+            if "room_and_property_type" in json_listing:
+                pt = json_listing["room_and_property_type"]
                 if len(pt) > 254:
                     listing.property_type = pt[:254]
                 else:
                     listing.property_type = pt
-            else:
-                listing.property_type = None
+            if "is_superhost" in json_listing:
+                listing.is_superhost = json_listing["is_superhost"]
+            if "min_nights" in json_listing:
+                listing.minstay = json_listing["min_nights"]
+            if "max_nights" in json_listing:
+                listing.max_nights = json_listing["max_nights"]
+            if "avg_rating" in json_listing:
+                listing.avg_rating = json_listing["avg_rating"]
+            if "person_capacity" in json_listing:
+                listing.person_capacity = json_listing["person_capacity"]
+            
             # pricing
             json_pricing = json["pricing_quote"]
             listing.price = json_pricing["rate"]["amount"] if "rate" in json_pricing else None
@@ -622,6 +631,7 @@ class ABSurveyByBoundingBox(ABSurvey):
                         # params["items_offset"]   = str(18*items_offset)
                         params["section_offset"]   = str(8)
                     # make the http request
+
                     response = airbnb_ws.ws_request_with_repeats(
                         self.config, self.config.URL_API_SEARCH_ROOT, params)
                     # process the response
@@ -1007,7 +1017,7 @@ class ABSurveyByNeighborhood(ABSurvey):
                                      room_count=room_count,
                                      section_offset=str(section_offset + 1)))
                     if flag == self.config.FLAGS_PRINT:
-                        # for FLAGS_PRINT, fetch one page and print it
+                        # for FLAGS_PRINT, fetch one page and (print) it
                         sys.exit(0)
                     if room_count < self.config.SEARCH_LISTINGS_ON_FULL_PAGE:
                         logger.debug("Final page of listings for this search")
