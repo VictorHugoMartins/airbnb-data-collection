@@ -27,13 +27,17 @@ from airbnb_survey import ABSurveyByBoundingBox
 from airbnb_survey import ABSurveyByNeighborhood, ABSurveyByZipcode
 from airbnb_listing import ABListing
 from airbnb_geocoding import BoundingBox
+from airbnb_geocoding import Location
 import airbnb_ws
+from geopy import distance
 
 # ============================================================================
 # CONSTANTS
 # ============================================================================
 
 # Script version
+# 4.0 April 2020: Beginning of Victor Hugo's code changes, adapting the previously
+# developed work for UFOP research
 # 3.6 May 2019: Fixed problem where pagination was wrong because of a change in 
 # the Airbnb web site.
 # 3.5 July 2018: Added column to room table for rounded-off latitude and
@@ -52,7 +56,7 @@ import airbnb_ws
 # 2.6 adds a bounding box search
 # 2.5 is a bit of a rewrite: classes for ABListing and ABSurvey, and requests lib
 # 2.3 released Jan 12, 2015, to handle a web site update
-SCRIPT_VERSION_NUMBER = "3.7.0"
+SCRIPT_VERSION_NUMBER = "4.0"
 # logging = logging.getLogger()
 
 def list_search_area_info(config, search_area):
@@ -150,30 +154,6 @@ def db_ping(config):
             print("Connection test failed")
     except Exception:
         logging.exception("Connection test failed")
-
-
-def update_city(config, city):
-    """ Update cities in a room in the database. Raise an error if it fails.
-    Return number of rows affected."""
-    try:
-        rowcount = 0
-        conn = config.connect()
-        cur = conn.cursor()
-        sql = """
-            update room set city = %s where substring(address, 1, %s) = %s
-            """
-        update_args = (
-            city, len(city), city
-            )
-        cur.execute(sql, update_args)
-        rowcount = cur.rowcount
-        cur.close()
-        conn.commit()
-        print(str(rowcount) + " rooms updated")
-        return rowcount
-    except psycopg2.Error as pge:
-        logging.error("Failed to update cities")
-        raise
 
 
 def db_add_survey(config, search_area):
@@ -415,15 +395,26 @@ def search_sublocaties_by_bounding_box(config, city):
         conn = config.connect()
         cur = conn.cursor()
 
+
+        """SELECT distinct(search_area.name) from search_area, room
+            where room.city = 'Ouro Preto' and search_area.name = concat(room.sublocality, ', ', room.city) 
+            order by search_area.name"""
+
+        """os q n existem SELECT distinct(sublocality) from search_area, room
+        where room.city = 'Ouro Preto'
+        and concat(room.sublocality, ', ', room.city) not in ( select name from search_area where strpos(name, 'Ouro Preto') <> 0 )
+        order by sublocality"""
+        ''' for result in results insere em search_area e faz a busca AAAAAAA NAO SEI'''
         sql = """SELECT name from search_area, sublocality, level2 where
             level2.level2_name = %s and level2.level2_id = sublocality.level2_id
-            and sublocality.sublocality_name = search_area.name order by name"""
+            and sublocality.sublocality_name = search_area.name order by sublocality_name"""
 
         cur.execute(sql, (city,))
         rowcount = cur.rowcount
-        results = cur.fetchall()
 
         if rowcount > 0:
+            results = cur.fetchall()
+            logging.info("Sublocalities: %s", results)
             # create new super_survey
             sql = """INSERT into super_survey(city, date) values (%s, current_date) returning ss_id"""
             cur.execute(sql, (city,))
@@ -432,17 +423,294 @@ def search_sublocaties_by_bounding_box(config, city):
             for result in results:
                 logging.info("Search by %s", result[0])
                 survey_id = db_add_survey(config,
-                                          city)
+                                          result[0])
                 # update inserting super_survey_id
                 sql = """UPDATE survey set ss_id = %s where survey_id = %s"""
                 cur.execute(sql, (ss_id, survey_id))
 
                 survey = ABSurveyByBoundingBox(config, survey_id)
                 survey.search(config.FLAGS_ADD)
+
     except Exception:
         logging.error("Failed to search from sublocalities")
         raise
 
+
+def update_routes(config):
+    try:
+            conn = config.connect()
+            cur = conn.cursor()
+
+            sql = """SELECT room_id, latitude, longitude from room
+                    where route is not null and sublocality is  null and city = 'Ouro Preto'
+                    order by route""" # os q precisa atualizar
+            cur.execute(sql)
+            routes = cur.fetchall()
+
+            sql = """SELECT room_id, latitude, longitude, sublocality from room
+                    where route is not null and sublocality is not null and city = 'Ouro Preto'
+                    order by route""" # nenhum dos 2 é nulo
+            cur.execute(sql)
+            results = cur.fetchall()
+            print(str(cur.rowcount) + "routes")
+
+            for result in results:
+                room_id = result[0]
+                lat = result[1]
+                lng = result[2]
+                sublocality = result[3]
+
+                for route in routes:
+                    room_id = route[0]
+                    latitude = route[1]
+                    longitude = route[2]
+                    if is_inside(latitude, longitude, lat, lng):
+                        sql = """UPDATE room set sublocality = %s
+                                where room_id = %s"""
+                        update_args = (
+                            sublocality, room_id
+                            )
+                        cur.execute(sql, update_args)
+                        rowcount = cur.rowcount
+                        conn.commit()
+                        break
+                
+            exit(0)
+    except:
+        raise
+
+
+def is_inside(lat_center, lng_center, lat_test, lng_test):
+    center_point = [{'lat': lat_center, 'lng': lng_center}]
+    test_point = [{'lat': lat_test, 'lng': lng_test}]
+
+    for radius in range(100):
+        center_point_tuple = tuple(center_point[0].values()) # (-7.7940023, 110.3656535)
+        test_point_tuple = tuple(test_point[0].values()) # (-7.79457, 110.36563)
+
+        dis = distance.distance(center_point_tuple, test_point_tuple).km
+        
+        if dis <= radius:
+            print("{} point is inside the {} km radius from {} coordinate".format(test_point_tuple, radius/1000, center_point_tuple))
+            return True
+    return False
+
+
+def search_routes_by_bounding_box(config, city):
+    try:
+        rowcount = -1
+        logging.info("Initializing search by routes")
+        conn = config.connect()
+        cur = conn.cursor()
+
+
+        sql = """SELECT distinct(search_area.name) from search_area, route
+                where search_area.name = concat(route.name, ', ', city)
+                and city = %s
+                and bb_n_lat <> -20.3699597
+                and bb_e_lng <> -43.4719237
+                and bb_s_lat <> -20.4126148
+                and bb_w_lng <> -43.5313676
+                order by search_area.name asc"""
+
+        cur.execute(sql, (city,))
+        rowcount = cur.rowcount
+
+        if rowcount > 0:
+            results = cur.fetchall()
+            logging.info("Routes: %s", results)
+            # create new super_survey
+            sql = """INSERT into super_survey(city, date) values (%s, current_date) returning ss_id"""
+            cur.execute(sql, (city,))
+            ss_id = cur.fetchone()[0]
+
+            for result in results:
+                name = result[0]
+                
+                logging.info("Search by %s", name)
+                survey_id = db_add_survey(config, name)
+                # update inserting super_survey_id
+                sql = """UPDATE survey set ss_id = 22 where survey_id = %s"""
+                cur.execute(sql, ( survey_id,))
+
+                survey = ABSurveyByBoundingBox(config, survey_id)
+                survey.search(config.FLAGS_ADD)
+
+                if name == "Rua Grupiara, Ouro Preto":
+                    exit(0)
+
+    except Exception:
+        logging.error("Failed to search from sublocalities")
+        raise
+
+
+def search_reviews(config, survey_id):
+    try:
+        rowcount = -1
+        logging.info("Initializing search by reviews")
+        conn = config.connect()
+        cur = conn.cursor()
+
+
+        sql = """select room_id, survey_id from room where survey_id  in ( select survey_id from survey where ss_id = %s ) order by room_id"""
+
+        cur.execute(sql, (survey_id,))
+        rowcount = cur.rowcount
+
+        if rowcount > 0:
+            results = cur.fetchall()
+            
+            for result in results:
+                room_id = result[0]
+                listing = ABListing(config, room_id, survey_id)
+
+                ''' The page must obey a certain structure to return the comment data,
+                I defined the limit of attempts to find that page "complete" before moving on to the next room '''
+                for i in range(config.MAX_CONNECTION_ATTEMPTS):
+                    logging.info("Attempt {i}: searching for room {r}".format(i=i+1, r=room_id)) 
+                    if listing.get_comments():
+                        break
+
+    except Exception:
+        logging.error("Failed to search reviews")
+        raise
+
+
+def restart_super_survey(config, super_survey_id):
+    try:
+        rowcount = -1
+        logging.info("Restarting super survey")
+        conn = config.connect()
+        cur = conn.cursor()
+
+
+        sql = """SELECT distinct(survey_id) from survey
+                 where ss_id = %s
+                 order by survey_id"""
+
+        cur.execute(sql, (super_survey_id,))
+        rowcount = cur.rowcount
+
+        if rowcount > 0:
+            results = cur.fetchall()
+            
+            for result in results:
+                survey_id = result[0]
+
+                survey = ABSurveyByBoundingBox(config, survey_id)
+                survey.search(config.FLAGS_ADD)
+
+    except Exception:
+        logging.error("Failed to restart super survey")
+        raise
+
+
+def continue_super_survey_by_sublocality(config, ss_id):
+    try:
+        rowcount = -1
+        logging.info("Continue super survey")
+        conn = config.connect()
+        cur = conn.cursor()
+
+
+        sql = """SELECT distinct(sublocality) from room where city = 'Ouro Preto' and sublocality >
+                ( select survey_description from survey where ss_id = 33
+                  group by survey_id, survey_description
+                  order by survey_id desc limit 1
+                ) order by sublocality"""
+
+        cur.execute(sql, (ss_id,))
+        rowcount = cur.rowcount
+
+        if rowcount > 0:
+            results = cur.fetchall()
+            
+            for result in results:
+                sublocality = result[0]
+                logging.info("\nSearch by %s", sublocality)
+                survey_id = db_add_survey(config, sublocality + ", Ouro Preto")
+                # update inserting super_survey_id
+                sql = """UPDATE survey set ss_id = %s where survey_id = %s"""
+                cur.execute(sql, (ss_id, survey_id))
+
+                survey = ABSurveyByBoundingBox(config, survey_id)
+                survey.search(config.FLAGS_ADD)
+
+    except Exception:
+        logging.error("Failed to continue super survey")
+        raise
+
+
+def continue_super_survey_by_route(config, super_survey_id):
+    try:
+        rowcount = -1
+        logging.info("Initializing survey by routes")
+        conn = config.connect()
+        cur = conn.cursor()
+
+
+        sql = """SELECT distinct(route) from room where city = 'Ouro Preto' and route >
+                ( select survey_description from survey where ss_id = 33
+                  group by survey_id, survey_description
+                  order by survey_id desc limit 1
+                ) order by route"""
+
+        cur.execute(sql, (super_survey_id,))
+        rowcount = cur.rowcount
+
+        if rowcount > 0:
+            results = cur.fetchall()
+            
+            for result in results:
+                route = result[0]
+                logging.info("Search by %s", route)
+                survey_id = db_add_survey(config,
+                                          route)
+                # update inserting super_survey_id
+                sql = """UPDATE survey set ss_id = %s where survey_id = %s"""
+                cur.execute(sql, (ss_id, survey_id))
+
+                survey = ABSurveyByBoundingBox(config, survey_id)
+                survey.search(config.FLAGS_ADD)
+
+    except Exception:
+        logging.error("Failed to continue super survey")
+        raise
+
+def delete_room_repeats(config, super_survey_id):
+    try:
+        logging.info("Deleting repeats from super survey")
+        conn = config.connect()
+        cur = conn.cursor()
+
+
+        sql = """DELETE from room
+                where room_id in
+                    (select room_id from room
+                    group by room_id
+                    having Count(room_id)>1)
+                and not last_modified in
+                    (select max(last_modified) from room
+                    group by room_id
+                     having Count(room_id)>1)
+                """
+
+        cur.execute(sql, (super_survey_id,))
+        rowcount = cur.rowcount
+
+        if rowcount > 0:
+            print(rowcount + " rooms deleted")
+        else:
+            print("No rooms deleted")
+    except Exception:
+        logging.error("Failed to continue super survey")
+        raise
+
+def update_db_search_area():
+    # sql distinct(city), state for result insere (MAS PRA FAZER ISSO TEM Q INSERIR ESTADO NO ROOM)
+    # faz isso com sublocality, city e depois pra route, sublocality
+    # if sublocality is not None and route is not None: insere
+    return
 
 
 def parse_args():
@@ -547,9 +815,24 @@ def parse_args():
     group.add_argument('-uc', '--update_cities',
                        metavar='city_name', type=str,
                        help="""update cities from a room""") # by victor
-    group.add_argument('-ss', '--search_sublocalities',
+    group.add_argument('-sbs', '--search_sublocalities_by_bounding_box',
                        metavar='city_name', type=str,
                        help="""bounding box search from sublocalities""")
+    group.add_argument('-sbr', '--search_routes_by_bounding_box',
+                       metavar='city_name', type=str,
+                       help="""bounding box search from routes""")
+    group.add_argument('-sr', '--search_reviews',
+                       metavar='survey_id', type=int,
+                       help="""search reviews from a survey""")
+    group.add_argument('-rss', '--restart_super_survey',
+                       metavar='super_survey_id', type=int,
+                       help="""restart super survey""")
+    group.add_argument('-css', '--continue_super_survey_by_sublocality',
+                       metavar='super_survey_id', type=int,
+                       help="""continue super survey by sublocality""")
+    group.add_argument('-csr', '--continue_super_survey_by_route',
+                       metavar='super_survey_id', type=int,
+                       help="""continue super survey by route""")
     group.add_argument('-V', '--version',
                        action='version',
                        version='%(prog)s, version ' +
@@ -568,6 +851,7 @@ def main():
     (parser, args) = parse_args()
     logging.basicConfig(format='%(levelname)-8s%(message)s')
     ab_config = ABConfig(args)
+
     try:
         if args.search:
             survey = ABSurveyByNeighborhood(ab_config, args.search)
@@ -628,8 +912,18 @@ def main():
             survey.search(ab_config.FLAGS_PRINT)
         elif args.update_cities:
             update_city(ab_config, args.update_cities)
-        elif args.search_sublocalities:
+        elif args.search_sublocalities_by_bounding_box:
             search_sublocaties_by_bounding_box(ab_config, args.search_sublocalities)
+        elif args.search_routes_by_bounding_box:
+            search_routes_by_bounding_box(ab_config, args.search_routes_by_bounding_box)
+        elif args.search_reviews:
+            search_reviews(ab_config, args.search_reviews)
+        elif args.restart_super_survey:
+            restart_super_survey(ab_config, args.restart_super_survey)
+        elif args.continue_super_survey_by_route:
+            continue_super_survey_by_route(ab_config, args.continue_super_survey_by_route)
+        elif args.continue_super_survey_by_sublocality:
+            continue_super_survey_by_sublocality(ab_config, args.continue_super_survey_by_sublocality)
         else:
             parser.print_help()
     except (SystemExit, KeyboardInterrupt):
@@ -641,3 +935,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# > sao tomé
