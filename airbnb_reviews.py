@@ -23,7 +23,24 @@ logger = logging.getLogger()
 
 class ABReview():
 
-    def __init__(self, config, path, room_id):
+    def __init__(self, config, review_id):
+        self.config = config
+        self.review_id = review_id
+
+        self.room_id = None
+        self.comment = None
+        self.language = None
+        self.create_at = None
+        self.response = None
+        self.localized_date = None
+        self.reviewer_name = None
+        self.reviewer_id = None
+        self.rating = None
+        self.deleted = None
+        self.role = None
+        logger.setLevel(config.log_level)
+
+    def get_attributes(self, config, path, room_id):
 
         self.config = config
         self.room_id = room_id
@@ -37,12 +54,13 @@ class ABReview():
         self.reviewer_id = self.__get_reviewer_id(path)
         self.rating = self.__get_rating(path)
         self.deleted = self.__get_deleted(path)
+        self.role = self.__get_role(path)
 
         logger.setLevel(config.log_level)
 
-        self.__save(self.config.FLAGS_INSERT_REPLACE)
+        self.save(self.config.FLAGS_INSERT_REPLACE)
 
-    def __save(self, insert_replace_flag):
+    def save(self, insert_replace_flag):
         """
         Save a listing in the database. Delegates to lower-level methods
         to do the actual database operations.
@@ -51,7 +69,7 @@ class ABReview():
             False: listing already existed
         """
         try:
-            rowcount = -1
+            rowcount = 0#-1
             
             if insert_replace_flag == self.config.FLAGS_INSERT_REPLACE:
                 rowcount = self.__update()
@@ -109,13 +127,15 @@ class ABReview():
             sql = """
                 INSERT into reviews(id, room_id, comment, language,
                     create_at, response, localized_data,
-                    reviewer_name, reviewer_id, rating, deleted)
-                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    reviewer_name, reviewer_id, rating, deleted,
+                    role)
+                    values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """
             insert_args = (
                 self.review_id, self.room_id, self.comment, self.language,
-                self.create_at, self.response, self.localized_date, self.reviewer_name,
-                self.reviewer_id, self.rating, self.deleted
+                self.create_at, self.response, self.localized_date,
+                self.reviewer_name, self.reviewer_id, self.rating, self.deleted,
+                self.role
                 )
             cur.execute(sql, insert_args)
             cur.close()
@@ -142,14 +162,14 @@ class ABReview():
                 update reviews
                 set room_id = %s, comment = %s, language = %s,
                     create_at = %s, response = %s, localized_data = %s,
-                    reviewer_name = %s, reviewer_id = %s, rating = %s, deleted = %s,
+                    reviewer_name = %s, reviewer_id = %s, rating = %s, deleted = %s, role = %s,
                     last_modified = now()::timestamp
                 where id = %s"""
 
             update_args = (
                 self.room_id, self.comment, self.language,
                 self.create_at, self.response, self.localized_date, self.reviewer_name,
-                self.reviewer_id, self.rating, self.deleted, self.review_id
+                self.reviewer_id, self.rating, self.deleted, self.role, self.review_id
                 )
             logger.debug("Executing...")
             cur.execute(sql, update_args)
@@ -168,69 +188,65 @@ class ABReview():
     def __get_comment(self, path):
         try:
             return str(path["comments"])
-        except:
-            self.comment = None
-            raise
+        except KeyError:
+            return None
 
     def __get_language(self, path):
         try:
             return path["language"]
-        except:
-            self.language = None
-            raise
+        except KeyError:
+            return None
 
     def __get_review_id(self, path):
         try:
             return path["id"]
-        except:
-            self.review_id = None
-            raise
+        except KeyError:
+            return None
 
     def __get_created_at(self, path):
         try:
             return path["created_at"]
-        except:
-            self.create_at = None
-            raise
+        except KeyError:
+            return None
 
     def __get_deleted(self, path):
         try:
             return path["reviewee"]["deleted"]
-        except:
-            self.deleted = None
-            raise
+        except KeyError:
+            return None
 
     def __get_response(self, path):
         try:
             return path["response"]
-        except:
-            self.response = None
-            raise
+        except KeyError:
+            return None
 
     def __get_localized_date(self, path):
         try:
             return path["localized_date"]
-        except:
-            self.localized_date = None
-            raise
+        except KeyError:
+            return None
 
     def __get_reviewer_name(self, path):
         try:
             return path["reviewer"]["first_name"]
-        except:
-            self.reviewer_name = None
-            raise
+        except KeyError:
+            return None
 
     def __get_rating(self, path):
         try:
             return path["rating"]
-        except:
-            self.rating = None
-            raise
+        except KeyError:
+            return None
 
     def __get_reviewer_id(self, path):
         try:
             return path["reviewer"]["id"]
-        except:
-            self.rating = None
-            raise
+        except KeyError:
+            return None
+
+    def __get_role(self, path):
+        try:
+            return path["role"]
+        except KeyError:
+            return 'guest'

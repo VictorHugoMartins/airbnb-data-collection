@@ -217,6 +217,26 @@ WITH (
   OIDS=FALSE
 );
 
+CREATE TABLE public.booking_reviews
+(
+  review_id integer NOT NULL,
+  hotel_id integer,
+  room_id integer,
+  reviewer_id integer,
+  reviewer_name character varying(1023),
+  country character varying(1023),
+  date character varying(1023),
+  review_title character varying(5000),
+  review_body character varying(5000),
+  response integer,
+  room character varying(1023),
+  stay_date character varying(1023),
+  rating character varying(1023),
+  last_modified timestamp without time zone DEFAULT now()
+) WITH (
+  OIDS=FALSE
+);
+
 CREATE OR REPLACE FUNCTION public.trg_location()
   RETURNS trigger AS
 $BODY$

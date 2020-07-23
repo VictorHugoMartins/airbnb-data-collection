@@ -64,13 +64,13 @@ class ABListing():
         self.currency = None
         # rate_type (str) - "nightly" or other?
         self.rate_type = None
-        """ """
         self.sublocality = None
         self.route = None
         self.is_superhost = None
         self.max_nights = None
         self.avg_rating = None
         self.person_capacity = None
+        self.pictures = None
 
         logger.setLevel(config.log_level)
 
@@ -147,8 +147,9 @@ class ABListing():
             if self.deleted == 1:
                 self.save_as_deleted()
             else:
-                if insert_replace_flag == self.config.FLAGS_INSERT_REPLACE:
+                '''if insert_replace_flag == self.config.FLAGS_INSERT_REPLACE:
                     rowcount = self.__update()
+                '''
                 if (rowcount == 0 or
                         insert_replace_flag == self.config.FLAGS_INSERT_NO_REPLACE):
                     try:
@@ -262,7 +263,8 @@ class ABListing():
             response = airbnb_ws.ws_request_with_repeats(self.config, room_url)
             if response is not None:
                 page = response.text
-                tree = html.fromstring(page)                
+                tree = html.fromstring(page)  
+
                 self.__get_room_info_from_tree(tree, flag)
                 logger.info("Room %s: found", self.room_id)
                 return True
@@ -294,10 +296,10 @@ class ABListing():
                     coworker_hosted, extra_host_languages, name,
                     property_type, currency, rate_type,
                     sublocality, route, is_superhost,
-                    max_nights, avg_rating)
+                    max_nights, avg_rating, pictures)
                 values (%s, %s, %s, %s, %s, %s, %s, %s, %s,
                 %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s, %s, %s, %s, %s
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
                 )"""
             insert_args = (
                 self.room_id, self.host_id, self.room_type, self.country,
@@ -308,7 +310,7 @@ class ABListing():
                 self.coworker_hosted, self.extra_host_languages, self.name,
                 self.property_type, self.currency, self.rate_type,
                 self.sublocality, self.route, self.is_superhost,
-                self.max_nights, self.avg_rating
+                self.max_nights, self.avg_rating, self.pictures
                 )
             cur.execute(sql, insert_args)
             cur.close()
@@ -341,7 +343,7 @@ class ABListing():
                     price = %s, deleted = %s, last_modified = now()::timestamp,
                     minstay = %s, latitude = %s, longitude = %s,
                     coworker_hosted = %s, extra_host_languages = %s, name = %s,
-                    property_type = %s, currency = %s, rate_type = %s
+                    property_type = %s, currency = %s, rate_type = %s, pictures = %s
                 where room_id = %s
                 and survey_id = %s"""
             update_args = (
@@ -353,7 +355,7 @@ class ABListing():
                 self.minstay, self.latitude,
                 self.longitude,
                 self.coworker_hosted, self.extra_host_languages, self.name,
-                self.property_type, self.currency, self.rate_type,
+                self.property_type, self.currency, self.rate_type, self.pictures,
                 self.room_id,
                 self.survey_id,
                 )
@@ -591,22 +593,50 @@ class ABListing():
             s = tree.xpath("//script[@id='data-state']/text()")
             
             if s is not None:
+                print(s)
+                print("<- s")
                 j = json.loads(s[0])
 
                 r = j["bootstrapData"]["reduxData"]["homePDP"]["listingInfo"]["listing"]["sorted_reviews"]
-
-                if int(self.reviews) > 7:
-                    qtd_reviews = 7
-                else:
-                    qtd_reviews = int(self.reviews)
-                for i in range(qtd_reviews):
-                    review = ABReview(self.config, r[i], self.room_id)
-            return True
+                if r is not None:
+                    if self.reviews is None:
+                        return False
+                    elif int(self.reviews) > 7:
+                        qtd_reviews = 7
+                    elif int(self.reviews) <= 7:
+                        qtd_reviews = int(self.reviews)
+                    for individual_review in r:
+                        review = ABReview(self.config, individual_review, self.room_id)
+                    return True
         except IndexError:
             return True
         except KeyError:
-            logger.info("Page has unexpected structure")
-            return False
+            # 2020-05-17
+            try: # get reviews from guests
+                x = j["bootstrapData"]["reduxData"]["userProfile"]["api"]["serverData"]["user_profile"]["recent_reviews_from_guest"]
+                print(x)
+                if x is not None:
+                    logger.info("Reviews from host page")
+                    
+                    for individual_review in x:
+                        review = ABReview(self.config, individual_review, self.room_id)
+                    return True
+            except KeyError:
+                print("Page has unexpected structure")
+                return False
+            try: # get reviews from hosts
+                x = j["bootstrapData"]["reduxData"]["userProfile"]["api"]["serverData"]["user_profile"]["recent_reviews_from_host"]
+                
+                if x is not None:
+                    logger.info("Reviews from host page")
+                    
+                    print(x)
+                    for individual_review in x:
+                        review = ABReview(self.config, individual_review, self.room_id)
+                    return True
+            except KeyError:
+                print("Page has unexpected structure")
+                return False
         except Exception as e:
             logger.exception(e)
             return False
@@ -853,17 +883,44 @@ class ABListing():
             if response is not None:
                 page = response.text
                 tree = html.fromstring(page)
-
                 if self.__get_reviews(tree) == False:
                     return False
                 elif self.reviews == 0:
                     print("No reviews to find")
                     return True
                 else:
-                    self.__get_reviews_text(tree)
-                
-                logger.info("Room %s: found", self.room_id)
-                return True
+                    return self.__get_reviews_text(tree)
+            else:
+                logger.info("Room %s: not found", self.room_id)
+                return False
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except Exception as ex:
+            logger.exception("Room " + str(self.room_id) +
+                             ": failed to retrieve from web site.")
+            logger.error("Exception: " + str(type(ex)))
+            raise
+
+
+    def get_comments(self, host_id, response):
+        """ Get the reviews properties from the web site """
+        try:
+            # initialization
+            logger.info("-" * 70)
+            logger.info("Host " + str(host_id) +
+                        ": getting from Airbnb web site")
+            room_url = "airbnb.com.br/users/show/" + str(host_id)
+            
+            if response is not None:
+                page = response.text
+                tree = html.fromstring(page)
+                if self.__get_reviews(tree) == False:
+                    return False
+                elif self.reviews == 0:
+                    print("No reviews to find")
+                    return True
+                else:
+                    return self.__get_reviews_text(tree)
             else:
                 logger.info("Room %s: not found", self.room_id)
                 return False

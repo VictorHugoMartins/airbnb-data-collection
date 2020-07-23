@@ -19,6 +19,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from booking_reviews import BReview
+from airbnb_reviews import ABReview
 
 SCRIPT_VERSION_NUMBER = "4.0"
 logger = logging.getLogger()
@@ -115,15 +116,13 @@ def update_price(config, driver, city, room_id):
             print("This room don't have a price yet.")
             return
 
-        exit(0)
-        
         rowcount = -1
         logging.info("Searching for price")
         conn = config.connect()
         cur = conn.cursor()
 
-        sql = """UPDATE room set price = %s, last_modified = now()::timestamp
-            where room_id = %s and price is null"""
+        sql = """UPDATE room set price = %s, currency = 'RS', last_modified = now()::timestamp
+            where room_id = %s"""
         update_args = ( price, room_id )
         cur.execute(sql, update_args)
         conn.commit()
@@ -134,19 +133,20 @@ def update_price(config, driver, city, room_id):
         print("Unable to find element")
         raise
 
-def search(config, city):
+def update_with_preexistent_comodities(config, city, args):
     try:
         rowcount = -1
         logging.info("Initialing search by overall satisfactions")
         conn = config.connect()
         cur = conn.cursor()
 
-        sql = """SELECT distinct(room_id) from room where city = %s
-                and comodities is null
-                and price is null
-                and overall_satisfaction is null
-                and deleted = 1
-                order by room_id""" # and comodities is null and overall_satisfaction is null
+        print(city)
+
+        sql = """SELECT distinct(room_id), comodities from room where city = %s
+                and comodities is not null
+                order by room_id""" #and comodities is null
+                #and price is null
+                #and overall_satisfaction is null
 
         cur.execute(sql, (city,))
         rowcount = cur.rowcount
@@ -156,7 +156,43 @@ def search(config, city):
             results = cur.fetchall()
             for result in results:
                 room_id = result[0]
-                url = DOMAIN + str(room_id)
+                comodities = result[1]
+                rowcount = -1
+                sql = """UPDATE room set comodities = %s, last_modified = now()::timestamp
+                        where room_id = %s and comodities is null"""
+                update_args = ( comodities, room_id )
+                cur.execute(sql, update_args)
+                rowcount = cur.rowcount
+                conn.commit()
+                
+                print(rowcount, " comodities updated")
+        return True
+    except Exception:
+        logger.error("Failed to update comodities")
+        raise
+
+def search(config, city, args):
+    try:
+        rowcount = -1
+        logging.info("Initialing search by overall satisfactions")
+        conn = config.connect()
+        cur = conn.cursor()
+
+        sql = """SELECT distinct(room_id) from room where city = %s
+                and deleted = 0 and comodities is null and last_modified < '2020-07-17'
+                order by room_id""" #and comodities is null
+                #and price is null
+                #and overall_satisfaction is null
+
+        cur.execute(sql, (city,))
+        rowcount = cur.rowcount
+        print(rowcount, " results")
+
+        if rowcount > 0:
+            results = cur.fetchall()
+            for result in results:
+                room_id = result[0]
+                url = DOMAIN + str(result[0])
                 for i in range(config.ATTEMPTS_TO_FIND_PAGE):
                     try:
                         print("Attempt ", i+1, " to find room ", room_id)
@@ -167,10 +203,19 @@ def search(config, city):
                             save_as_deleted(config, room_id)
                             driver.quit()
                             break
-
-                        update_comodities(config, driver, city, room_id)
-                        update_overall_satisfaction(config, driver, city, room_id)
-                        update_price(config, driver, city, room_id)
+                        
+                        time.sleep(3) 
+                        driver.find_element_by_xpath('/html/body/div[1]/div[2]/div[4]/div[2]/div/button').click()
+                        time.sleep(3)  
+                        '''if args.comments:              
+                            get_reviews(config, driver, city, room_id)
+                            print("GET Os REVIEWS")'''
+                        if args.comodities:
+                            update_comodities(config, driver, city, room_id)
+                        '''if args.overall_satisfaction:
+                            update_overall_satisfaction(config, driver, city, room_id)
+                        if args.price:
+                            update_price(config, driver, city, room_id)'''
                         driver.quit()
                         break
                     except selenium.common.exceptions.TimeoutException:
@@ -179,6 +224,39 @@ def search(config, city):
     except Exception:
         logger.error("Failed to search overall satisfactions")
         raise
+
+def get_reviews(config, driver, city, room_id):
+    try:
+        driver.find_element_by_xpath('//*[@class="_19qg1ru"]/a[@class="_1v4ygly5"]').click()
+        time.sleep(5)
+    except selenium.common.exceptions.NoSuchElementException:
+        print("No reviews yet")
+        return
+    reviews = driver.find_element_by_xpath('//*[@class="_16hs373"]/div[@class="_1v5ksyp"]')
+    reviews = reviews.find_elements_by_xpath('//div[@class="_1gjypya"]')
+    print("ao tamanho ai: ", len(reviews))
+    for r in reviews:
+        try:
+            r.find_element_by_class_name('_1d079j1e').click()
+        except selenium.common.exceptions.NoSuchElementException:
+            print("")
+        x = r.text.split('\n')
+        review_id = int(r.get_attribute('data-review-id'))
+        review = ABReview(config, review_id)
+        review.room_id = room_id
+        review.localized_data = x[1]
+        review.comment = x[2]
+        review.reviewer_id = r.find_element_by_class_name('_105023be').get_attribute('href').\
+                        split('https://www.airbnb.com.br/users/show/')[1]
+        print("review id: ", review.review_id)
+        print("localized data:", review.localized_data)
+        print("comment", review.comment)
+        print("reviewer id", review.reviewer_id)
+
+        review.save(config.FLAGS_INSERT_REPLACE)
+    print("CHEGOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOU AQUIIIIIIII")
+    driver.quit()
+    return True
 
 def parse_args():
     """
@@ -195,18 +273,32 @@ def parse_args():
                         help="""explicitly set configuration file, instead of
                         using the default <username>.config""")
     parser.add_argument("-cd", "--check_date",
-                        default=True,
+                        action="store_true", default=True,
                         help="""search using a checkin-checkout date""") # para implementar
-    parser.add_argument("-or", "--only_reviews",
-                        default=False,
-                        help="""search only for reviews""") # para implementar
-
-    # Only one argument!
-    group = parser.add_mutually_exclusive_group()
-    group.add_argument('-sc', '--search_city',
+    parser.add_argument("-p", "--price",
+                        action="store_true", default=True,
+                        help="""update price""") # para implementar
+    parser.add_argument("-os", "--overall_satisfaction",
+                        action="store_true", default=True,
+                        help="""update overall_satisfaction""") # para implementar
+    parser.add_argument("-co", "--comodities",
+                        action="store_true", default=True,
+                        help="""update comodities""") # para implementar
+    parser.add_argument("-cm", "--comments",
+                        action="store_true", default=True,
+                        help="""update review's comment""") # para implementar
+    parser.add_argument("-upc", "--update_preexistent_comodities",
+                        action="store_true", default=False,
+                        help="""update comodities with values preexistents""") # para implementar
+    parser.add_argument('-sc', '--search_city',
                        metavar='city_name', type=str,
                        help="""search by a city
                        """) 
+    
+
+    # Only one argument!
+    group = parser.add_mutually_exclusive_group()
+    
 
     args = parser.parse_args()
     return (parser, args)
@@ -221,7 +313,11 @@ def main():
     
     try:
         if args.search_city:
-            search(config, args.search_city)
+            if args.update_preexistent_comodities:
+                print("aqui")
+                update_with_preexistent_comodities(config, args.search_city, args)
+            else:
+                search(config, args.search_city, args)
     except (SystemExit, KeyboardInterrupt):
         logger.debug("Interrupted execution")
         exit(0)

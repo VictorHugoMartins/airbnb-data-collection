@@ -2,6 +2,7 @@
 # ============================================================================
 # Airbnb web site scraper, for analysis of Airbnb listings
 # Tom Slee, 2013--2015.
+# Victor Martins, 2020.
 #
 # function naming conventions:
 #   ws_get = get from web site
@@ -15,6 +16,7 @@
 #   print = get from web site and print
 # ============================================================================
 import logging
+import requests
 import argparse
 import sys
 import time
@@ -388,7 +390,7 @@ def fill_loop_by_room(config, survey_id):
             raise
 
 
-def search_sublocaties_by_bounding_box(config, city):
+def search_sublocalities_by_bounding_box(config, city):
     try:
         rowcount = -1
         logging.info("Initializing search by sublocalities")
@@ -436,20 +438,62 @@ def search_sublocaties_by_bounding_box(config, city):
         raise
 
 
-def update_routes(config):
+def update_routes(config, city):
     try:
             conn = config.connect()
             cur = conn.cursor()
 
-            sql = """SELECT room_id, latitude, longitude from room
-                    where route is not null and sublocality is  null and city = 'Ouro Preto'
-                    order by route""" # os q precisa atualizar
+            sql = """SELECT distinct(room_id), latitude, longitude from room
+                    where route is null and
+                    ( sublocality is null or sublocality = '1392' or
+                    sublocality = '162' or sublocality = '302'
+                    or sublocality = '')
+                    and latitude <= -20.3699597 and latitude >= -20.4126148
+                    and longitude <= -43.4719237 and longitude >= -43.5313676
+                    order by room_id""" # os q precisa atualizar
             cur.execute(sql)
             routes = cur.fetchall()
+            print(str(cur.rowcount) + " routes to update")
 
-            sql = """SELECT room_id, latitude, longitude, sublocality from room
-                    where route is not null and sublocality is not null and city = 'Ouro Preto'
-                    order by route""" # nenhum dos 2 é nulo
+            sql = """SELECT distinct(room_id), latitude, longitude, sublocality from room
+                    where route is not null and ( sublocality is not null and sublocality <> '')
+                    and latitude <= -20.3699597 and latitude >= -20.4126148
+                    and longitude <= -43.4719237 and longitude >= -43.5313676
+                    and sublocality <> '1392' and sublocality <> '162' and sublocality <> '302'
+                    order by sublocality desc""" # nenhum dos 2 é nulo
+            cur.execute(sql)
+            results = cur.fetchall()
+            
+            for route in routes:
+                r_id = route[0]
+                latitude = route[1]
+                longitude = route[2]
+
+                for result in results: 
+                    room_id = result[0]
+                    lat = result[1]
+                    lng = result[2]
+                    sublocality = result[3]
+
+                    if is_inside(latitude, longitude, lat, lng):
+                        sql = """UPDATE room set sublocality = %s where room_id = %s"""
+                        update_args = ( sublocality, r_id )
+                        cur.execute(sql, update_args)
+                        conn.commit()
+
+                        print("Room ", r_id," updated for ", sublocality)
+                        break
+                
+    except:
+        raise
+
+
+def update_routes_geolocation(config):
+    try:
+            conn = config.connect()
+            cur = conn.cursor()
+
+            sql = """select room_id, latitude, longitude from room where route is null""" # nenhum dos 2 é nulo
             cur.execute(sql)
             results = cur.fetchall()
             print(str(cur.rowcount) + "routes")
@@ -458,24 +502,78 @@ def update_routes(config):
                 room_id = result[0]
                 lat = result[1]
                 lng = result[2]
-                sublocality = result[3]
 
-                for route in routes:
-                    room_id = route[0]
-                    latitude = route[1]
-                    longitude = route[2]
-                    if is_inside(latitude, longitude, lat, lng):
-                        sql = """UPDATE room set sublocality = %s
-                                where room_id = %s"""
-                        update_args = (
-                            sublocality, room_id
-                            )
-                        cur.execute(sql, update_args)
-                        rowcount = cur.rowcount
-                        conn.commit()
-                        break
+                location = Location(lat, lng) # initialize a location with coordinates
+                location.reverse_geocode(config) # find atributes for location with google api key
                 
-            exit(0)
+                if location.get_country() != "N/A":
+                    country = location.get_country()
+                else:
+                    country = None
+                if location.get_level2() != "N/A":
+                    city = location.get_level2()
+                else:
+                    city = None
+                if location.get_neighborhood() != "N/A":
+                    neighborhood = location.get_neighborhood()
+                else:
+                    neighborhood = None
+                if location.get_sublocality() != "N/A":
+                    sublocality = location.get_sublocality()
+                else:
+                    sublocality = None
+                if location.get_route() != "N/A":
+                    route = location.get_route()
+                else:
+                    route = None
+
+                sql = """UPDATE room set route = %s, sublocality = %s, city = %s, country = %s, neighborhood = %s
+                        where room_id = %s"""
+                update_args = (
+                    route, sublocality, city, country, neighborhood, room_id
+                    )
+                cur.execute(sql, update_args)
+                rowcount = cur.rowcount
+                print("Room ", room_id, " updated for ", route)
+                conn.commit()
+    except:
+        raise
+
+
+def update_cities(config, city):
+    try:
+        conn = config.connect()
+        cur = conn.cursor()
+
+        sql = """SELECT distinct(room_id), route, sublocality, city, country from room
+                where latitude <= -20.3699597 and latitude >= -20.4126148
+                and longitude <= -43.4719237 and longitude >= -43.5313676
+                and route is not null
+                
+                group by room_id, route, sublocality, city, country
+                order by room_id""" # os q precisa atualizar
+        cur.execute(sql)
+        results = cur.fetchall()
+        print(str(cur.rowcount) + " rooms to update")
+
+        i = 0 
+        for result in results:     
+            room_id = result[0]
+            route = result[1]
+            sublocality = result[2]
+            city = result[3]
+            country = result[4]
+
+            sql = """UPDATE room set route = %s,
+                    sublocality = %s,
+                    city = %s, country = %s
+                    where room_id = %s"""
+            update_args = ( route, sublocality, city, country, room_id )
+            cur.execute(sql, update_args)
+            conn.commit()
+
+            print(cur.rowcount, "room(s) ", room_id," updated for ", sublocality)
+                
     except:
         raise
 
@@ -484,14 +582,15 @@ def is_inside(lat_center, lng_center, lat_test, lng_test):
     center_point = [{'lat': lat_center, 'lng': lng_center}]
     test_point = [{'lat': lat_test, 'lng': lng_test}]
 
-    for radius in range(100):
+    for radius in range(50):
         center_point_tuple = tuple(center_point[0].values()) # (-7.7940023, 110.3656535)
         test_point_tuple = tuple(test_point[0].values()) # (-7.79457, 110.36563)
 
         dis = distance.distance(center_point_tuple, test_point_tuple).km
         
         if dis <= radius:
-            print("{} point is inside the {} km radius from {} coordinate".format(test_point_tuple, radius/1000, center_point_tuple))
+            print("{} point is inside the {} km radius from {} coordinate".\
+                    format(test_point_tuple, radius/1000, center_point_tuple))
             return True
     return False
 
@@ -507,10 +606,10 @@ def search_routes_by_bounding_box(config, city):
         sql = """SELECT distinct(search_area.name) from search_area, route
                 where search_area.name = concat(route.name, ', ', city)
                 and city = %s
-                and bb_n_lat <> -20.3699597
-                and bb_e_lng <> -43.4719237
-                and bb_s_lat <> -20.4126148
-                and bb_w_lng <> -43.5313676
+                and route.bb_n_lat <> -20.3699597
+                and route.bb_e_lng <> -43.4719237
+                and route.bb_s_lat <> -20.4126148
+                and route.bb_w_lng <> -43.5313676
                 order by search_area.name asc"""
 
         cur.execute(sql, (city,))
@@ -526,25 +625,21 @@ def search_routes_by_bounding_box(config, city):
 
             for result in results:
                 name = result[0]
-                
                 logging.info("Search by %s", name)
                 survey_id = db_add_survey(config, name)
                 # update inserting super_survey_id
-                sql = """UPDATE survey set ss_id = 22 where survey_id = %s"""
-                cur.execute(sql, ( survey_id,))
+                sql = """UPDATE survey set ss_id = %s where survey_id = %s"""
+                cur.execute(sql, (ss_id, survey_id))
 
                 survey = ABSurveyByBoundingBox(config, survey_id)
                 survey.search(config.FLAGS_ADD)
-
-                if name == "Rua Grupiara, Ouro Preto":
-                    exit(0)
 
     except Exception:
         logging.error("Failed to search from sublocalities")
         raise
 
 
-def search_reviews(config, survey_id):
+def search_reviews1(config, survey_id):
     try:
         rowcount = -1
         logging.info("Initializing search by reviews")
@@ -552,10 +647,14 @@ def search_reviews(config, survey_id):
         cur = conn.cursor()
 
 
-        sql = """select room_id, survey_id from room where survey_id  in ( select survey_id from survey where ss_id = %s ) order by room_id"""
+        sql = """SELECT room_id from room where survey_id  in
+                    ( select survey_id from survey where ss_id >= %s )
+                    and room_id not in ( select distinct(room_id) from reviews )
+                    and room_id in ( select distinct(room_id) from room where reviews > 0 ) order by room_id"""
 
         cur.execute(sql, (survey_id,))
         rowcount = cur.rowcount
+        logging.info(str(rowcount) + " rooms founded.")
 
         if rowcount > 0:
             results = cur.fetchall()
@@ -566,15 +665,90 @@ def search_reviews(config, survey_id):
 
                 ''' The page must obey a certain structure to return the comment data,
                 I defined the limit of attempts to find that page "complete" before moving on to the next room '''
-                for i in range(config.MAX_CONNECTION_ATTEMPTS):
+                for i in range(10):
                     logging.info("Attempt {i}: searching for room {r}".format(i=i+1, r=room_id)) 
                     if listing.get_comments():
                         break
+        else:
+            print("No rooms in this super survey")
 
     except Exception:
         logging.error("Failed to search reviews")
         raise
 
+
+def search_reviews(config, survey_id):
+    try:
+        rowcount = -1
+        logging.info("Initializing search by host reviews")
+        conn = config.connect()
+        cur = conn.cursor()
+
+
+        sql = """SELECT room_id, survey_id, host_id from room where reviews > 0 order by host_id desc"""
+
+        cur.execute(sql, (survey_id,))
+        rowcount = cur.rowcount
+        logging.info(str(rowcount) + " rooms founded.")
+
+        if rowcount > 0:
+            results = cur.fetchall()
+                     
+            for result in results:
+                room_id = result[0]
+                survey_id = result[1]
+                host_id = result[2]
+                listing = ABListing(config, room_id, survey_id)
+
+                response = requests.get('https://www.airbnb.com.br/users/show/' + str(host_id))
+                if response is not None:
+                    print(response.status_code)
+                    
+                    ''' The page must obey a certain structure to return the comment data,
+                    I defined the limit of attempts to find that page "complete" before moving on to the next room '''
+                    for i in range(10):
+                        logging.info("Attempt {i}: searching for room {r}".format(i=i+1, r=host_id)) 
+                        if listing.get_comments(host_id, response):
+                            print("Comments finded")
+                            break
+        else:
+            print("No rooms in this super survey")
+
+    except Exception:
+        logging.error("Failed to search reviews")
+        raise
+
+def get_comments(self):
+    """ Get the reviews properties from the web site """
+    try:
+        # initialization
+        logger.info("-" * 70)
+        logger.info("Host " + str(host_id) +
+                    ": getting from Airbnb web site")
+        room_url = "airbnb.com.br/users/show/" + str(host_id)
+        response = airbnb_ws.ws_request_with_repeats(self.config, room_url)
+        if response is not None:
+            page = response.text
+            tree = html.fromstring(page)
+            print(page)
+            exit(0)
+            if self.__get_reviews(tree) == False:
+                return False
+            elif self.reviews == 0:
+                print("No reviews to find")
+                return True
+            else:
+                return self.__get_reviews_text(tree)
+        else:
+            logger.info("Room %s: not found", self.room_id)
+            return False
+    except (KeyboardInterrupt, SystemExit):
+        raise
+    except Exception as ex:
+        logger.exception("Room " + str(self.host_id) +
+                         ": failed to retrieve from web site.")
+        logger.error("Exception: " + str(type(ex)))
+        raise
 
 def restart_super_survey(config, super_survey_id):
     try:
@@ -677,6 +851,7 @@ def continue_super_survey_by_route(config, super_survey_id):
         logging.error("Failed to continue super survey")
         raise
 
+
 def delete_room_repeats(config, super_survey_id):
     try:
         logging.info("Deleting repeats from super survey")
@@ -705,6 +880,7 @@ def delete_room_repeats(config, super_survey_id):
     except Exception:
         logging.error("Failed to continue super survey")
         raise
+
 
 def update_db_search_area():
     # sql distinct(city), state for result insere (MAS PRA FAZER ISSO TEM Q INSERIR ESTADO NO ROOM)
@@ -812,9 +988,9 @@ def parse_args():
                        metavar='survey_id', type=int,
                        help="""search for rooms using survey_id,
                        by zipcode (NO LONGER SUPPORTED)""")
-    group.add_argument('-uc', '--update_cities',
+    group.add_argument('-ur', '--update_routes',
                        metavar='city_name', type=str,
-                       help="""update cities from a room""") # by victor
+                       help="""update routes from rooms""") # by victor
     group.add_argument('-sbs', '--search_sublocalities_by_bounding_box',
                        metavar='city_name', type=str,
                        help="""bounding box search from sublocalities""")
@@ -910,10 +1086,11 @@ def main():
         elif args.printsearch_by_zipcode:
             survey = ABSurveyByZipcode(ab_config, args.printsearch_by_zipcode)
             survey.search(ab_config.FLAGS_PRINT)
-        elif args.update_cities:
-            update_city(ab_config, args.update_cities)
+        elif args.update_routes:
+            update_cities(ab_config, args.update_routes)
+            update_routes(ab_config, args.update_routes)
         elif args.search_sublocalities_by_bounding_box:
-            search_sublocaties_by_bounding_box(ab_config, args.search_sublocalities)
+            search_sublocalities_by_bounding_box(ab_config, args.search_sublocalities_by_bounding_box)
         elif args.search_routes_by_bounding_box:
             search_routes_by_bounding_box(ab_config, args.search_routes_by_bounding_box)
         elif args.search_reviews:
@@ -935,5 +1112,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# > sao tomé

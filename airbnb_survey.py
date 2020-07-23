@@ -194,8 +194,10 @@ class ABSurvey():
                 listing.max_nights = json_listing["max_nights"]
             if "avg_rating" in json_listing:
                 listing.avg_rating = json_listing["avg_rating"]
-            if "person_capacity" in json_listing:
-                listing.person_capacity = json_listing["person_capacity"]
+            if "picture_urls" in json_listing:
+                listing.pictures = json_listing["picture_urls"]
+            else:
+                listing.pictures = None
             
             # pricing
             json_pricing = json["pricing_quote"]
@@ -751,6 +753,7 @@ class ABSurveyByBoundingBox(ABSurvey):
                 # dict for the listing in question
                 # There may be multiple lists of listings
                 json_listings_lists = search_json_keys("listings", json_doc)
+
                 # json_doc = json_doc["explore_tabs"]
                 # if json_doc: logger.debug("json: explore_tabs")
                 # json_doc = json_doc["sections"]
@@ -762,6 +765,7 @@ class ABSurveyByBoundingBox(ABSurvey):
                         if json_listings is None:
                             continue
                         for json_listing in json_listings:
+                            print(json_listing)
                             room_id = int(json_listing["listing"]["id"])
                             if room_id is not None:
                                 room_count += 1
@@ -1046,6 +1050,7 @@ class ABSurveyByNeighborhood(ABSurvey):
                                                          params)
             json_response = response.json()
             for result in json_response["results_json"]["search_results"]:
+                print(result)
                 room_id = int(result["listing"]["id"])
                 if room_id is not None:
                     room_count += 1
@@ -1235,6 +1240,7 @@ class ABSurveyByZipcode(ABSurvey):
             json_response = response.json()
             for result in json_response["results_json"]["search_results"]:
                 room_id = int(result["listing"]["id"])
+                print(result)
                 if room_id is not None:
                     room_count += 1
                     listing = self.listing_from_search_page_json(result, room_id)

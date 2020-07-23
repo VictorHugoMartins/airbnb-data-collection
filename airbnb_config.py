@@ -30,7 +30,7 @@ class ABConfig():
         self.connection = None
         self.FLAGS_ADD = 1
         self.FLAGS_PRINT = 9
-        self.FLAGS_INSERT_REPLACE = True
+        self.FLAGS_INSERT_REPLACE = False
         self.FLAGS_INSERT_NO_REPLACE = False
         self.URL_ROOT = "https://www.airbnb.com/"
         self.URL_ROOM_ROOT = self.URL_ROOT + "rooms/"
@@ -50,6 +50,12 @@ class ABConfig():
         self.HTTP_PROXY_LIST_COMPLETE = []
         self.GOOGLE_API_KEY = None
         self.ATTEMPTS_TO_FIND_PAGE = 10
+        self.SEARCH_WITH_DATE = True
+        '''if args.check_date is not None and not args.check_date:
+            self.SEARCH_WITH_DATE = False
+        self.SEARCH_ONLY_REVIEWS = False
+        if args.only_reviews is not None and not args.only_reviews:
+            self.SEARCH_ONLY_REVIEWS = True'''
 
         try:
             config = configparser.ConfigParser()

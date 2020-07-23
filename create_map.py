@@ -15,7 +15,7 @@ LOG_LEVEL = logging.INFO
 LOG_FORMAT = '%(levelname)-8s%(message)s'
 logging.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
 DEFAULT_START_DATE = '2017-05-02'
-today = today = dt.date.today().isoformat()
+today = dt.date.today().isoformat()
 
 def create_map(table):
 	data = pd.read_csv(table)
@@ -163,7 +163,6 @@ def main():
 		print("Map saved")
 	else:
 		parser.print_help()
-
 
 if __name__ == "__main__":
 	main()

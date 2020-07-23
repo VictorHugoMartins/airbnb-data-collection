@@ -4,12 +4,8 @@ from sklearn import metrics
 from sklearn.cluster import KMeans
 import pandas as pd
 
-def get_optimal_clusters():
+def get_optimal_clusters(X):
 	# Load data from input file
-	data = pd.read_excel("public/data/l.xlsx")
-	data.fillna("-1", inplace = True)
-	X = data.iloc[:,1:15].values #12,11
-	# Initialize variables
 	scores = []
 	values = np.arange(2, 10)
 
@@ -54,4 +50,4 @@ def get_optimal_clusters():
 	plt.ylim(y_min, y_max)
 	plt.xticks(())
 	plt.yticks(())
-	plt.show()
+	#plt.show()

@@ -11,7 +11,32 @@ LOG_LEVEL = logging.INFO
 # Set up logging
 LOG_FORMAT = '%(levelname)-8s%(message)s'
 logging.basicConfig(format=LOG_FORMAT, level=LOG_LEVEL)
-DEFAULT_START_DATE = '2017-05-02'
+DEFAULT_START_DATE = '2020-03-03'
+
+centro = ['Agua Limpa', 'Água Limpa', 'Alto Cruz', 'Antonio Dias', 'Barra', 'Cabecas', \
+         'Centro', 'Jardim Alvorada', 'Loteamento', 'Morro Da Queimada', 'Morro Sao Sebastiao', \
+         'Nossa Senhora Das Dores', 'Nossa Senhora De Lourdes', 'Nossa Senhora Do Carmo', \
+         'Nossa Senhora Do Pilar', 'Nossa Senhora Do Rosario', 'Ouro Preto', 'Padre Faria', \
+         'Pilar', 'Pinheiros', 'Rosario', 'Sao Cristovao', 'Sao Francisco', 'Sao Sebastiao', \
+         'Vila Pereira', 'Vila Sao Jose' ]
+entorno = ['Bairro Da Lagoa', 'Bauxita', 'Morro Do Cruzeiro', 'Saramenha De Cima', 'Vila Aparecida', 'Vila Itacolomy']
+distrito = ['Amarantina', 'Cachoeira Do Campo', 'Chapada', 'Glaura', 'Lavras Novas', \
+            'Miguel Burnier', 'Santa Rita De Ouro Preto', 'Santo Antonio Do Leite', 'Santo Antônio do Leite', \
+            'Sao Bartolomeu' ]
+
+centro_coordenadas = [-43.547957, -20.415906, -43.451998, -20.348322]
+entorno_coordenadas = [-43.534224, -20.43521, -43.490107, -20.395795]
+
+def define_region(lat, lng):
+    regiao = 'Distrito'
+    if ( lat >= centro_coordenadas[1] and lat <= centro_coordenadas[3] and
+        lng >= centro_coordenadas[0] and lng <= centro_coordenadas[2] ):
+        regiao = 'Centro'
+    if ( lat >= entorno_coordenadas[1] and lat <= entorno_coordenadas[3] and
+        lng >= entorno_coordenadas[0] and lng <= entorno_coordenadas[2] ):
+        regiao = 'Entorno'
+    return regiao
+
 
 
 def survey_df(ab_config, city, start_date):
@@ -30,6 +55,18 @@ def survey_df(ab_config, city, start_date):
     conn.close()
     return(df)
 
+def super_survey_df(ab_config, city, start_date):
+    sql_survey_ids = """
+        select ss_id, date from super_survey
+        where city = %(city)s
+        and date > '{start_date}'
+        order by ss_id
+    """.format(start_date=start_date)
+    conn = ab_config.connect()
+    df = pd.read_sql(sql_survey_ids, conn,
+                     params={"city": city})
+    conn.close()
+    return(df)
 
 def city_view_name(ab_config, city):
     sql_abbrev = """
@@ -166,13 +203,13 @@ def export_city_data(ab_config, city, project, format, start_date, directory):
                  " for " + city +
                  " using project " + project)
 
-    df = survey_df(ab_config, city, start_date)
-    survey_ids = df["survey_id"].tolist()
-    survey_dates = df["survey_date"].tolist()
+    df = super_survey_df(ab_config, city, start_date)
+    survey_ids = df["ss_id"].tolist()
+    survey_dates = df["date"].tolist()
     logging.info(" ---- Surveys: " + ', '.join(str(id) for id in survey_ids))
     conn = ab_config.connect()
 
-    city_view = city_view_name(ab_config, city)
+    city_view = 'Ouro Preto' #city_view_name(ab_config, city)
     # survey_ids = [11, ]
     if project == "gis":
         sql = """
@@ -201,6 +238,7 @@ def export_city_data(ab_config, city, project, format, start_date, directory):
         order by room_id
         """
     else:
+        print(".... eita")
         sql = """
         select room_id, host_id, room_type,
             address, city, neighborhood,
@@ -209,10 +247,10 @@ def export_city_data(ab_config, city, project, format, start_date, directory):
             price, minstay,
             latitude, longitude,
             last_modified as collected
-        from room
-        where survey_id=%(survey_id)s
+        from room, sublocality
+        where survey_id in ( select survey_id from survey where ss_id = %(survey_id)s ) and city = 'Ouro Preto'
         order by room_id
-        """
+        """ # testar o 36 e 41 no pgadmin
 
     city_bar = city.replace(" ", "_").lower()
     if format == "csv":
@@ -224,7 +262,7 @@ def export_city_data(ab_config, city, project, format, start_date, directory):
             csvfile = csvfile.lower()
             df = pd.read_sql(sql, conn,
                              # index_col="room_id",
-                             params={"survey_id": survey_id}
+                             params={"survey_id": survey_id, "city":city}
                              )
             logging.info("CSV export: survey " +
                          str(survey_id) + " to " + csvfile)
@@ -234,6 +272,7 @@ def export_city_data(ab_config, city, project, format, start_date, directory):
         today = dt.date.today().isoformat()
         xlsxfile = directory + ("slee_{project}_{city_bar}_summary_{today}.xlsx"
                 ).format(project=project, city_bar=city_bar, today=today)
+        print("25222222222")
         writer = pd.ExcelWriter(xlsxfile, engine="xlsxwriter")
         logging.info("Spreadsheet name: " + xlsxfile)
         # read surveys
@@ -247,7 +286,7 @@ def export_city_data(ab_config, city, project, format, start_date, directory):
             if len(df) > 0:
                 logging.info("Survey " + str(survey_id) +
                              ": to Excel worksheet")
-                df.to_excel(writer, sheet_name=str(survey_date))
+                df.to_excel(writer, sheet_name=str(survey_date).split()[0])
             else:
                 logging.info("Survey " + str(survey_id) +
                              " not in production project: ignoring")
@@ -301,26 +340,62 @@ def export_city_data(ab_config, city, project, format, start_date, directory):
         writer.save()
 
 
-def export_by_sublocalities(config, city, project, format, start_date):
-    # create a directory for all the data for the city
-    directory = ('{project}/{city}/').format(project=project, city=city)
-    if not os.path.isdir(directory): # if directory don't exists, create
-        os.mkdir(directory)
-
-    # first export the data from the city itself
-    export_city_data(config, city, project.lower(),
-                    format, start_date, directory)
+def export_airbnb_room(config, city, project, format, start_date):
     try:
         rowcount = -1
-        logging.info("Initializing search by sublocalities")
+        logging.info("Initializing export Airbnb'b rooms for " + city)
+        conn = config.connect()
+        cur = conn.cursor()
+        cnxn = config.connect()
+        sql = """SELECT room_id, host_id, reviews, price, overall_satisfaction,
+                accommodates, bedrooms, bathrooms, minstay, max_nights,
+                latitude, longitude, avg_rating, is_superhost, room_type,
+                rate_type, survey_id, currency, deleted,
+                extra_host_languages, name, property_type,
+                route, sublocality, city, country,
+                address, comodities, last_modified as collected
+                FROM room where city = '{city}'
+                order by comodities, room_id, last_modified""".format(city=city)
+
+        # create a directory for all the data for the city
+        directory = ('{project}/data/').format(project=project)
+        if not os.path.isdir(directory): # if directory don't exists, create
+            os.mkdir(directory)
+
+        today = today = dt.date.today().isoformat()
+        directory = directory + 'airbnb_rooms_{city}_{today}.xlsx'.format(city=city, today=today)
+        pd.read_sql(sql,cnxn).to_excel(directory, sheet_name="Total Listings")
+
+        data = pd.read_excel(directory)
+    
+        # update the file inserting the region
+
+        region = [ define_region(lat, lng) for lat, lng in zip(data['latitude'], data['longitude']) ]
+        
+        #region = ['Centro' if x in centro else 'Entorno' if x in entorno else 'Distrito' if x in distrito else x for x in data['sublocality']]
+        data.insert(16, "region", region)
+        data = data.drop(columns=['Unnamed: 0']) #, 'host_id', 'room_type'
+        data.to_excel(directory, sheet_name="Total Listings")
+
+        logging.info("Finishing export")
+
+        return directory
+    except PermissionError:
+        print("Permission denied: ", directory, " is open")
+    except Exception:
+        logging.error("Failed to export by sublocalities")
+        raise
+
+
+def export_all_cities(config, city, project, format, start_date):
+
+    try:
+        rowcount = -1
+        logging.info("Initializing export for " + city)
         conn = config.connect()
         cur = conn.cursor()
 
-        sql = """SELECT name from search_area, sublocality, level2 where
-            level2.level2_name = %s and level2.level2_id = sublocality.level2_id
-            and sublocality.sublocality_name = search_area.name
-            and strpos(sublocality_name, 'N/A') = 0
-            order by name""" # pensar melhor #
+        sql = """SELECT distinct(city) from room order by city""" # pensar melhor #
             # tratar problema do n/a
 
         cur.execute(sql, (city,))
@@ -329,12 +404,120 @@ def export_by_sublocalities(config, city, project, format, start_date):
 
         if rowcount > 0:
             for result in results:
-                export_city_data(config, result[0], project.lower(),
-                    format, start_date, directory)
+                cnxn = config.connect()
+                city = result[0]
+                
+                sql = """SELECT room_id, host_id, room_type, name,
+                        route, neighborhood, sublocality, city, country
+                        neighborhood, address, reviews, overall_satisfaction,
+                        accommodates, bedrooms, bathrooms, price, currency, deleted,
+                        minstay, max_nights, latitude, longitude, survey_id,
+                        coworker_hosted, extra_host_languages,
+                        property_type, rate_type, is_superhost,
+                        avg_rating, last_modified as collected
+                        FROM room where city = '{city}'
+                        order by country, sublocality, sublocality, route, room_id, last_modified desc""".format(city=result[0])
+
+                # create a directory for all the data for the city
+                directory = ('{project}/data/').format(project=project)
+                if not os.path.isdir(directory): # if directory don't exists, create
+                    os.mkdir(directory)
+
+                today = today = dt.date.today().isoformat()
+                pd.read_sql(sql,cnxn).to_excel(directory + 'rooms_{city}_{today}.xlsx'.format(city=result[0], today=today), sheet_name="Total Listings")
+    
+                logging.info("Finishing export")
+                break
+
+    except PermissionError:
+        print("Permission denied: ", directory, " is open")
     except Exception:
         logging.error("Failed to export by sublocalities")
         raise
 
+
+def export_reviews(config, table, city, project, format):
+
+    try:
+        rowcount = -1
+        logging.info("Initializing export " + table + "'s reviews for " + city)
+        conn = config.connect()
+        cur = conn.cursor()
+   
+        if table == 'airbnb':
+            sql = """SELECT id, room_id, role, comment, response, language,
+                create_at, localized_data, reviewer_name, reviewer_id,
+                rating, deleted, last_modified as collected
+                FROM reviews where room_id in ( select room_id from room where city = '{city}')
+                order by role, room_id, id""".format(city=city)
+        else:
+            sql = """SELECT id, room_id, role, comment, response, language,
+                create_at, localized_data, reviewer_name, reviewer_id,
+                rating, deleted, last_modified as collected
+                FROM reviews where room_id in ( select room_id from room where city = '{city}')
+                order by role, room_id, id""".format(city=city)
+
+        # create a directory for reviews
+        directory = ('{project}/data/').format(project=project)
+        if not os.path.isdir(directory): # if directory don't exists, create
+            os.mkdir(directory)
+
+        today = today = dt.date.today().isoformat()
+        pd.read_sql(sql,conn).to_excel(directory + '{table}_reviews_{city}_{today}.xlsx'.\
+                    format(table=table,city=city,today=today), sheet_name="Total Listings")
+
+        logging.info("Finishing export")
+
+    except PermissionError:
+        print("Permission denied: ", directory, " is open")
+    except Exception:
+        logging.error("Failed to export reviews")
+        raise
+
+
+def export_booking_room(config, city, project, format):
+    try:
+        rowcount = -1
+        logging.info("Initializing export for Booking's rooms of " + city)
+        conn = config.connect()
+        cur = conn.cursor()
+   
+        sql = """SELECT room_id, hotel_id, reviews, overall_satisfaction, property_type, accommodates,
+                latitude, longitude, price, currency, name, room_name, bed_type
+                popular_facilidades, comodities, images, address, route, sublocality, city, state,
+                country, last_modified as collected
+                from booking_room where city = '{city}'
+                order by comodities, room_id, hotel_id, last_modified""".format(city=city)
+
+        directory = ('{project}/data/').format(project=project)
+        if not os.path.isdir(directory): # if directory don't exists, create
+            os.mkdir(directory)
+
+        today = today = dt.date.today().isoformat()
+
+        directory = directory + 'booking_{city}_{today}.xlsx'.format(city=city,today=today)
+        pd.read_sql(sql,conn).to_excel(directory, sheet_name="Total Listings")
+
+        data = pd.read_excel(directory)
+    
+        # update the file inserting the region
+
+        region = [ define_region(lat, lng) for lat, lng in zip(data['latitude'], data['longitude']) ]
+        
+        #region = ['Centro' if x in centro else 'Entorno' if x in entorno else 'Distrito' if x in distrito else x for x in data['sublocality']]
+        data.insert(16, "region", region)
+        data = data.drop(columns=['Unnamed: 0'])
+        data.to_excel(directory, sheet_name="Total Listings")
+
+        logging.info("Finishing export")
+
+        return directory
+
+    except PermissionError:
+        print("Permission denied: ", directory, " is open")
+    except Exception:
+        logging.error("Failed to export reviews")
+        raise
 
 
 def main():
@@ -348,6 +531,18 @@ def main():
     parser.add_argument('-c', '--city',
                         metavar='city', action='store',
                         help="""set the city""")
+    parser.add_argument('-la', '--listings_airbnb',
+                        action='store_true', default=False,
+                        help="export the listings from airbnb")
+    parser.add_argument('-lb', '--listings_booking',
+                        action='store_true', default=False,
+                        help="export the listings from booking")
+    parser.add_argument('-ra', '--reviews_airbnb',
+                        action='store_true', default=False,
+                        help="export the reviews from airbnb")
+    parser.add_argument('-rb', '--reviews_booking',
+                        action='store_true', default=False,
+                        help="export the reviews from booking")
     parser.add_argument('-p', '--project',
                         metavar='project', action='store', default="public",
                         help="""the project determines the table or view: public
@@ -365,19 +560,34 @@ def main():
     args = parser.parse_args()
     ab_config = ABConfig(args)
 
-    export_by_sublocalities(ab_config, args.city, args.project.lower(),
-                    args.format, args.start_date)
-    exit(0)
+    '''export_city_data(ab_config, 'Ouro Preto', args.project.lower(), args.format, args.start_date, '{project}/data/')
+    exit(0)'''
+
     if args.city:
-        if args.summary:
-            export_city_summary(ab_config, args.city, args.project.lower(),
-                    args.start_date)
-        else:
-            export_city_data(ab_config, args.city, args.project.lower(),
-                    args.format, args.start_date)
+        if args.listings_airbnb:
+            export_airbnb_room(ab_config, args.city, args.project.lower(),
+                          args.format, args.start_date) # conferir
+        elif args.listings_booking:
+            export_booking_room(ab_config, args.city, args.project.lower(),
+                args.format) # conferir
+        elif args.reviews_booking:
+            export_reviews(ab_config, 'booking',args.city, args.project.lower(),
+                args.format)
+        elif args.reviews_airbnb:
+            export_reviews(ab_config, 'airbnb',args.city, args.project.lower(),
+                args.format)
+        else: # export all
+            export_airbnb_room(ab_config, args.city, args.project.lower(),
+                          args.format, args.start_date) # conferir
+            export_booking_room(ab_config, args.city, args.project.lower(),
+                args.format)
+            export_reviews(ab_config, 'booking',args.city, args.project.lower(),
+                args.format)
+            export_reviews(ab_config, 'airbnb',args.city, args.project.lower(),
+                args.format)
+
     else:
         parser.print_help()
-
 
 if __name__ == "__main__":
     main()

@@ -9,6 +9,7 @@ import json
 from airbnb_config import ABConfig
 import sys
 import logging
+from geopy import distance
 
 FORMAT_STRING = "%(asctime)-15s %(levelname)-8s%(message)s"
 logging.basicConfig(level=logging.INFO, format=FORMAT_STRING)
@@ -38,6 +39,41 @@ class Location():
         """
         return cls(lat_round, lng_round)
 
+    
+    def update_location(self, config):
+        """
+        Insert or update a location with the required address information
+        """
+        try:
+            conn = config.connect()
+            cur = conn.cursor()
+            sql = """
+            UPDATE location
+            SET neighborhood = %s,
+            sublocality = %s,
+            locality = %s,
+            level2 = %s,
+            level1 = %s,
+            country = %s
+            WHERE lat_round = %s AND lng_round = %s
+            """
+            update_args = (self.neighborhood,
+                           self.sublocality,
+                           self.locality,
+                           self.level2,
+                           self.level1,
+                           self.country,
+                           self.lat_round,
+                           self.lng_round,
+                          )
+            LOGGER.debug(update_args)
+            cur.execute(sql, update_args)
+            cur.close()
+            conn.commit()
+            return True
+        except:
+            LOGGER.exception("Exception in update_location")
+            return False
 
 
 class BoundingBox():
@@ -81,11 +117,15 @@ class BoundingBox():
         try:
             gmaps = googlemaps.Client(key=config.GOOGLE_API_KEY)
             results = gmaps.geocode((search_area))
-            bounds = results[0]["geometry"]["bounds"]
+
+            print(results)
+
+            bounds = results[0]["geometry"]["viewport"]
             bounding_box = (bounds["southwest"]["lat"],
                             bounds["northeast"]["lat"],
                             bounds["southwest"]["lng"],
                             bounds["northeast"]["lng"],)
+
             return cls(bounding_box)
         except:
             LOGGER.exception("Exception in BoundingBox_from_google: exiting")
@@ -136,42 +176,6 @@ def select_lat_lng(config, bounding_box):
     except Exception: 
         LOGGER.exception("Exception in select_lat_lng: exiting")
         sys.exit()
-
-
-def update_location(config, location):
-    """
-    Insert or update a location with the required address information
-    """
-    try:
-        conn = config.connect()
-        cur = conn.cursor()
-        sql = """
-        UPDATE location
-        SET neighborhood = %s,
-        sublocality = %s,
-        locality = %s,
-        level2 = %s,
-        level1 = %s,
-        country = %s
-        WHERE lat_round = %s AND lng_round = %s
-        """
-        update_args = (location.neighborhood,
-                       location.sublocality,
-                       location.locality,
-                       location.level2,
-                       location.level1,
-                       location.country,
-                       location.lat_round,
-                       location.lng_round,
-                      )
-        LOGGER.debug(update_args)
-        cur.execute(sql, update_args)
-        cur.close()
-        conn.commit()
-        return True
-    except:
-        LOGGER.exception("Exception in update_location")
-        return False
 
 
 def reverse_geocode(config, location):
@@ -262,6 +266,8 @@ def main():
                         help="""number_of_lookups""")
     args = parser.parse_args()
     search_area = args.sa
+
+    print(search_area)
     if args.count:
         count = args.count
     else:
@@ -274,6 +280,7 @@ def main():
                     search_area,
                     bounding_box.bb_s_lat, bounding_box.bb_n_lat,
                     bounding_box.bb_w_lng, bounding_box.bb_e_lng)
+        
         # bounding_box = BoundingBox.from_db(config, search_area)
         # LOGGER.info("Bounding box for %s from DB = (%s, %s, %s, %s)",
                     # search_area,
@@ -303,7 +310,7 @@ def main():
                 location.level1,
                 location.country)
             )
-        success = update_location(config, location)
+        success = location.update_location(config)
         if success:
             LOGGER.info("Update succeeded: %s, %s in %s: %s of %s",
                         location.lat_round, location.lng_round,
@@ -316,3 +323,18 @@ def main():
 if __name__ == "__main__":
     main()
 
+'''
+[{'address_components': [{'long_name': '154', 'short_name': '154', 'types': ['street_number']}, 
+{'long_name': 'Rua Augusto Corrêa de Magalhães', 'short_name': 'R. Augusto Corrêa de Magalhães', 
+'types': ['route']}, {'long_name': 'Água Limpa', 'short_name': 'Água Limpa', 'types':
+ ['political', 'sublocality', 'sublocality_level_1']}, {'long_name': 'Ouro Preto', 'short_name': 'Ouro Preto', 'types': ['administrative_area_level_2', 'political']}, {'long_name': 'Minas Gerais', 'short_name': 'MG', 'types': ['administrative_area_level_1', 'political']}, {'long_name': 'Brazil', 'short_name': 'BR', 'types': ['country', 'political']}, {'long_name': '35400-000', 'short_name': '35400-000', 'types': ['postal_code']}], 'formatted_address': 'R. Augusto Corrêa de Magalhães, 154 - Água Limpa, Ouro Preto - MG, 35400-000, Brazil', 'geometry': {'location': {'lat': -20.3811652, 'lng': -43.5150962}, 'location_type': 'ROOFTOP', 'viewport': {'northeast': {'lat': -20.37981621970849, 'lng': -43.5137472197085}, 'southwest': {'lat': -20.3825141802915, 'lng': -43.5164451802915}}}, 'place_id': 'ChIJK9p-gP0KpAARLs-yzKh_fIQ', 'plus_code': {'compound_code': 'JF9M+GX Ouro Preto, State of Minas Gerais, Brazil', 'global_code': '58FRJF9M+GX'}, 'types': ['dentist', 'establishment', 'health', 'point_of_interest']}]
+
+
+ [{'address_components': [{'long_name': 'Ouro Preto', 'short_name': 'Ouro Preto', 'types':
+    ['locality', 'political']}, {'long_name': 'Ouro Preto', 'short_name': 'Ouro Preto',
+    'types': ['administrative_area_level_2', 'political']},
+    {'long_name': 'State of Minas Gerais', 'short_name': 'MG', 'types':
+    ['administrative_area_level_1', 'political']}, {'long_name': 'Brazil', 'short_name': 'BR', 'types':
+    ['country', 'political']}, {'long_name': '35400-000', 'short_name': '35400-000', 'types': ['postal_code']}],
+    'formatted_address': 'Ouro Preto, State of Minas Gerais, 35400-000, Brazil', 'geometry': {'bounds': {'northeast': {'lat': -20.3699597, 'lng': -43.4719237}, 'southwest': {'lat': -20.4126148, 'lng': -43.5313676}}, 'location': {'lat': -20.3855743, 'lng': -43.5035777}, 'location_type': 'APPROXIMATE', 'viewport': {'northeast': {'lat': -20.3699597, 'lng': -43.4719237}, 'southwest': {'lat': -20.4126148, 'lng': -43.5313676}}}, 'place_id': 'ChIJW7VXLB0LpAAR_NWDHRPRhNk', 'types': ['locality', 'political']}]
+'''
