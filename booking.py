@@ -635,6 +635,28 @@ def scrape_accommodation_data(config, driver, accommodation_url, n_page):
 	#if accommodation.reviews is not None:
 	#    accommodation.get_reviews_text(driver)
 
+def fill_empty_routes(config):
+	try:
+		rowcount = 0
+		conn = config.connect()
+		cur = conn.cursor()
+		logger.debug("Updating...")
+		sql = """UPDATE booking_room set route = split_part(address, ',', 1)
+				where route is null"""
+		logger.debug("Executing...")
+		cur.execute(sql)
+		rowcount = cur.rowcount
+		logger.debug("Closing...")
+		cur.close()
+		conn.commit()
+		logger.debug(str(rowcount) + " rooms updated")
+
+	except:
+		# may want to handle connection close errors
+		logger.debug("Exception in updating")
+		logger.warning("Exception in __update: raising")
+		raise
+
 def update_cities(config, city):
 	try:
 		conn = config.connect()
@@ -833,6 +855,7 @@ def main():
 		if args.city:
 			search(config, args.city, args.tomorrow_rooms)
 		elif args.update_routes:
+			fill_empty_routes(config)
 			update_cities(config, args.update_routes)
 			update_routes(config, args.update_routes)
 	except (SystemExit, KeyboardInterrupt):
