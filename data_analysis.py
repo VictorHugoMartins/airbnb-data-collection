@@ -13,11 +13,12 @@ from airbnb_config import ABConfig
 import os.path
 import clustering_quality as cq
 import export_spreadsheet as exs
+import create_map as cm
 from kmodes import kmodes
 from pandas import ExcelWriter
 from matplotlib.backends.backend_pdf import PdfPages
 import re
-import table as tb
+from googletrans import Translator
 
 logger = logging.getLogger()
 LOG_LEVEL = logging.INFO
@@ -30,11 +31,34 @@ today = dt.date.today().isoformat()
 shared_rooms = ['Albergue']
 entire_homes = ['Pousada', 'Pousada campestre', 'Chalé', 'Chalés alpinos', \
 				'Casa de temporada', 'Cama e Café (B&B)', 'Camping', 'Hospedagem domiciliar']
-private_rooms = ['Hotel', 'Motel', 'Apartamento', 'Apartamentos'] 
+private_rooms = ['Motel', 'Apartamento', 'Apartamentos']
+hotel_rooms = ['Hotel']
+
+# Python code to find frequency of each word 
+def frequency_table(str): 
+	# break the string into list of words  
+	str2 = []
+  
+	# loop till string values present in list str 
+	for i in str: # checking for the duplicacy 
+		if i not in str2:
+			str2.append(i) # insert value in str2 
+			  
+	values = []
+	for i in range(0, len(str2)): 
+		# count the frequency of each word(present  
+		# in str2) in str and print 
+		#print('Frequency of', str2[i], 'is :', str.count(str2[i]))
+		if str.count(str2[i]) > 1:
+			#x = (str2[i], str.count(str2[i]))
+			values.append(str2[i])
+	return values
 
 def create_columns_with_comodities(da, lista):
 	for cname in lista:
-		da[cname] = [ 1 if cname in x else 0 for x in da['comodities'] ]
+		traducao = cname[0]
+		original = cname[1]
+		da[original] = [ 1 if original in x or traducao in x else 0 for x in da['comodities'] ]
 	return da
 
 def get_individual_comodities(la):
@@ -49,22 +73,30 @@ def get_individual_comodities(la):
 		x = x.replace('"', '')
 		x = x.split(',')
 		for l in x:
-			if l == "":
+			if l == "" or l == "nan":
 				continue
 			if len(l.split()) > 1:
 				l = l.split()[0] # 'wifi gratuito' turns into 'wifi'
 			m.append(l)
 			xs.append(l)
 		linha.append(xs)
+
 	n = list(set(m))
+	como = []
+	translator = Translator()
+	for l in n:
+		k = translator.translate(l, dest='en').text
+		k = re.sub(r' ', '', k)
+		como.append([k, l])
+	
+	return sorted(como)
 
 	return sorted(n)
 
 def prepare_text(s):
 	s = str(s)
 	s = s.lower()
-	s = re.sub('[^a-zA-Z, \n\.]', '', s) #0-9 depois do Z caso manter numeros
-	
+	s = re.sub(r' [0-9]+', '', s) #0-9 depois do Z caso manter numeros
 	return s
 
 def prepare_comodities(da):
@@ -99,7 +131,6 @@ def plot_graph_with_clusters_comodities_values(data, qtd=False, percentage=False
 		fig, axs = plt.subplots(ncols=1)
 	
 		tmp_data = data[data.total_clusters == n]
-		print(tmp_data)
 		if qtd:
 			g = sns.barplot(x="comodity", y="qtd", hue="current_cluster", data=tmp_data)
 			g.axes.set_ylim(0, data['total_listings'].max() + 10)
@@ -119,7 +150,6 @@ def plot_graph_with_clusters_region_values(table, data, qtd=False, percentage=Fa
 	fig, axs = plt.subplots(ncols=3, nrows=4)
 	for n in range(1, 4):
 		tmp_data = data[data.total_clusters == n]
-		print(tmp_data)
 		groupedvalues=tmp_data.groupby('current_cluster').sum().reset_index()
 		
 		if qtd:
@@ -259,26 +289,23 @@ def create_dataframe_with_means(table, means, region, rooms, comodities):
 	drooms.fillna(0)
 	drooms.to_excel(writer, sheet_name="room filter")
 	
-
 	writer.save()
-	
-	'''plot_graph_with_clusters_comodities_values(dcomodities, qtd=True)
-	plot_graph_with_clusters_comodities_values(dcomodities, percentage=True)
-	return'''
 
-	# filter the data in clusters by region
-	plot_graph_with_clusters_region_values(table, dregion, percentage=True)
-	plot_graph_with_clusters_region_values(table, dregion, qtd=True)
+	plot_graph_with_qtd_values(table, dmeans)
+	plot_graph_with_clusters_average_values(table, dmeans) # all the values in each cluster, without more filters
 	
+	plot_graph_with_clusters_comodities_values(dcomodities, qtd=True)
+
+	exit(0)
+	plot_graph_with_clusters_comodities_values(dcomodities, percentage=True)
 	
 	plot_graph_with_clusters_room_type_values(table, drooms, qtd=True)
 	plot_graph_with_clusters_room_type_values(table, drooms, percentage=True)
-	
-	return
-	plot_graph_with_qtd_values(table, dmeans)
-	plot_graph_with_clusters_average_values(table, dmeans) # all the values in each cluster, without more filters
 
-def prepare_airbnb(da):
+	plot_graph_with_clusters_region_values(table, dregion, percentage=True)
+	plot_graph_with_clusters_region_values(table, dregion, qtd=True)
+
+def prepare_airbnb(da, table='airbnb'):
 	# convert the prices for R$
 	da['price'] = [x * 5.05 if x != '-1' and y == 'USD' else x for x, y in zip(da['price'], da['currency'])]
 	da['currency'] = ['BRL' if x != '.' else x for x in da['currency']]
@@ -289,9 +316,13 @@ def prepare_airbnb(da):
 	lena = da['Unnamed: 0'].count()
 	da['table'] = [ 'airbnb' for x in range(lena)]
 
+	if table == 'airbnb + booking':
+		da = da.drop(columns=['name', 'minstay', 'max_nights', 'avg_rating', 'is_superhost', \
+					'rate_type', 'survey_id', 'extra_host_languages'])
+
 	return da
 
-def prepare_booking(db):
+def prepare_booking(db, table='booking'):
 	# prices already in R$
 	db['price_pc'] = [x / y if x != '-1' else x for x, y in zip(db['price'], db['accommodates'])]
 	db['os'] = [ float(x / 2.0 ) for x in db['overall_satisfaction']] #  if x != '-1' else float(x) 
@@ -304,9 +335,13 @@ def prepare_booking(db):
 	
 	room_type = [ 'Shared room' if x in shared_rooms else
 						'Entire home/apt' if x in entire_homes else
-						'Private room' if x in private_rooms else x
+						'Private room' if x in private_rooms else
+						'Hotel room' if x in hotel_rooms else x
 						for x in db['property_type'] ]
 	db.insert(10, "room_type", room_type)
+
+	if table == 'airbnb + booking':
+		db = db.drop(columns=['name', 'hotel_id', 'images', 'state', 'room_name', 'popular_facilidades'])
 	
 	return db
 
@@ -317,10 +352,6 @@ def join_data(da, db):
 	da['table'] = [ 'airbnb' for x in range(lena)]
 	db['table'] = [ 'booking' for x in range(lenb)]
 	
-	da = da.drop(columns=['bedrooms', 'bathrooms', 'minstay', 'max_nights', 'avg_rating', 'is_superhost', \
-					'rate_type', 'survey_id', 'extra_host_languages'])
-	db = db.drop(columns=['images', 'state', 'room_name', 'popular_facilidades'])
-
 	data = da.append(db, sort=False)
 
 	writer = ExcelWriter('public/data/airbnb_and_booking_' + today + '.xlsx')
@@ -329,16 +360,18 @@ def join_data(da, db):
 
 	return data
 
-def export_clusters(table, km, data, n_clusters):
+def export_clusters(table, data, n_clusters):
 	# Identify the clusters and include them in the dataframe
 	#data_index = data.index.values
-	cluster = km.labels_
-	data.insert(2, "cluster", cluster)
-
-	writer = ExcelWriter('public/data/dados agrupados em ' + str(n_clusters) + ' clusters para ' + table + '.xlsx')
-	for n in range(0, n_clusters):
-		data[data.cluster == n].to_excel(writer, sheet_name="cluster " + str(n+1))
+				
+	directory = 'public/data/dados agrupados em ' + str(n_clusters) + ' clusters para ' + table + '.xlsx'
+	writer = ExcelWriter(directory)
+	data.to_excel(writer, sheet_name= str(n_clusters) + " clusters")
+	'''for n in range(0, n_clusters):
+		data[data.cluster == n].to_excel(writer, sheet_name="cluster " + str(n+1))'''
 	writer.save()
+
+	cm.map(directory, n_clusters)
 
 def average_property_type(data, property_type, column):
 	if property_type != 'entire home':
@@ -349,6 +382,9 @@ def average_property_type(data, property_type, column):
 			data  = data[data.property_type != x ]
 	if property_type != 'shared room':
 		for x in shared_rooms:
+			data  = data[data.property_type != x ]
+	if property_type != 'hotel room':
+		for x in hotel_rooms:
 			data  = data[data.property_type != x ]
 	return data[column].mean()
 
@@ -368,50 +404,62 @@ def sum_property_type(data, property_type, column):
 	if property_type != 'shared room':
 		for x in shared_rooms:
 			data  = data[data.property_type != x ]
+	if property_type != 'hotel room':
+		for x in hotel_rooms:
+			data  = data[data.property_type != x ]
 	return data[column].sum()
 
 def compare_sites(table='airbnb + booking', dairbnb=None, dbooking=None):
 	if table == 'airbnb':
 		logging.info("AIRBNB DATA")
 		data = pd.read_excel(dairbnb)
-		data = prepare_airbnb(data)
 
-		comodities = prepare_comodities(data)
+		drop_duplicates = True
+		if drop_duplicates:
+			logging.info("Using distinct rooms")
+			data = data.drop_duplicates(subset ="room_id", keep = 'first')
+		else:
+			logging.info("Using all rooms in database")
+
+		data = prepare_airbnb(data, table=table)
+
+		comodities = get_individual_comodities(data['comodities'])
 	elif table == 'booking':
 		logging.info("BOOKING DATA")
 		data = pd.read_excel(dbooking)
-		data = prepare_booking(data)
 
-		comodities = prepare_comodities(data)
+		drop_duplicates = True
+		if drop_duplicates:
+			logging.info("Using distinct rooms")
+			data = data.drop_duplicates(subset ="room_id", keep = 'first')
+		else:
+			logging.info("Using all rooms in database")
+
+		data = prepare_booking(data, table=table)
+
+		comodities = get_individual_comodities(data['comodities'])
 	else:
 		logging.info("JOINED DATA ( Airbnb + Booking) ")
-		d1 = pd.read_excel(dairbnb)
-		d2 = pd.read_excel(dbooking)
+		data_airbnb = pd.read_excel(dairbnb)
+		data_booking = pd.read_excel(dbooking)
 
-		all_data = 'n'
-		if all_data == 'n':
-			d1 = d1.drop_duplicates(subset ="room_id", keep = 'first')
-			d2 = d2.drop_duplicates(subset ="room_id", keep = 'first')
-
-		d1 = prepare_airbnb(d1)
-		comodities_airbnb = prepare_comodities(d1)
-
-		d2 = prepare_booking(d2)
-		comodities_booking = prepare_comodities(d2)
-
-		comodities = tb.freq(sorted(comodities_airbnb + comodities_booking))
-		data = join_data(d1, d2)
+		drop_duplicates = True
+		if drop_duplicates:
+			logging.info("Using distinct rooms")
+			data_airbnb = data_airbnb.drop_duplicates(subset ="room_id", keep = 'first')
+			data_booking = data_booking.drop_duplicates(subset ="room_id", keep = 'first')
+		else:
+			logging.info("Using all rooms in database")
+		data_airbnb = prepare_airbnb(data_airbnb, table=table)
+		comodities_airbnb = get_individual_comodities(data_airbnb['comodities'])
 		
-	data = create_columns_with_comodities(data, comodities)
-	
-	#all_data = input("Use all data in the clustering? (y/n): ")
-	all_data = 'n'
-	if all_data == 'n':
-		data = data.drop_duplicates(subset ="room_id", keep = 'first')
-		# db = db.drop_duplicates(subset ="room_id", keep = 'first')
-		logging.info("Using distinct rooms")
-	else:
-		logging.info("Using all rooms in database")
+		data_booking = prepare_booking(data_booking, table=table)
+		comodities_booking = get_individual_comodities(data_booking['comodities'])
+
+		comodities = frequency_table(comodities_airbnb + comodities_booking)
+		data = join_data(data_airbnb, data_booking)
+		
+	data = create_columns_with_comodities(data, comodities)		
 
 	region_types = data['region'].unique().tolist()
 	room_types = data['room_type'].unique().tolist()
@@ -433,8 +481,25 @@ def compare_sites(table='airbnb + booking', dairbnb=None, dbooking=None):
 
 		# if theres just 1 cluster, there's "no cluster"
 		if n_clusters > 1:
-			km = kmodes.KModes(n_clusters=n_clusters, init='Huang', n_init=5, verbose=0).fit(data)
-			export_clusters(table, km, clustered_data, n_clusters)
+			if n_clusters == 3 and table == 'airbnb + booking':
+				da_airbnb = data[data.table == 'airbnb']
+				km = kmodes.KModes(n_clusters=2, init='Huang', n_init=5, verbose=0).fit(da_airbnb)
+				
+				cluster = km.labels_
+				da_airbnb.insert(2, "cluster", cluster)
+
+				da_booking = data[data.table == 'booking']
+				da_booking['cluster'] = [ 2 for x in da_booking['Unnamed: 0']]
+				clustered_data = da_airbnb.append(da_booking, sort=False)
+				
+				export_clusters(table, clustered_data, n_clusters)
+			else:
+				km = kmodes.KModes(n_clusters=n_clusters, init='Huang', n_init=5, verbose=0).fit(data)
+
+				cluster = km.labels_
+				clustered_data.insert(2, "cluster", cluster)
+
+				export_clusters(table, clustered_data, n_clusters)
 
 		for f in range (0, n_clusters):
 			if n_clusters == 1:
@@ -478,20 +543,29 @@ def compare_sites(table='airbnb + booking', dairbnb=None, dbooking=None):
 				region_values.append(tmp)
 
 			for x in comodities:
-				qtd_x = tmp_data[x].sum()
-				percentage_x = (qtd_x / len_tmp_data) * 100 if qtd_x > 0 else 0
+				cname = x[1]
+				qtd_x = tmp_data[cname].sum()
+				percentage_x = (qtd_x / len_tmp_data) * 100
 
-				tmp = (n_clusters, f, len_tmp_data, x, qtd_x, percentage_x)
+				tmp = (n_clusters, f, len_tmp_data, cname, qtd_x, percentage_x)
 				comodities_values.append(tmp)
 
-			if f > 1:
+			'''if f > 1:
 				plot_scatter(table, tmp_data, km)
+				exit(0)'''
 
 		if n_clusters > 1:
 			clustered_data = clustered_data.drop(columns=['cluster'], inplace = True)
 	create_dataframe_with_means(table, v_medios, region_values, room_values, comodities_values)
 
 def plot_scatter(table, data, km): # to update
+	from sklearn.decomposition import PCA
+	pca_2 = PCA(2)
+	plot_columns = pca_2.fit_transform(data)
+	plt.scatter(x=plot_columns[:,0], y=plot_columns[:,1], c=model3.labels_,)
+	plt.show()
+
+	return
 	X['longitude'] = data['longitude']
 	X['latitude'] = data['latitude']
 	X['cluster'] = data['cluster']
@@ -513,7 +587,7 @@ def define_directories(config, args):
 	elif args.city:
 		d_airbnb = exs.export_airbnb_room(config, args.city, args.project.lower(),
 												args.format, args.start_date)
-	
+
 	if args.file_booking:
 		d_booking = args.file_booking
 	elif args.city:

@@ -41,7 +41,6 @@ class ABReview():
         logger.setLevel(config.log_level)
 
     def get_attributes(self, config, path, room_id):
-
         self.config = config
         self.room_id = room_id
         self.review_id = self.__get_review_id(path)
