@@ -1,0 +1,78 @@
+2023-01-13 22:00:24,770 INFO    ======================================================================
+2023-01-13 22:00:24,771 INFO    Survey 5, for Ouro Preto
+2023-01-13 22:00:24,771 INFO    Searching by bounding box, max_zoom=24
+2023-01-13 22:00:24,772 INFO    ----------------------------------------------------------------------
+2023-01-13 22:00:24,772 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
+2023-01-13 22:00:24,773 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-01-13 22:00:25,142 WARNING HTTP status 403 from web site: IP address blocked. Waiting 1.0 minutes.
+2023-01-13 22:01:27,060 ERROR   Exception in get_search_page_info_rectangle
+Traceback (most recent call last):
+  File "C:\ufop\airbnb-data-collection\airbnb_listing.py", line 157, in save
+    self.__insert()
+  File "C:\ufop\airbnb-data-collection\airbnb_listing.py", line 328, in __insert
+    cur.execute(sql, insert_args)
+psycopg2.errors.UndefinedColumn: column "route" of relation "room" does not exist
+LINE 9:                     sublocality, route, is_superhost,
+                                         ^
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\ufop\airbnb-data-collection\airbnb_survey.py", line 781, in search_node
+    if listing.save(self.config.FLAGS_INSERT_NO_REPLACE):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ufop\airbnb-data-collection\airbnb_listing.py", line 167, in save
+    self.config.connection.conn.rollback()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'conn'
+2023-01-13 22:01:27,070 ERROR   Error in recurse_quadtree
+Traceback (most recent call last):
+  File "C:\ufop\airbnb-data-collection\airbnb_listing.py", line 157, in save
+    self.__insert()
+  File "C:\ufop\airbnb-data-collection\airbnb_listing.py", line 328, in __insert
+    cur.execute(sql, insert_args)
+psycopg2.errors.UndefinedColumn: column "route" of relation "room" does not exist
+LINE 9:                     sublocality, route, is_superhost,
+                                         ^
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\ufop\airbnb-data-collection\airbnb_survey.py", line 506, in recurse_quadtree
+    (zoomable, median_leaf) = self.search_node(
+                              ^^^^^^^^^^^^^^^^^
+  File "C:\ufop\airbnb-data-collection\airbnb_survey.py", line 781, in search_node
+    if listing.save(self.config.FLAGS_INSERT_NO_REPLACE):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ufop\airbnb-data-collection\airbnb_listing.py", line 167, in save
+    self.config.connection.conn.rollback()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'conn'
+2023-01-13 22:01:27,080 ERROR   Error
+Traceback (most recent call last):
+  File "C:\ufop\airbnb-data-collection\airbnb_listing.py", line 157, in save
+    self.__insert()
+  File "C:\ufop\airbnb-data-collection\airbnb_listing.py", line 328, in __insert
+    cur.execute(sql, insert_args)
+psycopg2.errors.UndefinedColumn: column "route" of relation "room" does not exist
+LINE 9:                     sublocality, route, is_superhost,
+                                         ^
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\ufop\airbnb-data-collection\airbnb_survey.py", line 445, in search
+    self.recurse_quadtree(quadtree_node, median_node, None, flag)
+  File "C:\ufop\airbnb-data-collection\airbnb_survey.py", line 506, in recurse_quadtree
+    (zoomable, median_leaf) = self.search_node(
+                              ^^^^^^^^^^^^^^^^^
+  File "C:\ufop\airbnb-data-collection\airbnb_survey.py", line 781, in search_node
+    if listing.save(self.config.FLAGS_INSERT_NO_REPLACE):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ufop\airbnb-data-collection\airbnb_listing.py", line 167, in save
+    self.config.connection.conn.rollback()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'conn'

@@ -1,0 +1,35 @@
+2023-01-14 11:45:01,996 INFO    ======================================================================
+2023-01-14 11:45:01,997 INFO    Survey 82, for Ouro Preto, Minas Gerais
+2023-01-14 11:45:01,998 INFO    Searching by bounding box, max_zoom=24
+2023-01-14 11:45:01,998 INFO    ----------------------------------------------------------------------
+2023-01-14 11:45:01,999 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
+2023-01-14 11:45:01,999 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-01-14 11:45:02,295 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:45:09,815 INFO    Page 01 returned 18 listings
+2023-01-14 11:45:10,738 INFO    Room 736390796820280107: insert failed
+2023-01-14 11:45:10,740 INFO    Room 51978370: insert failed
+2023-01-14 11:45:10,741 INFO    Room 40752066: insert failed
+2023-01-14 11:45:10,743 INFO    Room 41502392: insert failed
+2023-01-14 11:45:10,745 INFO    Room 714323517316563160: insert failed
+2023-01-14 11:45:10,747 INFO    Room 47939876: insert failed
+2023-01-14 11:45:10,751 INFO    Room 740983683035077351: insert failed
+2023-01-14 11:45:10,752 INFO    Room 794011987542751252: insert failed
+2023-01-14 11:45:10,754 INFO    Room 50723507: insert failed
+2023-01-14 11:45:10,754 INFO    Page 02 returned 12 listings
+2023-01-14 11:45:10,754 INFO    Final page of listings for this search
+2023-01-14 11:45:10,755 INFO    Results: 2 pages, 21 new rooms
+2023-01-14 11:45:10,758 INFO    Finishing survey 82, for Ouro Preto, Minas Gerais
+2023-01-14 11:45:11,418 ERROR   Top level exception handler: quitting.
+Traceback (most recent call last):
+  File "C:\ufop\airbnb-data-collection\airbnb.py", line 843, in main
+    full_survey(ab_config, args.full_survey, False, True)
+  File "C:\ufop\airbnb-data-collection\airbnb.py", line 654, in full_survey
+    update_routes_geolocation(ab_config, area)
+  File "C:\ufop\airbnb-data-collection\airbnb.py", line 285, in update_routes_geolocation
+    location.insert_in_table_location(config)
+  File "C:\ufop\airbnb-data-collection\airbnb_geocoding.py", line 120, in insert_in_table_location
+    cur.execute(sql, update_args)
+psycopg2.errors.InvalidTextRepresentation: invalid input syntax for type integer: "Rua Padre Antônio Carvalho"
+LINE 13:         ('Rua Padre Antônio Carvalho'+1, 'N/A', 'Antônio Dia...
+                  ^
+

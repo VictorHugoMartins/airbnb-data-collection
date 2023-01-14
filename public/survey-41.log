@@ -1,0 +1,31 @@
+2023-01-14 11:07:45,032 INFO    ======================================================================
+2023-01-14 11:07:45,032 INFO    Survey 41, for Ouro Preto, Minas Gerais
+2023-01-14 11:07:45,033 INFO    Searching by bounding box, max_zoom=24
+2023-01-14 11:07:45,034 INFO    ----------------------------------------------------------------------
+2023-01-14 11:07:45,034 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
+2023-01-14 11:07:45,034 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-01-14 11:07:46,575 INFO    Page 01 returned 18 listings
+2023-01-14 11:07:47,763 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:07:54,779 INFO    Room 47939876: insert failed
+2023-01-14 11:07:54,785 INFO    Room 43805080: insert failed
+2023-01-14 11:07:54,791 INFO    Room 51978370: insert failed
+2023-01-14 11:07:54,797 INFO    Room 41502392: insert failed
+2023-01-14 11:07:54,802 INFO    Room 40752066: insert failed
+2023-01-14 11:07:54,808 INFO    Room 30403033: insert failed
+2023-01-14 11:07:54,814 INFO    Room 714323517316563160: insert failed
+2023-01-14 11:07:54,820 INFO    Room 736390796820280107: insert failed
+2023-01-14 11:07:54,826 INFO    Room 51217390: insert failed
+2023-01-14 11:07:54,833 INFO    Room 52024666: insert failed
+2023-01-14 11:07:54,839 INFO    Room 54222723: insert failed
+2023-01-14 11:07:54,844 INFO    Room 47334727: insert failed
+2023-01-14 11:07:54,849 INFO    Room 740983683035077351: insert failed
+2023-01-14 11:07:54,854 INFO    Room 794011987542751252: insert failed
+2023-01-14 11:07:54,858 INFO    Room 50723507: insert failed
+2023-01-14 11:07:54,862 INFO    Room 19969297: insert failed
+2023-01-14 11:07:54,869 INFO    Page 02 returned 18 listings
+2023-01-14 11:07:56,272 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:08:03,900 INFO    Page 03 returned 00 listings
+2023-01-14 11:08:03,900 INFO    Final page of listings for this search
+2023-01-14 11:08:03,901 INFO    Results: 3 pages, 20 new rooms
+2023-01-14 11:08:03,941 INFO    Finishing survey 41, for Ouro Preto, Minas Gerais
+2023-01-14 11:08:03,944 INFO    Pronto! Pesquisa finalizada!

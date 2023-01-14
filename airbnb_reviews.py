@@ -60,15 +60,8 @@ class ABReview():
         self.save(self.config.FLAGS_INSERT_REPLACE)
 
     def save(self, insert_replace_flag):
-        """
-        Save a listing in the database. Delegates to lower-level methods
-        to do the actual database operations.
-        Return values:
-            True: listing is saved in the database
-            False: listing already existed
-        """
         try:
-            rowcount = 0#-1
+            rowcount = 0
             
             if insert_replace_flag == self.config.FLAGS_INSERT_REPLACE:
                 rowcount = self.__update()

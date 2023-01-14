@@ -1,0 +1,10 @@
+2023-01-14 10:53:43,062 INFO    ======================================================================
+2023-01-14 10:53:43,062 INFO    Survey 36, for Ouro Preto
+2023-01-14 10:53:43,064 INFO    Searching by bounding box, max_zoom=24
+2023-01-14 10:53:43,064 INFO    ----------------------------------------------------------------------
+2023-01-14 10:53:43,065 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
+2023-01-14 10:53:43,065 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-01-14 10:53:44,617 INFO    Page 01 returned 12 listings
+2023-01-14 10:53:44,617 INFO    Final page of listings for this search
+2023-01-14 10:53:44,618 INFO    Results: 1 pages, 12 new rooms
+2023-01-14 10:53:44,620 INFO    Finishing survey 36, for Ouro Preto

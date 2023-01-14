@@ -75,7 +75,6 @@ class Location():
             LOGGER.exception("Exception in update_location")
             return False
 
-
 class BoundingBox():
     """
     Get max and min lat and long for a search area
@@ -176,7 +175,6 @@ def select_lat_lng(config, bounding_box):
     except Exception: 
         LOGGER.exception("Exception in select_lat_lng: exiting")
         sys.exit()
-
 
 def reverse_geocode(config, location):
     """
@@ -322,19 +320,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-'''
-[{'address_components': [{'long_name': '154', 'short_name': '154', 'types': ['street_number']}, 
-{'long_name': 'Rua Augusto Corrêa de Magalhães', 'short_name': 'R. Augusto Corrêa de Magalhães', 
-'types': ['route']}, {'long_name': 'Água Limpa', 'short_name': 'Água Limpa', 'types':
- ['political', 'sublocality', 'sublocality_level_1']}, {'long_name': 'Ouro Preto', 'short_name': 'Ouro Preto', 'types': ['administrative_area_level_2', 'political']}, {'long_name': 'Minas Gerais', 'short_name': 'MG', 'types': ['administrative_area_level_1', 'political']}, {'long_name': 'Brazil', 'short_name': 'BR', 'types': ['country', 'political']}, {'long_name': '35400-000', 'short_name': '35400-000', 'types': ['postal_code']}], 'formatted_address': 'R. Augusto Corrêa de Magalhães, 154 - Água Limpa, Ouro Preto - MG, 35400-000, Brazil', 'geometry': {'location': {'lat': -20.3811652, 'lng': -43.5150962}, 'location_type': 'ROOFTOP', 'viewport': {'northeast': {'lat': -20.37981621970849, 'lng': -43.5137472197085}, 'southwest': {'lat': -20.3825141802915, 'lng': -43.5164451802915}}}, 'place_id': 'ChIJK9p-gP0KpAARLs-yzKh_fIQ', 'plus_code': {'compound_code': 'JF9M+GX Ouro Preto, State of Minas Gerais, Brazil', 'global_code': '58FRJF9M+GX'}, 'types': ['dentist', 'establishment', 'health', 'point_of_interest']}]
-
-
- [{'address_components': [{'long_name': 'Ouro Preto', 'short_name': 'Ouro Preto', 'types':
-    ['locality', 'political']}, {'long_name': 'Ouro Preto', 'short_name': 'Ouro Preto',
-    'types': ['administrative_area_level_2', 'political']},
-    {'long_name': 'State of Minas Gerais', 'short_name': 'MG', 'types':
-    ['administrative_area_level_1', 'political']}, {'long_name': 'Brazil', 'short_name': 'BR', 'types':
-    ['country', 'political']}, {'long_name': '35400-000', 'short_name': '35400-000', 'types': ['postal_code']}],
-    'formatted_address': 'Ouro Preto, State of Minas Gerais, 35400-000, Brazil', 'geometry': {'bounds': {'northeast': {'lat': -20.3699597, 'lng': -43.4719237}, 'southwest': {'lat': -20.4126148, 'lng': -43.5313676}}, 'location': {'lat': -20.3855743, 'lng': -43.5035777}, 'location_type': 'APPROXIMATE', 'viewport': {'northeast': {'lat': -20.3699597, 'lng': -43.4719237}, 'southwest': {'lat': -20.4126148, 'lng': -43.5313676}}}, 'place_id': 'ChIJW7VXLB0LpAAR_NWDHRPRhNk', 'types': ['locality', 'political']}]
-'''

@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import logging
 import os.path
-import create_map as cm
 from pandas import ExcelWriter
 
 def show_values_on_bars(axs, h_v="v", space=0.4):
@@ -69,9 +68,9 @@ def plot_graph_with_clusters_region_values(table, data, qtd=False, percentage=Fa
 		g.axes.set_ylim(0, data['overall_satisfaction'].max() + 1)
 		show_values_on_bars(g)
 		
-		'''g = sns.barplot(x="region", y="reviews", hue="current_cluster", data=tmp_data, ax=axs[3][n-1])
+		g = sns.barplot(x="region", y="reviews", hue="current_cluster", data=tmp_data, ax=axs[3][n-1])
 		g.axes.set_ylim(0, data['reviews'].max() + (  data['reviews'].mean() / 2))
-		show_values_on_bars(g)'''
+		show_values_on_bars(g)
 
 	fig.suptitle('quantidade de quartos filtrados por região para cada cluster em k clusterizações', fontsize=16)
 	mng = plt.get_current_fig_manager()
@@ -188,3 +187,42 @@ def plot_graph_with_clusters_room_type_values(table, data, qtd=False, percentage
 	mng.resize(*mng.window.maxsize())
 	plt.subplots_adjust(left=0.05, bottom=0.11, right=0.97, top=0.88, wspace=0.25, hspace=0.20)
 	plt.show()
+
+def create_dataframe_with_means(table, means, region, rooms, comodities):
+	writer = ExcelWriter('public/data/mean values_' + table + '_' + today + '.xlsx')
+	
+	dcomodities = pd.DataFrame(list(comodities), columns=['total_clusters', 'current_cluster', 'total_listings', 'comodity', \
+															'qtd','percentage']) #add avg price e outros tbm
+	dcomodities.to_excel(writer, sheet_name='region')
+
+
+	dmeans = pd.DataFrame(list(means), columns=['total_clusters', 'current_cluster', 'total_listings', \
+											'avg_price','avg_overall_satisfaction', 'qtd_airbnb', \
+											'qtd_booking', 'percentage_airbnb', 'percentage_booking'])
+	dmeans.fillna(0)
+	dmeans.to_excel(writer, sheet_name='mean values')
+
+	dregion = pd.DataFrame(list(region), columns=['total_clusters', 'current_cluster', 'total_listings', \
+												'region','qtd','percentage', 'price', 'overall_satisfaction'])
+
+	dregion.fillna(0)
+	dregion.to_excel(writer, sheet_name='region filter')
+
+	drooms = pd.DataFrame(list(rooms), columns=['total_clusters', 'current_cluster', 'total_listings',
+												'room_type', 'qtd', 'percentage','price', 'overall_satisfaction'])
+	drooms.fillna(0)
+	drooms.to_excel(writer, sheet_name="room filter")
+	
+	writer.save()
+
+	plot_graph_with_qtd_values(table, dmeans)
+	plot_graph_with_clusters_average_values(table, dmeans) # all the values in each cluster, without more filters
+	
+	plot_graph_with_clusters_comodities_values(dcomodities, qtd=True)
+	plot_graph_with_clusters_comodities_values(dcomodities, percentage=True)
+	
+	plot_graph_with_clusters_room_type_values(table, drooms, qtd=True)
+	plot_graph_with_clusters_room_type_values(table, drooms, percentage=True)
+
+	plot_graph_with_clusters_region_values(table, dregion, percentage=True)
+	plot_graph_with_clusters_region_values(table, dregion, qtd=True)

@@ -1,0 +1,147 @@
+2023-01-14 11:31:16,292 INFO    ======================================================================
+2023-01-14 11:31:16,293 INFO    Survey 64, for Ouro Preto, Minas Gerais
+2023-01-14 11:31:16,294 INFO    Searching by bounding box, max_zoom=24
+2023-01-14 11:31:16,295 INFO    ----------------------------------------------------------------------
+2023-01-14 11:31:16,295 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
+2023-01-14 11:31:16,296 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-01-14 11:31:17,219 INFO    Page 01 returned 18 listings
+2023-01-14 11:31:17,930 INFO    Room 51217390: insert failed
+2023-01-14 11:31:17,932 INFO    Room 52024666: insert failed
+2023-01-14 11:31:17,934 INFO    Room 47939876: insert failed
+2023-01-14 11:31:17,935 INFO    Room 51978370: insert failed
+2023-01-14 11:31:17,937 INFO    Room 40752066: insert failed
+2023-01-14 11:31:17,939 INFO    Room 30403033: insert failed
+2023-01-14 11:31:17,941 INFO    Room 41502392: insert failed
+2023-01-14 11:31:17,944 INFO    Room 47334727: insert failed
+2023-01-14 11:31:17,957 INFO    Room 758263738755481654: insert failed
+2023-01-14 11:31:17,959 INFO    Room 50723507: insert failed
+2023-01-14 11:31:17,961 INFO    Room 54222723: insert failed
+2023-01-14 11:31:17,963 INFO    Room 714323517316563160: insert failed
+2023-01-14 11:31:17,964 INFO    Room 794011987542751252: insert failed
+2023-01-14 11:31:17,966 INFO    Room 740983683035077351: insert failed
+2023-01-14 11:31:17,967 INFO    Room 19969297: insert failed
+2023-01-14 11:31:17,970 INFO    Room 736390796820280107: insert failed
+2023-01-14 11:31:17,971 INFO    Page 02 returned 18 listings
+2023-01-14 11:31:19,019 INFO    Room 42270186: insert failed
+2023-01-14 11:31:19,055 INFO    Page 03 returned 18 listings
+2023-01-14 11:31:19,795 INFO    Page 04 returned 18 listings
+2023-01-14 11:31:20,621 INFO    Page 05 returned 18 listings
+2023-01-14 11:31:21,435 INFO    Page 06 returned 18 listings
+2023-01-14 11:31:21,857 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:31:31,038 INFO    Page 07 returned 18 listings
+2023-01-14 11:31:31,778 INFO    Page 08 returned 18 listings
+2023-01-14 11:31:33,143 INFO    Page 09 returned 18 listings
+2023-01-14 11:31:34,478 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:31:41,586 INFO    Page 10 returned 18 listings
+2023-01-14 11:31:43,177 INFO    Page 11 returned 18 listings
+2023-01-14 11:31:44,905 INFO    Page 12 returned 18 listings
+2023-01-14 11:31:48,033 INFO    Page 13 returned 18 listings
+2023-01-14 11:31:50,114 INFO    Page 14 returned 18 listings
+2023-01-14 11:31:51,993 INFO    Page 15 returned 18 listings
+2023-01-14 11:31:53,119 INFO    Page 16 returned 18 listings
+2023-01-14 11:31:53,966 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:32:02,630 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:32:09,311 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:32:19,295 INFO    Page 17 returned 18 listings
+2023-01-14 11:32:21,567 INFO    Page 18 returned 18 listings
+2023-01-14 11:32:24,298 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:32:35,730 INFO    Page 19 returned 18 listings
+2023-01-14 11:32:40,877 INFO    Room 786728469325385696: insert failed
+2023-01-14 11:32:40,883 INFO    Room 52200787: insert failed
+2023-01-14 11:32:40,889 INFO    Room 724479550095540531: insert failed
+2023-01-14 11:32:40,930 INFO    Room 50167985: insert failed
+2023-01-14 11:32:40,942 INFO    Room 34944198: insert failed
+2023-01-14 11:32:40,958 INFO    Page 20 returned 18 listings
+2023-01-14 11:32:45,469 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:32:57,873 INFO    Room 31830711: insert failed
+2023-01-14 11:32:57,875 INFO    Room 36908627: insert failed
+2023-01-14 11:32:57,877 INFO    Room 42383334: insert failed
+2023-01-14 11:32:57,879 INFO    Room 48005578: insert failed
+2023-01-14 11:32:57,881 INFO    Room 792591671330772257: insert failed
+2023-01-14 11:32:57,883 INFO    Room 675488767542051573: insert failed
+2023-01-14 11:32:57,885 INFO    Room 644265453763372279: insert failed
+2023-01-14 11:32:57,887 INFO    Room 602403433498354515: insert failed
+2023-01-14 11:32:57,889 INFO    Room 53432722: insert failed
+2023-01-14 11:32:57,904 INFO    Page 21 returned 18 listings
+2023-01-14 11:33:00,137 INFO    Room 31830711: insert failed
+2023-01-14 11:33:00,139 INFO    Room 36908627: insert failed
+2023-01-14 11:33:00,142 INFO    Room 42383334: insert failed
+2023-01-14 11:33:00,144 INFO    Room 48005578: insert failed
+2023-01-14 11:33:00,146 INFO    Room 792591671330772257: insert failed
+2023-01-14 11:33:00,148 INFO    Room 675488767542051573: insert failed
+2023-01-14 11:33:00,150 INFO    Room 644265453763372279: insert failed
+2023-01-14 11:33:00,151 INFO    Room 602403433498354515: insert failed
+2023-01-14 11:33:00,153 INFO    Room 53432722: insert failed
+2023-01-14 11:33:00,154 INFO    Room 52535321: insert failed
+2023-01-14 11:33:00,155 INFO    Room 33225835: insert failed
+2023-01-14 11:33:00,156 INFO    Room 596870204414972755: insert failed
+2023-01-14 11:33:00,158 INFO    Room 45085254: insert failed
+2023-01-14 11:33:00,160 INFO    Room 768315557323720880: insert failed
+2023-01-14 11:33:00,162 INFO    Room 39219064: insert failed
+2023-01-14 11:33:00,163 INFO    Room 38821359: insert failed
+2023-01-14 11:33:00,164 INFO    Room 731830561439221944: insert failed
+2023-01-14 11:33:00,165 INFO    Room 801675201924895154: insert failed
+2023-01-14 11:33:00,166 INFO    Page 22 returned 18 listings
+2023-01-14 11:33:03,167 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:33:15,020 INFO    Room 31830711: insert failed
+2023-01-14 11:33:15,022 INFO    Room 36908627: insert failed
+2023-01-14 11:33:15,024 INFO    Room 42383334: insert failed
+2023-01-14 11:33:15,026 INFO    Room 48005578: insert failed
+2023-01-14 11:33:15,028 INFO    Room 792591671330772257: insert failed
+2023-01-14 11:33:15,029 INFO    Room 675488767542051573: insert failed
+2023-01-14 11:33:15,031 INFO    Room 644265453763372279: insert failed
+2023-01-14 11:33:15,033 INFO    Room 602403433498354515: insert failed
+2023-01-14 11:33:15,034 INFO    Room 53432722: insert failed
+2023-01-14 11:33:15,035 INFO    Room 52535321: insert failed
+2023-01-14 11:33:15,036 INFO    Room 33225835: insert failed
+2023-01-14 11:33:15,038 INFO    Room 596870204414972755: insert failed
+2023-01-14 11:33:15,039 INFO    Room 45085254: insert failed
+2023-01-14 11:33:15,040 INFO    Room 768315557323720880: insert failed
+2023-01-14 11:33:15,041 INFO    Room 39219064: insert failed
+2023-01-14 11:33:15,042 INFO    Room 38821359: insert failed
+2023-01-14 11:33:15,043 INFO    Room 731830561439221944: insert failed
+2023-01-14 11:33:15,044 INFO    Room 801675201924895154: insert failed
+2023-01-14 11:33:15,045 INFO    Page 23 returned 18 listings
+2023-01-14 11:33:16,003 INFO    Room 31830711: insert failed
+2023-01-14 11:33:16,005 INFO    Room 36908627: insert failed
+2023-01-14 11:33:16,007 INFO    Room 42383334: insert failed
+2023-01-14 11:33:16,009 INFO    Room 48005578: insert failed
+2023-01-14 11:33:16,011 INFO    Room 792591671330772257: insert failed
+2023-01-14 11:33:16,013 INFO    Room 675488767542051573: insert failed
+2023-01-14 11:33:16,015 INFO    Room 644265453763372279: insert failed
+2023-01-14 11:33:16,016 INFO    Room 602403433498354515: insert failed
+2023-01-14 11:33:16,018 INFO    Room 53432722: insert failed
+2023-01-14 11:33:16,019 INFO    Room 52535321: insert failed
+2023-01-14 11:33:16,021 INFO    Room 33225835: insert failed
+2023-01-14 11:33:16,022 INFO    Room 596870204414972755: insert failed
+2023-01-14 11:33:16,023 INFO    Room 45085254: insert failed
+2023-01-14 11:33:16,024 INFO    Room 768315557323720880: insert failed
+2023-01-14 11:33:16,026 INFO    Room 39219064: insert failed
+2023-01-14 11:33:16,029 INFO    Room 38821359: insert failed
+2023-01-14 11:33:16,030 INFO    Room 731830561439221944: insert failed
+2023-01-14 11:33:16,032 INFO    Room 801675201924895154: insert failed
+2023-01-14 11:33:16,032 INFO    Page 24 returned 18 listings
+2023-01-14 11:33:23,729 INFO    Room 31830711: insert failed
+2023-01-14 11:33:23,731 INFO    Room 36908627: insert failed
+2023-01-14 11:33:23,733 INFO    Room 42383334: insert failed
+2023-01-14 11:33:23,735 INFO    Room 48005578: insert failed
+2023-01-14 11:33:23,737 INFO    Room 792591671330772257: insert failed
+2023-01-14 11:33:23,738 INFO    Room 675488767542051573: insert failed
+2023-01-14 11:33:23,740 INFO    Room 644265453763372279: insert failed
+2023-01-14 11:33:23,742 INFO    Room 53432722: insert failed
+2023-01-14 11:33:23,743 INFO    Room 602403433498354515: insert failed
+2023-01-14 11:33:23,744 INFO    Room 52535321: insert failed
+2023-01-14 11:33:23,745 INFO    Room 33225835: insert failed
+2023-01-14 11:33:23,746 INFO    Room 596870204414972755: insert failed
+2023-01-14 11:33:23,747 INFO    Room 45085254: insert failed
+2023-01-14 11:33:23,748 INFO    Room 768315557323720880: insert failed
+2023-01-14 11:33:23,749 INFO    Room 39219064: insert failed
+2023-01-14 11:33:23,750 INFO    Room 38821359: insert failed
+2023-01-14 11:33:23,751 INFO    Room 731830561439221944: insert failed
+2023-01-14 11:33:23,752 INFO    Room 801675201924895154: insert failed
+2023-01-14 11:33:23,753 INFO    Page 25 returned 18 listings
+2023-01-14 11:33:26,136 INFO    Page 26 returned 00 listings
+2023-01-14 11:33:26,137 INFO    Final page of listings for this search
+2023-01-14 11:33:26,137 INFO    Results: 26 pages, 347 new rooms
+2023-01-14 11:33:26,139 INFO    Finishing survey 64, for Ouro Preto, Minas Gerais
+2023-01-14 11:33:26,436 INFO    Pronto! Pesquisa finalizada!

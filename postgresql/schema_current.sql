@@ -107,14 +107,14 @@ WITH (
   OIDS=FALSE
 );
 
-CREATE TABLE public.schema_version
-(
-  version numeric(5,2) NOT NULL,
-  CONSTRAINT schema_version_pkey PRIMARY KEY (version)
-)
-WITH (
-  OIDS=FALSE
-);
+-- CREATE TABLE public.schema_version
+-- (
+--   version numeric(5,2) NOT NULL,
+--   CONSTRAINT schema_version_pkey PRIMARY KEY (version)
+-- )
+-- WITH (
+--   OIDS=FALSE
+-- );
 
 
 CREATE TABLE public.search_area
@@ -135,8 +135,7 @@ WITH (
 CREATE TABLE public.survey
 (
   survey_id integer NOT NULL DEFAULT nextval('survey_survey_id_seq'::regclass),
-  survey_date date DEFAULT ('now'::text)::date,
-  survey_description character varying(255),
+  survey_ss_  survey_description character varying(255),
   search_area_id integer,
   comment character varying(255),
   survey_method character varying(20) DEFAULT 'neighborhood'::character varying, -- neighborhood or zipcode
@@ -262,3 +261,45 @@ ALTER SEQUENCE survey_search_page_page_id_seq OWNED BY survey_progress_log.page_
 ALTER SEQUENCE survey_survey_id_seq OWNED BY survey.survey_id;
 ALTER SEQUENCE search_area_search_area_id_seq OWNED BY search_area.search_area_id;
 ALTER SEQUENCE city_city_id_seq OWNED BY city.city_id;
+
+CREATE SEQUENCE super_survey_id_seq
+            START WITH 1
+            INCREMENT BY 1
+            NO MINVALUE
+            NO MAXVALUE
+            CACHE 1;
+
+CREATE TABLE public.super_survey
+(
+  ss_id integer NOT NULL DEFAULT nextval('super_survey_id_seq'::regclass),
+  date date DEFAULT ('now'::text)::date,
+  city character varying(255),
+)
+WITH (
+  OIDS=FALSE
+);
+
+CREATE SEQUENCE location_id_seq
+            START WITH 1
+            INCREMENT BY 1
+            NO MINVALUE
+            NO MAXVALUE
+            CACHE 1;
+
+CREATE TABLE public.location
+(
+  location_id integer NOT NULL DEFAULT nextval('location_id_seq'::regclass),
+  route character varying(255),
+        neighborhood character varying(255),
+        sublocality character varying(255),
+        locality character varying(255),
+        level2 character varying(255),
+        level1 character varying(255),
+        country character varying(255),
+        lat_round character varying(255),
+        lng_round character varying(255),
+        zipcode character varying(20)
+)
+WITH (
+  OIDS=FALSE
+);

@@ -1,0 +1,100 @@
+2023-01-13 21:48:51,109 INFO    ======================================================================
+2023-01-13 21:48:51,111 INFO    Survey 2, for Ouro Preto
+2023-01-13 21:48:51,112 INFO    Searching by bounding box, max_zoom=24
+2023-01-13 21:48:51,113 INFO    ----------------------------------------------------------------------
+2023-01-13 21:48:51,114 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
+2023-01-13 21:48:51,114 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-01-13 21:49:01,290 WARNING Network request 0: connectionError. Bad proxy 45.234.200.18:53281?
+2023-01-13 21:49:11,320 WARNING Network request 1: connectionError. Bad proxy 186.225.157.22:8080?
+2023-01-13 21:49:13,166 WARNING Network request 2: connectionError. Bad proxy 168.196.223.26:8080?
+2023-01-13 21:49:23,674 WARNING Network request 3: connectionError. Bad proxy 177.8.179.9:8080?
+2023-01-13 21:49:23,947 WARNING Network request 4: connectionError. Bad proxy 168.196.223.26:8080?
+2023-01-13 21:49:34,367 WARNING Network request 5: connectionError. Bad proxy 177.70.172.240:8080?
+2023-01-13 21:49:44,665 WARNING Network request 6: connectionError. Bad proxy 179.182.162.200:8080?
+2023-01-13 21:49:50,590 WARNING Network request 7: connectionError. Bad proxy 179.189.125.222:8080?
+2023-01-13 21:50:00,892 WARNING Network request 8: connectionError. Bad proxy 179.182.162.200:8080?
+2023-01-13 21:50:01,068 WARNING Network request 9: connectionError. Bad proxy 168.196.223.26:8080?
+2023-01-13 21:50:11,336 WARNING Network request 10: connectionError. Bad proxy 177.54.142.238:8080?
+2023-01-13 21:50:13,647 WARNING Network request 11: connectionError. Bad proxy 45.175.174.29:8080?
+2023-01-13 21:50:23,947 WARNING Network request 12: connectionError. Bad proxy 200.206.92.158:8080?
+2023-01-13 21:50:34,207 WARNING Network request 13: connectionError. Bad proxy 187.60.46.229:8080?
+2023-01-13 21:50:44,650 WARNING Network request 14: connectionError. Bad proxy 177.207.192.143:3128?
+2023-01-13 21:50:47,048 WARNING Network request 15: connectionError. Bad proxy 200.108.183.2:8080?
+2023-01-13 21:50:57,327 WARNING Network request 16: connectionError. Bad proxy 200.215.171.238:8080?
+2023-01-13 21:51:07,590 WARNING Network request 17: connectionError. Bad proxy 200.215.171.238:8080?
+2023-01-13 21:51:17,848 WARNING Network request 18: connectionError. Bad proxy 170.244.68.106:8080?
+2023-01-13 21:51:28,266 WARNING Network request 19: connectionError. Bad proxy 177.220.188.213:8080?
+2023-01-13 21:51:28,267 WARNING No response received from request despite multiple attempts: {'_format': 'for_explore_search_web', '_intents': 'p1', 'adults': '0', 'allow_override[]': '', 'auto_ib': 'False', 'children': '0', 'client_session_id': '', 'experiences_per_grid': '20', 'federated_search_session_id': '45de42ea-60d4-49a9-9335-9e52789cd306', 'fetch_filters': 'True', 'guests': '0', 'guidebooks_per_grid': '20', 'has_zero_guest_treatment': 'True', 'infants': '0', 'is_guided_search': 'True', 'is_new_cards_experiment': 'True', 'is_standard_search': 'True', 'items_offset': '18', 'items_per_grid': '18', 'key': 'd306zoyjsyarp7ifhu67rjxn52tv0t20', 'luxury_pre_launch': 'False', 'metadata_only': 'False', 'query_understanding_enabled': 'True', 'refinement_paths[]': '/homes', 'search_type': 'PAGINATION', 'search_by_map': 'True', 'section_offset': 0, 'selected_tab_id': 'home_tab', 'show_groupings': 'True', 'supports_for_you_v3': 'True', 'timezone_offset': '-240', 'ne_lat': '-20.2519', 'ne_lng': '-43.4372', 'sw_lat': '-20.5229', 'sw_lng': '-43.7846', 'screen_size': 'medium', 'zoom': 'True'}
+2023-01-13 21:51:38,411 WARNING Network request 0: connectionError. Bad proxy 177.54.142.238:8080?
+2023-01-13 21:51:48,502 WARNING Network request 1: connectionError. Bad proxy 177.70.172.240:8080?
+2023-01-13 21:51:50,915 ERROR   Exception in get_search_page_info_rectangle
+Traceback (most recent call last):
+  File "C:\ufop\airbnb-data-collection\airbnb_listing.py", line 157, in save
+    self.__insert()
+  File "C:\ufop\airbnb-data-collection\airbnb_listing.py", line 315, in __insert
+    cur.execute(sql, insert_args)
+psycopg2.errors.UndefinedColumn: column "sublocality" of relation "room" does not exist
+LINE 9:                     sublocality, route, is_superhost,
+                            ^
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\ufop\airbnb-data-collection\airbnb_survey.py", line 781, in search_node
+    if listing.save(self.config.FLAGS_INSERT_NO_REPLACE):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ufop\airbnb-data-collection\airbnb_listing.py", line 167, in save
+    self.config.connection.conn.rollback()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'conn'
+2023-01-13 21:51:50,984 ERROR   Error in recurse_quadtree
+Traceback (most recent call last):
+  File "C:\ufop\airbnb-data-collection\airbnb_listing.py", line 157, in save
+    self.__insert()
+  File "C:\ufop\airbnb-data-collection\airbnb_listing.py", line 315, in __insert
+    cur.execute(sql, insert_args)
+psycopg2.errors.UndefinedColumn: column "sublocality" of relation "room" does not exist
+LINE 9:                     sublocality, route, is_superhost,
+                            ^
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\ufop\airbnb-data-collection\airbnb_survey.py", line 506, in recurse_quadtree
+    (zoomable, median_leaf) = self.search_node(
+                              ^^^^^^^^^^^^^^^^^
+  File "C:\ufop\airbnb-data-collection\airbnb_survey.py", line 781, in search_node
+    if listing.save(self.config.FLAGS_INSERT_NO_REPLACE):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ufop\airbnb-data-collection\airbnb_listing.py", line 167, in save
+    self.config.connection.conn.rollback()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'conn'
+2023-01-13 21:51:50,992 ERROR   Error
+Traceback (most recent call last):
+  File "C:\ufop\airbnb-data-collection\airbnb_listing.py", line 157, in save
+    self.__insert()
+  File "C:\ufop\airbnb-data-collection\airbnb_listing.py", line 315, in __insert
+    cur.execute(sql, insert_args)
+psycopg2.errors.UndefinedColumn: column "sublocality" of relation "room" does not exist
+LINE 9:                     sublocality, route, is_superhost,
+                            ^
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\ufop\airbnb-data-collection\airbnb_survey.py", line 445, in search
+    self.recurse_quadtree(quadtree_node, median_node, None, flag)
+  File "C:\ufop\airbnb-data-collection\airbnb_survey.py", line 506, in recurse_quadtree
+    (zoomable, median_leaf) = self.search_node(
+                              ^^^^^^^^^^^^^^^^^
+  File "C:\ufop\airbnb-data-collection\airbnb_survey.py", line 781, in search_node
+    if listing.save(self.config.FLAGS_INSERT_NO_REPLACE):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\ufop\airbnb-data-collection\airbnb_listing.py", line 167, in save
+    self.config.connection.conn.rollback()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'psycopg2.extensions.connection' object has no attribute 'conn'

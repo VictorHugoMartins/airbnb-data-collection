@@ -1,0 +1,39 @@
+2023-01-14 10:39:40,756 ERROR   Invalid bounding box: e_lng must be > w_lng
+2023-01-14 10:39:40,757 INFO    ======================================================================
+2023-01-14 10:39:40,757 INFO    Survey 26, for Bauxita, Ouro Preto
+2023-01-14 10:39:40,758 INFO    Searching by bounding box, max_zoom=24
+2023-01-14 10:39:40,758 INFO    ----------------------------------------------------------------------
+2023-01-14 10:39:40,759 ERROR   Exception in get_rectangle_from_quadtree_node
+Traceback (most recent call last):
+  File "C:\ufop\airbnb-data-collection\airbnb_survey.py", line 842, in get_rectangle_from_quadtree_node
+    rectangle = self.bounding_box[0:4]
+                ~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+2023-01-14 10:39:40,761 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-01-14 10:39:40,761 ERROR   Exception in get_search_page_info_rectangle
+Traceback (most recent call last):
+  File "C:\ufop\airbnb-data-collection\airbnb_survey.py", line 556, in search_node
+    .format(n=rectangle[0], e=rectangle[1],
+              ~~~~~~~~~^^^
+TypeError: 'NoneType' object is not subscriptable
+2023-01-14 10:39:40,762 ERROR   TypeError in recurse_quadtree
+Traceback (most recent call last):
+  File "C:\ufop\airbnb-data-collection\airbnb_survey.py", line 506, in recurse_quadtree
+    (zoomable, median_leaf) = self.search_node(
+                              ^^^^^^^^^^^^^^^^^
+  File "C:\ufop\airbnb-data-collection\airbnb_survey.py", line 556, in search_node
+    .format(n=rectangle[0], e=rectangle[1],
+              ~~~~~~~~~^^^
+TypeError: 'NoneType' object is not subscriptable
+2023-01-14 10:39:40,763 ERROR   ("'NoneType' object is not subscriptable",)
+2023-01-14 10:39:40,764 ERROR   Error
+Traceback (most recent call last):
+  File "C:\ufop\airbnb-data-collection\airbnb_survey.py", line 445, in search
+    self.recurse_quadtree(quadtree_node, median_node, None, flag)
+  File "C:\ufop\airbnb-data-collection\airbnb_survey.py", line 506, in recurse_quadtree
+    (zoomable, median_leaf) = self.search_node(
+                              ^^^^^^^^^^^^^^^^^
+  File "C:\ufop\airbnb-data-collection\airbnb_survey.py", line 556, in search_node
+    .format(n=rectangle[0], e=rectangle[1],
+              ~~~~~~~~~^^^
+TypeError: 'NoneType' object is not subscriptable

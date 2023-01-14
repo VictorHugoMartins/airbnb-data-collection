@@ -281,6 +281,21 @@ class ABListing():
 
     def __insert(self):
         """ Insert a room into the database. Raise an error if it fails """
+        print(
+                self.room_id, self.host_id, self.room_type, self.country,
+                self.city, self.neighborhood, self.address, self.reviews,
+                self.overall_satisfaction, self.accommodates, self.bedrooms,
+                self.bathrooms, self.price, self.deleted, self.minstay,
+                self.latitude, self.longitude, self.survey_id,
+                self.coworker_hosted, self.extra_host_languages, self.name,
+                self.property_type, self.currency, self.rate_type,
+                self.sublocality, self.route,
+                self.is_superhost,
+                self.max_nights, self.avg_rating,
+                self.pictures
+                )
+                
+        # return
         try:
             logger.debug("Values: ")
             logger.debug("\troom_id: {}".format(self.room_id))
@@ -295,8 +310,8 @@ class ABListing():
                     minstay, latitude, longitude, survey_id,
                     coworker_hosted, extra_host_languages, name,
                     property_type, currency, rate_type,
-                    sublocality, route, is_superhost,
-                    max_nights, avg_rating, pictures)
+                    sublocality, route, avg_rating,
+                    is_superhost, max_nights, pictures)
                 values (%s, %s, %s, %s, %s, %s, %s, %s, %s,
                 %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
                 %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
@@ -309,8 +324,9 @@ class ABListing():
                 self.latitude, self.longitude, self.survey_id,
                 self.coworker_hosted, self.extra_host_languages, self.name,
                 self.property_type, self.currency, self.rate_type,
-                self.sublocality, self.route, self.is_superhost,
-                self.max_nights, self.avg_rating, self.pictures
+                self.sublocality, self.route, self.avg_rating,
+                 self.is_superhost,
+                self.max_nights, self.pictures
                 )
             cur.execute(sql, insert_args)
             cur.close()
@@ -405,6 +421,7 @@ class ABListing():
                 )
             if s is not None:
                 j = json.loads(s[0])
+                # print(j)
                 self.overall_satisfaction = j["listing"]["star_rating"]
             elif len(temp) > 0:
                 self.overall_satisfaction = temp[0]
@@ -593,8 +610,8 @@ class ABListing():
             s = tree.xpath("//script[@id='data-state']/text()")
             
             if s is not None:
-                print(s)
-                print("<- s")
+                # print(s)
+                # print("<- s")
                 j = json.loads(s[0])
 
                 r = j["bootstrapData"]["reduxData"]["homePDP"]["listingInfo"]["listing"]["sorted_reviews"]
@@ -614,7 +631,7 @@ class ABListing():
             # 2020-05-17
             try: # get reviews from guests
                 x = j["bootstrapData"]["reduxData"]["userProfile"]["api"]["serverData"]["user_profile"]["recent_reviews_from_guest"]
-                print(x)
+                # print(x)
                 if x is not None:
                     logger.info("Reviews from host page")
                     
@@ -630,7 +647,7 @@ class ABListing():
                 if x is not None:
                     logger.info("Reviews from host page")
                     
-                    print(x)
+                    # print(x)
                     for individual_review in x:
                         review = ABReview(self.config, individual_review, self.room_id)
                     return True

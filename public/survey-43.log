@@ -1,0 +1,36 @@
+2023-01-14 11:11:11,505 INFO    ======================================================================
+2023-01-14 11:11:11,505 INFO    Survey 43, for Ouro Preto, Minas Gerais
+2023-01-14 11:11:11,506 INFO    Searching by bounding box, max_zoom=24
+2023-01-14 11:11:11,506 INFO    ----------------------------------------------------------------------
+2023-01-14 11:11:11,506 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
+2023-01-14 11:11:11,507 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-01-14 11:11:11,969 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:11:19,392 INFO    Page 01 returned 18 listings
+2023-01-14 11:11:19,844 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:11:28,512 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:11:35,229 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:11:46,578 INFO    Room 51217390: insert failed
+2023-01-14 11:11:46,584 INFO    Room 52024666: insert failed
+2023-01-14 11:11:46,589 INFO    Room 47939876: insert failed
+2023-01-14 11:11:46,595 INFO    Room 51978370: insert failed
+2023-01-14 11:11:46,601 INFO    Room 40752066: insert failed
+2023-01-14 11:11:46,606 INFO    Room 30403033: insert failed
+2023-01-14 11:11:46,612 INFO    Room 41502392: insert failed
+2023-01-14 11:11:46,618 INFO    Room 47334727: insert failed
+2023-01-14 11:11:46,624 INFO    Room 23413941: insert failed
+2023-01-14 11:11:46,630 INFO    Room 758263738755481654: insert failed
+2023-01-14 11:11:46,636 INFO    Room 50723507: insert failed
+2023-01-14 11:11:46,642 INFO    Room 54222723: insert failed
+2023-01-14 11:11:46,648 INFO    Room 714323517316563160: insert failed
+2023-01-14 11:11:46,654 INFO    Room 794011987542751252: insert failed
+2023-01-14 11:11:46,660 INFO    Room 740983683035077351: insert failed
+2023-01-14 11:11:46,666 INFO    Room 19969297: insert failed
+2023-01-14 11:11:46,671 INFO    Room 42270186: insert failed
+2023-01-14 11:11:46,675 INFO    Room 736390796820280107: insert failed
+2023-01-14 11:11:46,675 INFO    Page 02 returned 18 listings
+2023-01-14 11:11:52,071 INFO    Room 736390796820280107: insert failed
+2023-01-14 11:11:52,158 INFO    Page 03 returned 18 listings
+2023-01-14 11:11:53,642 INFO    Page 04 returned 18 listings
+2023-01-14 11:11:58,428 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:12:09,773 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:12:20,178 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.

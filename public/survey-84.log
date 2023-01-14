@@ -1,0 +1,41 @@
+2023-01-14 11:45:52,959 INFO    ======================================================================
+2023-01-14 11:45:52,960 INFO    Survey 84, for Ouro Preto, Minas Gerais
+2023-01-14 11:45:52,961 INFO    Searching by bounding box, max_zoom=24
+2023-01-14 11:45:52,962 INFO    ----------------------------------------------------------------------
+2023-01-14 11:45:52,962 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
+2023-01-14 11:45:52,963 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-01-14 11:45:54,089 INFO    Page 01 returned 18 listings
+2023-01-14 11:45:54,886 INFO    Room 30403033: insert failed
+2023-01-14 11:45:54,888 INFO    Room 47939876: insert failed
+2023-01-14 11:45:54,889 INFO    Room 51978370: insert failed
+2023-01-14 11:45:54,891 INFO    Room 40752066: insert failed
+2023-01-14 11:45:54,892 INFO    Room 41502392: insert failed
+2023-01-14 11:45:54,894 INFO    Room 43805080: insert failed
+2023-01-14 11:45:54,897 INFO    Room 714323517316563160: insert failed
+2023-01-14 11:45:54,898 INFO    Room 736390796820280107: insert failed
+2023-01-14 11:45:54,900 INFO    Room 51217390: insert failed
+2023-01-14 11:45:54,901 INFO    Room 52024666: insert failed
+2023-01-14 11:45:54,903 INFO    Room 54222723: insert failed
+2023-01-14 11:45:54,905 INFO    Room 47334727: insert failed
+2023-01-14 11:45:54,907 INFO    Room 740983683035077351: insert failed
+2023-01-14 11:45:54,909 INFO    Room 794011987542751252: insert failed
+2023-01-14 11:45:54,911 INFO    Room 50723507: insert failed
+2023-01-14 11:45:54,912 INFO    Room 19969297: insert failed
+2023-01-14 11:45:54,913 INFO    Page 02 returned 18 listings
+2023-01-14 11:45:55,070 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:46:01,978 INFO    Room 762279793881682516: insert failed
+2023-01-14 11:46:01,998 INFO    Page 03 returned 18 listings
+2023-01-14 11:46:03,620 INFO    Page 04 returned 00 listings
+2023-01-14 11:46:03,620 INFO    Final page of listings for this search
+2023-01-14 11:46:03,621 INFO    Results: 4 pages, 37 new rooms
+2023-01-14 11:46:03,623 INFO    Finishing survey 84, for Ouro Preto, Minas Gerais
+2023-01-14 11:46:04,306 ERROR   Top level exception handler: quitting.
+Traceback (most recent call last):
+  File "C:\ufop\airbnb-data-collection\airbnb.py", line 843, in main
+    full_survey(ab_config, args.full_survey, False, True)
+  File "C:\ufop\airbnb-data-collection\airbnb.py", line 654, in full_survey
+    update_routes_geolocation(ab_config, area)
+  File "C:\ufop\airbnb-data-collection\airbnb.py", line 291, in update_routes_geolocation
+    route, sublocality, city, country, neighborhood, room_id
+                                                     ^^^^^^^
+NameError: name 'room_id' is not defined

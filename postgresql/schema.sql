@@ -6,7 +6,7 @@
 -- Dumped by pg_dump version 9.4.4
 -- Started on 2016-03-25 13:54:01
 
-CREATE EXTENSION postgis;
+-- CREATE EXTENSION postgis;
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -145,8 +145,8 @@ CREATE TABLE room (
     last_modified timestamp without time zone DEFAULT now(),
     latitude numeric(30,6),
     longitude numeric(30,6),
-    survey_id integer DEFAULT 999999 NOT NULL,
-    location geometry
+    survey_id integer DEFAULT 999999 NOT NULL
+    -- location geometry
 );
 
 

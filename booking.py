@@ -8,18 +8,20 @@ import requests
 import argparse
 import selenium
 import psycopg2
+from airbnb_geocoding import Location
+from airbnb_geocoding import BoundingBox
 from lxml import html
 from selenium import webdriver
 from airbnb_config import ABConfig
-from selenium.webdriver import Firefox
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from booking_reviews import BReview
 from geopy import distance
+import datetime as dt
+import utils
 
 
 SCRIPT_VERSION_NUMBER = "4.0"
@@ -37,10 +39,13 @@ class BListing():
 		time.sleep(5)
 		try:
 			self.hotel_id = self.get_hotel_id(driver)
-		except:
+		except selenium.common.exceptions.NoSuchElementException:
 			self.hotel_id = None
 		self.property_type = self.get_property_type(driver)
 		self.name = self.get_name(driver)
+
+		print(self.name)
+
 		self.address = self.get_address(driver)
 		self.popular_facilities = self.get_popular_facilities(driver)
 		self.overall_satisfaction = self.get_overall_satisfaction(driver)
@@ -52,11 +57,16 @@ class BListing():
 
 		self.room_id = None
 		self.room_name = None
+		self.qtd_rooms = None
 		self.bed_type = None
 		self.adults_accommodates = None
 		self.children_accommodates = None
 		self.comodities = None
 		self.price = None
+		self.bedroom_type = None
+
+		self.start_date = None
+		self.finish_date = None
 
 	def get_address(self, driver):
 		# Get the accommodation address
@@ -129,14 +139,6 @@ class BListing():
 		except:
 			return (None, None, None, None)
 
-		''''for i in x:
-			if 'city_name:' in i:
-				city = i.split("city_name: '")[1].split("'")[0]
-				state = i.split("state_name: '")[1].split("'")[0]
-				country = i.split("country_name: '")[1].split("'")[0]
-				currency = i.split("currency: '")[1].split("'")[0]
-				break'''
-
 		return (city, state, country, currency)
 
 	def get_popular_facilities(self, driver):
@@ -206,7 +208,6 @@ class BListing():
 			x = driver.find_elements_by_xpath('//*[@class="bedroom_bed_type"]/span')
 			n_rows = len(x)
 			for j in range(n_rows):
-				logger.debug(j, "ta no j")
 				try:
 					room_name.append(x[j].text)
 				except:
@@ -371,6 +372,10 @@ class BListing():
 			True: listing is saved in the database
 			False: listing already existed
 		"""
+		print("veio inserir")
+		self.__insert()
+		print("inseriu")
+		return
 		try:
 			rowcount = -1
 			
@@ -431,14 +436,16 @@ class BListing():
 				insert into booking_room (
 					room_id, hotel_id, name, room_name, address, popular_facilities,
 					overall_satisfaction, reviews, property_type, bed_type, accommodates, children_accommodates,
-					price, latitude, longitude, city, state, country, currency, comodities, images
+					price, latitude, longitude, city, state, country, currency, comodities,
+					images, bedroom_type, qtd_rooms
 					)
-				values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+				values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
 			insert_args = (
 				self.room_id, self.hotel_id, self.name, self.room_name, self.address, self.popular_facilities,
 				self.overall_satisfaction, self.reviews, self.property_type, self.bed_type, self.adults_accommodates,
 				self.children_accommodates, self.price, self.latitude, self.longitude,
-				self.city, self.state, self.country, self.currency, self.comodities, self.images
+				self.city, self.state, self.country, self.currency, self.comodities,
+				self.images, self.bedroom_type, self.qtd_rooms
 				)
 			cur.execute(sql, insert_args)
 			cur.close()
@@ -510,67 +517,119 @@ def prepare_driver(url):
 		(By.ID, 'ss')))
 	return driver
 
-def fill_form(driver, config, search_argument, tomorrow_rooms):
-	'''Finds all the input tags in form and makes a POST requests.'''
-	try:
-		search_field = driver.find_element_by_id('ss')
-		search_field.send_keys(search_argument)
+def fill_form(driver, config, search_argument, start_date, finish_date):
+	# preenche o campo de área de busca
+	search_field = driver.find_element_by_id('ss')
+	search_field.send_keys(search_argument)
 
-		#if config.SEARCH_WITH_DATE:
+
+	# tenta clicar em "checkin/checkout" para exibir calendário com datas disponíveis
+	try:
 		driver.find_element_by_xpath('/html/body/div[5]/div/div/div[2]/form/div[1]/div[2]/'\
 											'div[1]/div[2]/div/div/div/div/span').click()
-		
-		if tomorrow_rooms:
-			try: # select the first selectionable day in calendar (in pratice, tomorrow)
-				print("tomorrow in this month")
-				driver.find_element_by_xpath('/html/body/div[5]/div/div/div[2]/form/div[1]/div[2]/'\
-					'div[2]/div/div/div[3]/div[1]/table/tbody/tr/td[@class="bui-calendar__date"]').click()
-			except: # in case of "tomorrow" in the other month
-				print("Tomorrow in next month")
-				driver.find_element_by_xpath('/html/body/div[5]/div/div/div[2]/form/div[1]/div[2]/div[2]'\
-					'/div/div/div[3]/div[2]/table/tbody/tr[1]/td[@class="bui-calendar__date"]').click()
-		else: # search for rooms in the first day of next month
-			print("next month")
-			driver.find_element_by_xpath('/html/body/div[5]/div/div/div[2]/form/div[1]/div[2]/div[2]'\
-					'/div/div/div[3]/div[2]/table/tbody/tr[1]/td[@class="bui-calendar__date"]').click()
-		
-		# We look for the search button and click it
-		driver.find_element_by_class_name('sb-searchbox__button')\
-			.click()
-		
-		wait = WebDriverWait(driver, timeout=10).until(
-			EC.presence_of_all_elements_located(
-				(By.CLASS_NAME, 'sr-hotel__title')))
-		return True
 	except:
-		return False
+		driver.find_element_by_xpath('//div[@data-calendar2-title="Data de entrada"]').click()
+	
+	sd_div = None
+	if start_date:
+		actual_month = int(dt.date.today().isoformat().split("-")[1])
+		search_month = int(start_date.split("-")[1])
+		while ( search_month > actual_month ):
+			actual_month = actual_month + 1
+			driver.find_element_by_xpath("/html/body/div[5]/div/div/div[2]/"
+										+ "form/div[1]/div[2]/div[2]/div/div/div[2]").click()
+			
+		try: # in case start date is in the actual month
+			driver.find_element_by_xpath('//*[@data-date="' + start_date + '"]').click()
+		except: # in case is in the next
+			driver.find_element_by_xpath('//*[@data-date="' + start_date + '"]').click()
+	else: # look for the first date in next month
+		sd_div = driver.find_element_by_xpath('/html/body/div[5]/div/div/div[2]/form/div[1]/div[2]/div[2]'\
+					'/div/div/div[3]/div[2]/table/tbody/tr[1]/td[@class="bui-calendar__date"]')
+		sd_div.click()
+		start_date = sd_div.get_attribute("data-date")
+	
+	if finish_date: # if not, the default is the next day to the next to the start
+		try:
+			driver.find_element_by_xpath('//*[@data-date="' + finish_date + '"]').click()
+		except:
+			driver.find_element_by_xpath('//*[@data-date="' + finish_date + '"]').click()
+		
+	# We look for the search button and click it
+	driver.find_element_by_class_name('sb-searchbox__button')\
+		.click()
+	
+	wait = WebDriverWait(driver, timeout=10).until(
+		EC.presence_of_all_elements_located(
+			(By.CLASS_NAME, 'sr-hotel__title')))
 
-def scrape_results(config, driver, n_results):
+	return (start_date, finish_date)
+
+def scrape_results(config, driver, n_results, start_date, finish_date, search_reviews):
 	'''Returns the data from n_results amount of results.'''
-	#try:
 	accommodations_urls = list()
 
 	for accomodation_title in driver.find_elements_by_class_name('sr-hotel__title'):
 		accommodations_urls.append(accomodation_title.find_element_by_class_name(
 			'hotel_name_link').get_attribute('href'))
 
+	btypes = []
+	for bedroom_type in driver.find_elements_by_class_name('room_info'):
+		btypes.append(bedroom_type.text)
+	
 	k = 0
+
+	print(n_results, ": quantidade de resultados")
 	for url in range(0, n_results):
-		'''try:
-		if url == n_results:
-			print("End of page results")
-			break'''
-		try:
-			scrape_accommodation_data(config, driver, accommodations_urls[url], url)
-			k = k + 1
-		except IndexError:
-			break
+		scrape_accommodation_data(config, driver, accommodations_urls[url],
+									url, btypes[url], start_date, finish_date,
+									search_reviews)
+		k = k + 1
+		print(k, "º quarto inserido")
 
 	return k
 
-def scrape_accommodation_data(config, driver, accommodation_url, n_page):
+def get_price(driver):  # unused
+	prices = []
+	x = driver.find_elements_by_xpath('//*[@class="bui-price-display__value prco-inline-block-maker-helper prco-font16-helper"]')
+	n_rows = len(x)
+
+	for elem in x:
+		try:
+			prices.append(elem.text.split('R$ ')[1])
+		except:
+			prices.append(None)
+			logger.debug("Price not finded")
+
+	return prices
+
+def get_room_options(driver):
+	rooms_options = driver.find_elements_by_xpath("//td[contains(@class, ' hprt-table-cell hprt-table-room-select')]")
+	ro = []
+	for t in rooms_options:
+		ro.append(t.text)
+	return ro
+
+def get_room_name(elem, valor_anterior):
+	try:
+		rn = elem.find_element_by_class_name('hprt-roomtype-link').get_attribute("data-room-name")
+		if rn == "":
+			rn = elem.find_element_by_class_name('hprt-roomtype-link').text
+		rn = rn
+	except (TypeError, selenium.common.exceptions.NoSuchElementException):
+		return valor_anterior
+
+def get_room_id(elem, valor_anterior):
+	try:
+		return elem.find_element_by_class_name('hprt-roomtype-link').get_attribute("data-room-id")
+	except (TypeError, selenium.common.exceptions.NoSuchElementException):
+		return valor_anterior # room id anterior
+
+def scrape_accommodation_data(config=None, driver=None, accommodation_url=None,
+							n_page=None, bedroom_type=None,
+							start_date=None, finish_date = None,
+							search_reviews=None):
 	'''Visits an accommodation page and extracts the data.'''
-	#try:
 	if driver == None:
 		driver = prepare_driver(accommodation_url)
 
@@ -578,7 +637,8 @@ def scrape_accommodation_data(config, driver, accommodation_url, n_page):
 	time.sleep(12)
 
 	accommodation = BListing(config, driver, accommodation_url)
-	print(accommodation.name)
+	accommodation.start_date = start_date
+	accommodation.finish_date = finish_date
 
 	x = driver.find_elements_by_xpath('//table[@id="hprt-table"]/tbody/tr')
 	id_anterior = None
@@ -586,19 +646,21 @@ def scrape_accommodation_data(config, driver, accommodation_url, n_page):
 	room_anterior = None
 	linha_anterior = []
 	i = 1
+
+	prices = get_price(driver)
+	ro = get_room_options(driver)
+
 	for elem in x:
+		print(i)
 		accommodation.bed_type = []
-		print("Room: ", i," from page ", n_page)
-		try:
-			accommodation.room_id = elem.find_element_by_class_name('hprt-roomtype-link').get_attribute("data-room-id")
-			id_anterior = accommodation.room_id
-		except:
-			accommodation.room_id = id_anterior # room id anterior
-		try:
-			accommodation.room_name = elem.find_element_by_class_name('hprt-roomtype-link').get_attribute("data-room-name")
-			room_anterior = accommodation.room_name
-		except:
-			accommodation.room_name = room_anterior
+		accommodation.qtd_rooms = ro[i-1]
+
+		accommodation.room_id = get_room_id(elem, id_anterior)
+		id_anterior = accommodation.room_id
+
+		accommodation.room_name = get_room_name(elem, room_anterior)
+		room_anterior = accommodation.room_name
+
 		try:
 			beds_type = elem.find_elements_by_class_name("rt-bed-type")
 			for k in beds_type:
@@ -609,13 +671,13 @@ def scrape_accommodation_data(config, driver, accommodation_url, n_page):
 					accommodation.bed_type.append(k.text)
 			bed_anterior = accommodation.bed_type
 				# linha_anterior = [] ??????
-		except:
+		except (TypeError, selenium.common.exceptions.NoSuchElementException):
 			accommodation.bed_type = bed_anterior 
-			accommodation.adults_accommodates = elem.find_element_by_class_name('bui-u-sr-only').text.split('Máx. pessoas: ')[1]
-		try:
-			accommodation.price = elem.find_element_by_xpath('//tr[' + str(i) + ']/td[3]/div/div[2]/div[1]').text.split('R$ ')[1]
-		except:
-			accommodation.price = elem.find_element_by_xpath('//tr[' + str(i) + ']/td[2]/div/div[2]/div[1]').text.split('R$ ')[1]
+		
+		accommodation.adults_accommodates = elem.find_element_by_class_name('bui-u-sr-only').text.split('Máx. pessoas: ')[1]
+		accommodation.price = prices[i-1]
+		print(accommodation.price)
+
 		try:
 			y = elem.find_elements_by_xpath('//tr[' + str(i) + ']/td[1]/div/div[4]/div/div/span[@class="hprt-facilities-facility"]/span')
 			n_rows = len(x)
@@ -625,15 +687,15 @@ def scrape_accommodation_data(config, driver, accommodation_url, n_page):
 
 			accommodation.comodities = linha + accommodation.popular_facilities
 			linha_anterior = linha
-		except:
-			accommodation.comodities = linha_anterior 
+		except (TypeError, selenium.common.exceptions.NoSuchElementException):
+			accommodation.comodities = linha_anterior
 		#print(accommodation.comodities)
 
 		i = i + 1
+	accommodation.bedroom_type = bedroom_type
 	accommodation.save(config.FLAGS_INSERT_REPLACE)
-	
-	#if accommodation.reviews is not None:
-	#    accommodation.get_reviews_text(driver)
+	if accommodation.reviews is not None and search_reviews:
+		accommodation.get_reviews_text(driver)
 
 def fill_empty_routes(config):
 	try:
@@ -693,121 +755,173 @@ def update_cities(config, city):
 	except:
 		raise
 
-def is_inside(lat_center, lng_center, lat_test, lng_test):
-	center_point = [{'lat': lat_center, 'lng': lng_center}]
-	test_point = [{'lat': lat_test, 'lng': lng_test}]
-
-	for radius in range(50):
-		center_point_tuple = tuple(center_point[0].values()) # (-7.7940023, 110.3656535)
-		test_point_tuple = tuple(test_point[0].values()) # (-7.79457, 110.36563)
-
-		dis = distance.distance(center_point_tuple, test_point_tuple).km
-		
-		if dis <= radius:
-			print("{} point is inside the {} km radius from {} coordinate".\
-					format(test_point_tuple, radius/1000, center_point_tuple))
-			return True
-	return False
-
 def update_routes(config, city):
 	try:
-			conn = config.connect()
-			cur = conn.cursor()
+		conn = config.connect()
+		cur = conn.cursor()
 
-			sql = """SELECT distinct(room_id), latitude, longitude from booking_room
-					where route is null and
-					( sublocality is null or sublocality = '1392' or
-					sublocality = '162' or sublocality = '302'
-					or sublocality = '')
-					order by room_id""" # os q precisa atualizar
-			cur.execute(sql)
-			routes = cur.fetchall()
-			print(str(cur.rowcount) + " routes to update")
+		sql = """SELECT distinct(room_id), latitude, longitude from booking_room
+				where route is null and
+				( sublocality is null or sublocality = '1392' or
+				sublocality = '162' or sublocality = '302'
+				or sublocality = '')
+				order by room_id""" # os q precisa atualizar
+		cur.execute(sql)
+		routes = cur.fetchall()
+		print(str(cur.rowcount) + " routes to update")
 
-			sql = """SELECT distinct(room_id), latitude, longitude, sublocality from booking_room
-					where route is not null and ( sublocality is not null and sublocality <> '')
-					and sublocality <> '1392' and sublocality <> '162' and sublocality <> '302'
-					order by sublocality desc""" # nenhum dos 2 é nulo
-			cur.execute(sql)
-			results = cur.fetchall()
-			
-			for route in routes:
-				r_id = route[0]
-				latitude = route[1]
-				longitude = route[2]
+		sql = """SELECT distinct(room_id), latitude, longitude, sublocality from booking_room
+				where route is not null and ( sublocality is not null and sublocality <> '')
+				and sublocality <> '1392' and sublocality <> '162' and sublocality <> '302'
+				order by sublocality desc""" # nenhum dos 2 é nulo
+		cur.execute(sql)
+		results = cur.fetchall()
+		
+		for route in routes:
+			r_id = route[0]
+			latitude = route[1]
+			longitude = route[2]
 
-				for result in results: 
-					room_id = result[0]
-					lat = result[1]
-					lng = result[2]
-					sublocality = result[3]
+			for result in results: 
+				room_id = result[0]
+				lat = result[1]
+				lng = result[2]
+				sublocality = result[3]
 
-					if is_inside(latitude, longitude, lat, lng):
-						sql = """UPDATE booking_room set sublocality = %s where room_id = %s"""
-						update_args = ( sublocality, r_id )
-						cur.execute(sql, update_args)
-						conn.commit()
+				if utils.is_inside(latitude, longitude, lat, lng):
+					sql = """UPDATE booking_room set sublocality = %s where room_id = %s"""
+					update_args = ( sublocality, r_id )
+					cur.execute(sql, update_args)
+					conn.commit()
 
-						print("Room ", r_id," updated for ", sublocality)
-						break
+					print("Room ", r_id," updated for ", sublocality)
+					break
 				
 	except:
 		raise
 
-def search(config, area, tomorrow_rooms):
+def search(config, area, start_date, finish_date, search_reviews):
 	for i in range(config.ATTEMPTS_TO_FIND_PAGE):
 		print("Attempt ", i+1, " to find page")
 		try:
 			driver = prepare_driver(DOMAIN)
-			fill_form(driver, config, area, tomorrow_rooms)
+			(start_date, finish_date) = fill_form(driver, config, area,
+												start_date, finish_date)
 			break
 		except selenium.common.exceptions.TimeoutException:
 			continue
 
 	if driver is None:
 		return False
-
 	urls = []
 	for link in driver.find_elements_by_xpath('//*[@id="search_results_table"]/div[4]/nav/ul/li[2]/ul/li/a'):
-		urls.append(link.get_attribute('href'))
+		try:
+			urls.append(link.get_attribute('href'))
+		except IndexError:
+			continue
 	driver.quit()
 
 	i = 1
 	n_rooms = 0
+	print("Scrapping data")
+
+	if urls is None:
+		search(config, area, start_date, finish_date, search_reviews)
+		return
+
 	for url in urls:
 		page = prepare_driver(url)
 		logger.debug("Page ", i, " of ", len(urls))
-		n_rooms = n_rooms + scrape_results(config, page, 25)
+		n_rooms = n_rooms + scrape_results(config, page, 25, start_date,
+										finish_date, search_reviews)
 		print(n_rooms, " room(s) inserted")
 		page.quit()
 		i = i + 1
 	return True
 
-def update_routes_geolocation(config):
+def add_routes_area_by_bounding_box(config, city):
 	try:
 		conn = config.connect()
 		cur = conn.cursor()
 
-		sql = """UPDATE booking_room T1 
-				SET
-				 route = T2.name
-				FROM route T2
-				WHERE 
-				  strpos(address, T2.name) <> 0;
-				 
-				UPDATE booking_room T1 
-				SET
-				 sublocality = T2.sublocality
-				FROM room T2
-				WHERE 
-				  T1.route = T2.route""" # nenhum dos 2 é nulo
-		
-		cur.execute(sql)
-		rowcount = cur.rowcount
-		print(rowcount, " hotels updated")
-		conn.commit()
+		sql = """SELECT distinct(route) from booking_room
+				where city = %s""" # os q precisa atualizar
+		select_args = (city,)
+		cur.execute(sql, select_args)
+		results = cur.fetchall()
+		print(str(cur.rowcount) + " rooms finded")
+
+		for result in results:     
+			route_name = str(result[0]) + ', ' + city
+			bounding_box = BoundingBox.from_google(config, route_name)
+			if bounding_box != None:
+				bounding_box.add_search_area(config, route_name)                
 	except:
 		raise
+
+def update_routes_geolocation(config, city):
+	(lat_max, lat_min, lng_max, lng_min) = utils.get_area_coordinates_from_db(config, city)
+	
+	conn = config.connect()
+	cur = conn.cursor()
+
+	sql = """SELECT distinct(hotel_id), latitude, longitude
+		from booking_room
+		where route is null
+		order by hotel_id""" # nenhum dos 2 é nulo
+	'''where latitude <= %s and latitude >= %s and longitude <= %s and longitude >= %s
+	'''
+	select_args = (lat_max, lat_min, lng_max, lng_min,)
+	cur.execute(sql, select_args)
+	results = cur.fetchall()
+	print(str(cur.rowcount) + "routes")
+
+	
+	for result in results:
+		hotel_id = result[0]
+		lat = result[1]
+		lng = result[2]
+
+		if lat is None or lng is None:
+			continue
+
+		location = Location(lat, lng) # initialize a location with coordinates
+		location.reverse_geocode(config) # find atributes for location with google api key
+		
+		if location.get_country() != "N/A":
+			country = location.get_country()
+		else:
+			country = None
+		if location.get_level2() != "N/A":
+			city = location.get_level2()
+		else:
+			city = None
+		if location.get_neighborhood() != "N/A":
+			neighborhood = location.get_neighborhood()
+		else:
+			neighborhood = None
+		if location.get_sublocality() != "N/A":
+			sublocality = location.get_sublocality()
+		else:
+			sublocality = None
+		if location.get_route() != "N/A":
+			route = location.get_route()
+		else:
+			route = None
+
+		location.insert_in_table_location(config)
+		
+		sql = """UPDATE booking_room set route = %s, sublocality = %s
+				where hotel_id = %s"""
+		update_args = (
+			route, sublocality, hotel_id,
+			)
+		cur.execute(sql, update_args)
+		rowcount = cur.rowcount
+		print("Room ", hotel_id, " updated for ", route)
+		conn.commit()
+
+	add_routes_area_by_bounding_box(config, city)
 
 def parse_args():
 	"""
@@ -823,16 +937,27 @@ def parse_args():
 						metavar="config_file", action="store", default=None,
 						help="""explicitly set configuration file, instead of
 						using the default <username>.config""")
-	parser.add_argument("-t", "--tomorrow_rooms",
-						default=False,
-						help="""search rooms in the imediatly next day""") # para implementar
-	parser.add_argument("-or", "--only_reviews",
-						default=False,
+	parser.add_argument("-sr", "--search_reviews",
+						action="store_true", default=False,
 						help="""search only for reviews""") # para implementar
 	parser.add_argument('-sc', '--city',
 					   metavar='city_name', type=str,
 					   help="""search by a city
-					   """) 
+					   """)
+	parser.add_argument('-sd', '--start_date',
+					   metavar='start_date', type=str,
+					   help="""start date of travel
+					   """)
+	parser.add_argument('-fd', '--finish_date',
+					   metavar='finish_date', type=str,
+					   help="""finish date of travel
+					   """)
+	parser.add_argument("-urdb", "--update_routes_with_database",
+                        metavar="city_name", type=str,
+                        help="""update geolocation based on already existent data""")
+	parser.add_argument("-urbb", "--update_routes_with_bounding_box",
+                        metavar="city_name", type=str,
+                        help="""update geolocation based on Google's API""")
 	
 	# Only one argument!
 	group = parser.add_mutually_exclusive_group()
@@ -844,20 +969,22 @@ def parse_args():
 	return (parser, args)
 
 def main():
-	"""
-	Main entry point for the program.
-	"""
 	(parser, args) = parse_args()
 	logging.basicConfig(format='%(levelname)-8s%(message)s')
 	config = ABConfig(args)
-
+	
 	try:
 		if args.city:
-			search(config, args.city, args.tomorrow_rooms)
-		elif args.update_routes:
+			print("veio aqui")
+			search(config, args.city, args.start_date, args.finish_date,
+					args.search_reviews)
+		elif args.update_routes_with_database:
 			fill_empty_routes(config)
 			update_cities(config, args.update_routes)
 			update_routes(config, args.update_routes)
+			print("Data updated")
+		elif args.update_routes_with_bounding_box:
+			update_routes_geolocation(config, args.update_routes_with_bounding_box)
 	except (SystemExit, KeyboardInterrupt):
 		logger.debug("Interrupted execution")
 		exit(0)

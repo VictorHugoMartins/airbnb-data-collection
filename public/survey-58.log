@@ -1,0 +1,35 @@
+2023-01-14 11:22:58,736 INFO    ======================================================================
+2023-01-14 11:22:58,736 INFO    Survey 58, for Ouro Preto, Minas Gerais
+2023-01-14 11:22:58,737 INFO    Searching by bounding box, max_zoom=24
+2023-01-14 11:22:58,738 INFO    ----------------------------------------------------------------------
+2023-01-14 11:22:58,738 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
+2023-01-14 11:22:58,739 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-01-14 11:22:59,080 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:23:07,203 INFO    Page 01 returned 18 listings
+2023-01-14 11:23:09,157 INFO    Room 47939876: insert failed
+2023-01-14 11:23:09,163 INFO    Room 43805080: insert failed
+2023-01-14 11:23:09,169 INFO    Room 51978370: insert failed
+2023-01-14 11:23:09,175 INFO    Room 41502392: insert failed
+2023-01-14 11:23:09,181 INFO    Room 40752066: insert failed
+2023-01-14 11:23:09,186 INFO    Room 30403033: insert failed
+2023-01-14 11:23:09,193 INFO    Room 714323517316563160: insert failed
+2023-01-14 11:23:09,199 INFO    Room 736390796820280107: insert failed
+2023-01-14 11:23:09,205 INFO    Room 51217390: insert failed
+2023-01-14 11:23:09,212 INFO    Room 52024666: insert failed
+2023-01-14 11:23:09,218 INFO    Room 54222723: insert failed
+2023-01-14 11:23:09,224 INFO    Room 47334727: insert failed
+2023-01-14 11:23:09,229 INFO    Room 740983683035077351: insert failed
+2023-01-14 11:23:09,235 INFO    Room 794011987542751252: insert failed
+2023-01-14 11:23:09,241 INFO    Room 50723507: insert failed
+2023-01-14 11:23:09,246 INFO    Room 19969297: insert failed
+2023-01-14 11:23:09,279 INFO    Page 02 returned 18 listings
+2023-01-14 11:23:10,793 INFO    Room 762279793881682516: insert failed
+2023-01-14 11:23:10,947 INFO    Page 03 returned 18 listings
+2023-01-14 11:23:12,020 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:23:20,621 INFO    Page 04 returned 18 listings
+2023-01-14 11:23:23,301 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-14 11:23:30,793 INFO    Page 05 returned 00 listings
+2023-01-14 11:23:30,793 INFO    Final page of listings for this search
+2023-01-14 11:23:30,794 INFO    Results: 5 pages, 55 new rooms
+2023-01-14 11:23:30,796 INFO    Finishing survey 58, for Ouro Preto, Minas Gerais
+2023-01-14 11:23:30,800 INFO    Pronto! Pesquisa finalizada!
