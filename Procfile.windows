@@ -1,1 +1,1 @@
-web: bokeh serve --allow-websocket-origin=https://grotesque-nose-production.up.railway.app  --use-xheaders dashboard.py
+web: bokeh serve --allow-websocket-origin=https://airbnbandbookingscrap.up.railway.app/  --use-xheaders dashboard.py
