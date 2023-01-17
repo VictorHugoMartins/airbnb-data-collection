@@ -1,45 +1,32 @@
-# Python: Getting Started
+Not actively maintained - please fork
 
-A barebones Django app, which can easily be deployed to Heroku.
+# docker-bokeh
+Dockerfiles for running bokeh in Docker.
+Builds for most recent docker releases (both stable and dev) are generated.
 
-This application supports the [Getting Started with Python on Heroku](https://devcenter.heroku.com/articles/getting-started-with-python) article - check it out.
+To run the latest stable release do:
 
-## Running Locally
+```
+docker run -p 5100:5100 lukauskas/bokeh:latest 
+```
+To run latest dev release, use the tag `dev`. 
+For specific version number, just use the version number as a tag.
 
-Make sure you have Python 3.7 [installed locally](http://install.python-guide.org). To push to Heroku, you'll need to install the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli), as well as [Postgres](https://devcenter.heroku.com/articles/heroku-postgresql#local-setup).
+The command above will map the container port 5100 to port 5100 of the host machine. Adjust it as appropriate.
+By default you should be able to access the bokeh visualisation at http://172.0.0.1:5100.
 
-```sh
-$ git clone https://github.com/heroku/python-getting-started.git
-$ cd python-getting-started
+Two environment variables are supported:
 
-$ python3 -m venv getting-started
-$ pip install -r requirements.txt
+  * `PREFIX` - gets passed to `--prefix` in `bokeh serve`
+  * `ORIGIN` - passed to `--allow-websocket-origin`. 
+ 
+Adjust `ORIGIN` as appropriate for your application. This should be equal to FQDN plus port of the frontend of your application.
+For instance, if the application will be hosted on `http://www.example.com:1234` the ORIGIN variable should be `ORIGIN=www.example.com:1234`. If it is set incorrectly, `bokeh` will refuse any connections to websockets  and therefore no visualisations wil work.
+  
+Environment variable example:
 
-$ createdb python_getting_started
-
-$ python manage.py migrate
-$ python manage.py collectstatic
-
-$ heroku local
+```
+docker run -p 5100:5100 -e PREFIX=foo -e ORIGIN=www.example.com:5100 lukauskas/bokeh:latest 
 ```
 
-Your app should now be running on [localhost:5000](http://localhost:5000/).
-
-## Deploying to Heroku
-
-```sh
-$ heroku create
-$ git push heroku master
-
-$ heroku run python manage.py migrate
-$ heroku open
-```
-or
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
-
-## Documentation
-
-For more information about using Python on Heroku, see these Dev Center articles:
-
-- [Python on Heroku](https://devcenter.heroku.com/categories/python)
+Will allow one to access the visualisation at www.example.com:5100/foo/app
