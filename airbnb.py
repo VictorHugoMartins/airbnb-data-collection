@@ -841,7 +841,7 @@ def main():
             continue_super_survey_by_sublocality(
                 ab_config, args.continue_super_survey_by_sublocality)
         elif args.full_survey:
-            full_survey(ab_config, args.full_survey, False, True)
+            full_process(ab_config, args.full_survey)
         else:
             parser.print_help()
     except (SystemExit, KeyboardInterrupt):

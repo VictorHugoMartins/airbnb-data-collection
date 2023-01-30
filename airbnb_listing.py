@@ -71,6 +71,7 @@ class ABListing():
         self.avg_rating = None
         self.person_capacity = None
         self.pictures = None
+        self.bathroom = None
 
         logger.setLevel(config.log_level)
 
@@ -194,91 +195,6 @@ class ABListing():
             logger.error("Exception saving room")
             raise
 
-    def print_from_web_site(self):
-        """ What it says, although now nothing printed as the parsing code is
-        broken """
-        try:
-            print_string = "Room info:"
-            print_string += "\n\troom_id:\t" + str(self.room_id)
-            print_string += "\n\tsurvey_id:\t" + str(self.survey_id)
-            print_string += "\n\thost_id:\t" + str(self.host_id)
-            print_string += "\n\troom_type:\t" + str(self.room_type)
-            print_string += "\n\tcountry:\t" + str(self.country)
-            print_string += "\n\tcity:\t\t" + str(self.city)
-            print_string += "\n\tneighborhood:\t" + str(self.neighborhood)
-            print_string += "\n\taddress:\t" + str(self.address)
-            print_string += "\n\treviews:\t" + str(self.reviews)
-            print_string += "\n\toverall_satisfaction:\t"
-            print_string += str(self.overall_satisfaction)
-            print_string += "\n\taccommodates:\t" + str(self.accommodates)
-            print_string += "\n\tbedrooms:\t" + str(self.bedrooms)
-            print_string += "\n\tbathrooms:\t" + str(self.bathrooms)
-            print_string += "\n\tprice:\t\t" + str(self.price)
-            print_string += "\n\tdeleted:\t" + str(self.deleted)
-            print_string += "\n\tlatitude:\t" + str(self.latitude)
-            print_string += "\n\tlongitude:\t" + str(self.longitude)
-            print_string += "\n\tminstay:\t" + str(self.minstay)
-            print_string += "\n\tcoworker_hosted:\t" + str(self.coworker_hosted)
-            print_string += "\n\tlanguages:\t" + str(self.extra_host_languages)
-            print_string += "\n\tproperty_type:\t" + str(self.property_type)
-            #print(print_string)
-        except Exception:
-            raise
-
-    def print_from_db(self):
-        """ What it says """
-        try:
-            columns = self.get_columns()
-            sql = "select room_id"
-            for column in columns[1:]:
-                sql += ", " + column
-            sql += " from room where room_id = %s"
-            conn = self.config.connect()
-            cur = conn.cursor()
-            cur.execute(sql, (self.room_id,))
-            result_set = cur.fetchall()
-            if len(result_set) > 0:
-                for result in result_set:
-                    i = 0
-                    print("Room information: ")
-                    for column in columns:
-                        print("\t", column, "=", str(result[i]))
-                        i += 1
-                return True
-            else:
-                print("\nNo room", str(self.room_id), "in the database.\n")
-                return False
-            cur.close()
-        except Exception:
-            raise
-
-    def get_room_info_from_web_site(self, flag):
-        """ Get the room properties from the web site """
-        try:
-            # initialization
-            logger.info("-" * 70)
-            logger.info("Room " + str(self.room_id) +
-                        ": getting from Airbnb web site")
-            room_url = self.config.URL_ROOM_ROOT + str(self.room_id)
-            response = airbnb_ws.ws_request_with_repeats(self.config, room_url)
-            if response is not None:
-                page = response.text
-                tree = html.fromstring(page)  
-
-                self.__get_room_info_from_tree(tree, flag)
-                logger.info("Room %s: found", self.room_id)
-                return True
-            else:
-                logger.info("Room %s: not found", self.room_id)
-                return False
-        except (KeyboardInterrupt, SystemExit):
-            raise
-        except Exception as ex:
-            logger.exception("Room " + str(self.room_id) +
-                             ": failed to retrieve from web site.")
-            logger.error("Exception: " + str(type(ex)))
-            raise
-
     def __insert(self):
         """ Insert a room into the database. Raise an error if it fails """
         print(
@@ -292,7 +208,7 @@ class ABListing():
                 self.sublocality, self.route,
                 self.is_superhost,
                 self.max_nights, self.avg_rating,
-                self.pictures
+                self.pictures, self.bathroom
                 )
                 
         # return
@@ -311,10 +227,10 @@ class ABListing():
                     coworker_hosted, extra_host_languages, name,
                     property_type, currency, rate_type,
                     sublocality, route, avg_rating,
-                    is_superhost, max_nights, pictures)
+                    is_superhost, max_nights, pictures, bathroom)
                 values (%s, %s, %s, %s, %s, %s, %s, %s, %s,
                 %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
                 )"""
             insert_args = (
                 self.room_id, self.host_id, self.room_type, self.country,
@@ -326,7 +242,7 @@ class ABListing():
                 self.property_type, self.currency, self.rate_type,
                 self.sublocality, self.route, self.avg_rating,
                  self.is_superhost,
-                self.max_nights, self.pictures
+                self.max_nights, self.pictures, self.bathroom
                 )
             cur.execute(sql, insert_args)
             cur.close()
@@ -387,174 +303,6 @@ class ABListing():
         except:
             # may want to handle connection close errors
             logger.warning("Exception in __update: raising")
-            raise
-
-    def __get_country(self, tree):
-        try:
-            temp = tree.xpath(
-                "//meta[contains(@property,'airbedandbreakfast:country')]"
-                "/@content"
-                )
-            if len(temp) > 0:
-                self.country = temp[0]
-        except:
-            raise
-
-    def __get_city(self, tree):
-        try:
-            temp = tree.xpath(
-                "//meta[contains(@property,'airbedandbreakfast:city')]"
-                "/@content"
-                )
-            if len(temp) > 0:
-                self.city = temp[0]
-        except:
-            raise
-
-    def __get_rating(self, tree):
-        try:
-            # 2016-04-10
-            s = tree.xpath("//meta[@id='_bootstrap-listing']/@content")
-            temp = tree.xpath(
-                "//meta[contains(@property,'airbedandbreakfast:rating')]"
-                "/@content"
-                )
-            if s is not None:
-                j = json.loads(s[0])
-                # print(j)
-                self.overall_satisfaction = j["listing"]["star_rating"]
-            elif len(temp) > 0:
-                self.overall_satisfaction = temp[0]
-        except IndexError:
-            return
-        except:
-            raise
-
-    def __get_latitude(self, tree):
-        try:
-            temp = tree.xpath("//meta"
-                              "[contains(@property,"
-                              "'airbedandbreakfast:location:lat')]"
-                              "/@content")
-            if len(temp) > 0:
-                self.latitude = temp[0]
-        except:
-            raise
-
-    def __get_longitude(self, tree):
-        try:
-            temp = tree.xpath(
-                "//meta"
-                "[contains(@property,'airbedandbreakfast:location:longitude')]"
-                "/@content")
-            if len(temp) > 0:
-                self.longitude = temp[0]
-        except:
-            raise
-
-    def __get_host_id(self, tree):
-        try:
-            # 2016-04-10
-            s = tree.xpath("//meta[@id='_bootstrap-listing']/@content")
-            temp = tree.xpath(
-                "//div[@id='host-profile']"
-                "//a[contains(@href,'/users/show')]"
-                "/@href"
-            )
-            if s is not None:
-                j = json.loads(s[0])
-                self.host_id = j["listing"]["user"]["id"]
-                return
-            elif len(temp) > 0:
-                host_id_element = temp[0]
-                host_id_offset = len('/users/show/')
-                self.host_id = int(host_id_element[host_id_offset:])
-            else:
-                temp = tree.xpath(
-                    "//div[@id='user']"
-                    "//a[contains(@href,'/users/show')]"
-                    "/@href")
-                if len(temp) > 0:
-                    host_id_element = temp[0]
-                    host_id_offset = len('/users/show/')
-                    self.host_id = int(host_id_element[host_id_offset:])
-        except IndexError:
-            return
-        except:
-            raise
-
-    def __get_room_type(self, tree):
-        try:
-            # -- room type --
-            # new page format 2015-09-30?
-            temp = tree.xpath(
-                "//div[@class='col-md-6']"
-                "/div/span[text()[contains(.,'Room type:')]]"
-                "/../strong/text()"
-                )
-            if len(temp) > 0:
-                self.room_type = temp[0].strip()
-            else:
-                # new page format 2014-12-26
-                temp_entire = tree.xpath(
-                    "//div[@id='summary']"
-                    "//i[contains(concat(' ', @class, ' '),"
-                    " ' icon-entire-place ')]"
-                    )
-                if len(temp_entire) > 0:
-                    self.room_type = "Entire home/apt"
-                temp_private = tree.xpath(
-                    "//div[@id='summary']"
-                    "//i[contains(concat(' ', @class, ' '),"
-                    " ' icon-private-room ')]"
-                    )
-                if len(temp_private) > 0:
-                    self.room_type = "Private room"
-                temp_shared = tree.xpath(
-                    "//div[@id='summary']"
-                    "//i[contains(concat(' ', @class, ' '),"
-                    " ' icon-shared-room ')]"
-                    )
-                if len(temp_shared) > 0:
-                    self.room_type = "Shared room"
-        except:
-            raise
-
-    def __get_neighborhood(self, tree):
-        try:
-            temp2 = tree.xpath(
-                "//div[contains(@class,'rich-toggle')]/@data-address"
-                )
-            temp1 = tree.xpath("//table[@id='description_details']"
-                               "//td[text()[contains(.,'Neighborhood:')]]"
-                               "/following-sibling::td/descendant::text()")
-            if len(temp2) > 0:
-                temp = temp2[0].strip()
-                self.neighborhood = temp[temp.find("(")+1:temp.find(")")]
-            elif len(temp1) > 0:
-                self.neighborhood = temp1[0].strip()
-            if self.neighborhood is not None:
-                self.neighborhood = self.neighborhood[:50]
-        except:
-            raise
-
-    def __get_address(self, tree):
-        try:
-            temp = tree.xpath(
-                "//div[contains(@class,'rich-toggle')]/@data-address"
-                )
-            if len(temp) > 0:
-                temp = temp[0].strip()
-                self.address = temp[:temp.find(",")]
-            else:
-                # try old page match
-                temp = tree.xpath(
-                    "//span[@id='display-address']"
-                    "/@data-location"
-                    )
-                if len(temp) > 0:
-                    self.address = temp[0]
-        except:
             raise
 
     def __get_reviews(self, tree):
@@ -658,219 +406,6 @@ class ABListing():
             logger.exception(e)
             return False
  
-    def __get_accommodates(self, tree):
-        try:
-            # 2016-04-10
-            s = tree.xpath("//meta[@id='_bootstrap-listing']/@content")
-            temp = tree.xpath(
-                "//div[@class='col-md-6']"
-                "/div/span[text()[contains(.,'Accommodates:')]]"
-                "/../strong/text()"
-                )
-            if s is not None:
-                j = json.loads(s[0])
-                self.accommodates = j["listing"]["person_capacity"]
-                return
-            elif len(temp) > 0:
-                self.accommodates = temp[0].strip()
-            else:
-                temp = tree.xpath(
-                    "//div[@class='col-md-6']"
-                    "/div[text()[contains(.,'Accommodates:')]]"
-                    "/strong/text()"
-                    )
-                if len(temp) > 0:
-                    self.accommodates = temp[0].strip()
-                else:
-                    temp = tree.xpath(
-                        "//div[@class='col-md-6']"
-                        "//div[text()[contains(.,'Accommodates:')]]"
-                        "/strong/text()"
-                    )
-                    if len(temp) > 0:
-                        self.accommodates = temp[0].strip()
-            if type(self.accommodates) == str:
-                self.accommodates = self.accommodates.split('+')[0]
-                self.accommodates = self.accommodates.split(' ')[0]
-            self.accommodates = int(self.accommodates)
-            
-        except:
-            self.accommodates = None
-
-    def __get_bedrooms(self, tree):
-        try:
-            temp = tree.xpath(
-                "//div[@class='col-md-6']"
-                "/div/span[text()[contains(.,'Bedrooms:')]]"
-                "/../strong/text()"
-                )
-            if len(temp) > 0:
-                self.bedrooms = temp[0].strip()
-            else:
-                temp = tree.xpath(
-                    "//div[@class='col-md-6']"
-                    "/div[text()[contains(.,'Bedrooms:')]]"
-                    "/strong/text()"
-                    )
-                if len(temp) > 0:
-                    self.bedrooms = temp[0].strip()
-            if self.bedrooms:
-                self.bedrooms = self.bedrooms.split('+')[0]
-                self.bedrooms = self.bedrooms.split(' ')[0]
-            self.bedrooms = float(self.bedrooms)
-        except:
-            self.bedrooms = None
-
-    def __get_bathrooms(self, tree):
-        try:
-            temp = tree.xpath(
-                "//div[@class='col-md-6']"
-                "/div/span[text()[contains(.,'Bathrooms:')]]"
-                "/../strong/text()"
-                )
-            if len(temp) > 0:
-                self.bathrooms = temp[0].strip()
-            else:
-                temp = tree.xpath(
-                    "//div[@class='col-md-6']"
-                    "/div/span[text()[contains(.,'Bathrooms:')]]"
-                    "/../strong/text()"
-                    )
-                if len(temp) > 0:
-                    self.bathrooms = temp[0].strip()
-            if self.bathrooms:
-                self.bathrooms = self.bathrooms.split('+')[0]
-                self.bathrooms = self.bathrooms.split(' ')[0]
-            self.bathrooms = float(self.bathrooms)
-        except:
-            self.bathrooms = None
-
-    def __get_minstay(self, tree):
-        try:
-            # -- minimum stay --
-            temp3 = tree.xpath(
-                "//div[contains(@class,'col-md-6')"
-                "and text()[contains(.,'minimum stay')]]"
-                "/strong/text()"
-                )
-            temp2 = tree.xpath(
-                "//div[@id='details-column']"
-                "//div[contains(text(),'Minimum Stay:')]"
-                "/strong/text()"
-                )
-            temp1 = tree.xpath(
-                "//table[@id='description_details']"
-                "//td[text()[contains(.,'Minimum Stay:')]]"
-                "/following-sibling::td/descendant::text()"
-                )
-            if len(temp3) > 0:
-                self.minstay = temp3[0].strip()
-            elif len(temp2) > 0:
-                self.minstay = temp2[0].strip()
-            elif len(temp1) > 0:
-                self.minstay = temp1[0].strip()
-            if self.minstay is not None:
-                self.minstay = self.minstay.split('+')[0]
-                self.minstay = self.minstay.split(' ')[0]
-            self.minstay = int(self.minstay)
-        except:
-            self.minstay = None
-
-    def __get_price(self, tree):
-        try:
-            temp2 = tree.xpath(
-                "//meta[@itemprop='price']/@content"
-                )
-            temp1 = tree.xpath(
-                "//div[@id='price_amount']/text()"
-                )
-            if len(temp2) > 0:
-                self.price = temp2[0]
-            elif len(temp1) > 0:
-                self.price = temp1[0][1:]
-                non_decimal = re.compile(r'[^\d.]+')
-                self.price = non_decimal.sub('', self.price)
-            # Now find out if it's per night or per month
-            # (see if the per_night div is hidden)
-            per_month = tree.xpath(
-                "//div[@class='js-per-night book-it__payment-period  hide']")
-            if per_month:
-                self.price = int(int(self.price) / 30)
-            self.price = int(self.price)
-        except:
-            self.price = None
-
-    def __get_room_info_from_tree(self, tree, flag):
-        try:
-            # Some of these items do not appear on every page (eg,
-            # ratings, bathrooms), and so their absence is marked with
-            # logger.info. Others should be present for every room (eg,
-            # latitude, room_type, host_id) and so are marked with a
-            # warning.  Items coded in <meta
-            # property="airbedandbreakfast:*> elements -- country --
-            
-            if self.country is None:
-                self.__get_country(tree)
-            if self.city is None:
-                self.__get_city(tree)
-            if self.overall_satisfaction is None:
-                self.__get_rating(tree)
-            if self.latitude is None:
-                self.__get_latitude(tree)
-            if self.longitude is None:
-                self.__get_longitude(tree)
-            if self.host_id is None:
-                self.__get_host_id(tree)
-            if self.room_type is None:
-                self.__get_room_type(tree)
-            if self.neighborhood is None:
-                self.__get_neighborhood(tree)
-            if self.address is None:
-                self.__get_address(tree)
-            if self.reviews is None:
-                self.__get_reviews(tree)
-            self.__get_reviews_text(tree)
-            if self.accommodates is None:
-                self.__get_accommodates(tree)
-            if self.bedrooms is None:
-                self.__get_bedrooms(tree)
-            if self.bathrooms is None:
-                self.__get_bathrooms(tree)
-            # self.__get_minstay(tree) # get min_nights in json listing
-            if self.price is None:
-                self.__get_price(tree)
-            # self.__get_location()
-            self.deleted = 0
-
-            # NOT FILLING HERE, but maybe should? have to write helper methods:
-            # coworker_hosted, extra_host_languages, name,
-            #    property_type, currency, rate_type
-
-            if flag == self.config.FLAGS_ADD:
-                self.status_check()
-                self.save(self.config.FLAGS_INSERT_REPLACE)
-            elif flag == self.config.FLAGS_PRINT:
-                self.print_from_web_site()
-            return True
-        except (KeyboardInterrupt, SystemExit):
-            raise
-        except IndexError:
-            logger.exception("Web page has unexpected structure.")
-            raise
-        except UnicodeEncodeError as uee:
-            logger.exception("UnicodeEncodeError Exception at " +
-                             str(uee.object[uee.start:uee.end]))
-            raise
-        except AttributeError:
-            logger.exception("AttributeError")
-            raise
-        except TypeError:
-            logger.exception("TypeError parsing web page.")
-            raise
-        except Exception:
-            logger.exception("Error parsing web page.")
-            raise
-    
     def get_location(self):
         location = Location(self.latitude, self.longitude) # initialize a location with coordinates
         location.reverse_geocode(self.config) # find atributes for location with google api key
@@ -917,7 +452,6 @@ class ABListing():
                              ": failed to retrieve from web site.")
             logger.error("Exception: " + str(type(ex)))
             raise
-
 
     def get_comments(self, host_id, response):
         """ Get the reviews properties from the web site """

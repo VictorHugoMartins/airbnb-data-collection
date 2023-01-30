@@ -22,6 +22,7 @@ import airbnb_ws
 
 logger = logging.getLogger()
 
+
 class Timer:
     def __enter__(self):
         self.start = time.clock()
@@ -52,10 +53,12 @@ class ABSurvey():
         logger.setLevel(config.log_level)
 
         # create a file handler
-        logfile = "public/survey-{survey_id}.log".format(survey_id=self.survey_id)
+        logfile = "public/survey-{survey_id}.log".format(
+            survey_id=self.survey_id)
         filelog_handler = logging.FileHandler(logfile, encoding="utf-8")
         filelog_handler.setLevel(config.log_level)
-        filelog_formatter = logging.Formatter('%(asctime)-15s %(levelname)-8s%(message)s')
+        filelog_formatter = logging.Formatter(
+            '%(asctime)-15s %(levelname)-8s%(message)s')
         filelog_handler.setFormatter(filelog_formatter)
 
         # logging: set log file name, format, and level
@@ -116,6 +119,8 @@ class ABSurvey():
             listing = ABListing(self.config, room_id, self.survey_id)
             # listing
             json_listing = json["listing"] if "listing" in json else None
+            json_pricing = json["pricing_quote"] if "pricing_quote" in json else None
+            # print("O JSON LISTING: ", json_pricing)
             if json_listing is None:
                 return None
             if "room_type" in json_listing:
@@ -198,16 +203,24 @@ class ABSurvey():
                 listing.pictures = json_listing["picture_urls"]
             else:
                 listing.pictures = None
-            
+            if "bathroom_label" in json_listing:
+                listing.bathroom = json_listing["bathroom_label"]
+
+            if "structured_stay_display_price" in json_pricing:
+                structured_price = json_pricing['structured_stay_display_price']['primary_line']['price']
+                listing.price = structured_price.split('$')[1].split()[0]
+                listing.currency = structured_price.split()[1]
+
             # pricing
-            json_pricing = json["pricing_quote"]
-            listing.price = json_pricing["rate"]["amount"] if "rate" in json_pricing else None
-            listing.currency = json_pricing["rate"]["currency"] if "rate" in json_pricing else None
-            listing.rate_type = json_pricing["rate_type"] if "rate_type" in json_pricing else None
+            # json_pricing = json["pricing_quote"]
+            # listing.price = json_pricing["rate"]["amount"] if "rate" in json_pricing else None
+            # listing.currency = json_pricing["rate"]["currency"] if "rate" in json_pricing else None
+            # listing.rate_type = json_pricing["rate_type"] if "rate_type" in json_pricing else None
 
             return listing
         except:
-            logger.exception("Error in survey.listing_from_search_page_json: returning None")
+            logger.exception(
+                "Error in survey.listing_from_search_page_json: returning None")
             sys.exit(-1)
             return None
 
@@ -308,7 +321,8 @@ class ABSurvey():
                                  str(has_rooms), neighborhood)
             else:  # SEARCH_BY_ZIPCODE
                 zipcode = int(neighborhood_or_zipcode)
-                params = (self.survey_id, room_type, zipcode, guests, page_number,)
+                params = (self.survey_id, room_type,
+                          zipcode, guests, page_number,)
                 logger.debug(params)
                 sql = """
                     select spl.has_rooms
@@ -330,13 +344,11 @@ class ABSurvey():
             return has_rooms
 
 
-
 class ABSurveyByBoundingBox(ABSurvey):
     """
     Subclass of Survey that carries out a survey by a quadtree of bounding
     boxes: recursively searching rectangles.
     """
-
 
     def __init__(self, config, survey_id):
         super().__init__(config, survey_id)
@@ -363,7 +375,8 @@ class ABSurveyByBoundingBox(ABSurvey):
             cur.close()
             conn.commit()
             if row is None:
-                logger.debug("No progress logged for survey %s", self.survey_id)
+                logger.debug("No progress logged for survey %s",
+                             self.survey_id)
                 self.logged_progress = None
             else:
                 logged_progress = {}
@@ -376,7 +389,8 @@ class ABSurveyByBoundingBox(ABSurvey):
                 logger.info("\tmedian node=%s", logged_progress["median"])
                 return logged_progress
         except Exception:
-            logger.exception("Exception in get_progress: setting logged progress to None")
+            logger.exception(
+                "Exception in get_progress: setting logged progress to None")
             return None
 
     def get_bounding_box(self):
@@ -424,15 +438,16 @@ class ABSurveyByBoundingBox(ABSurvey):
             logger.info("Survey {survey_id}, for {search_area_name}".format(
                 survey_id=self.survey_id, search_area_name=self.search_area_name
             ))
-            ABSurvey.update_survey_entry(self, self.config.SEARCH_BY_BOUNDING_BOX)
+            ABSurvey.update_survey_entry(
+                self, self.config.SEARCH_BY_BOUNDING_BOX)
             logger.info("Searching by bounding box, max_zoom=%s",
                         self.config.SEARCH_MAX_RECTANGLE_ZOOM)
             # Initialize search parameters
             # quadtree_node holds the quadtree: each rectangle is
             # divided into 00 | 01 | 10 | 11, and the next level down adds
             # set starting point
-            quadtree_node = [] # list of [0,0] etc coordinates
-            median_node = [] # median lat, long to define optimal quadrants
+            quadtree_node = []  # list of [0,0] etc coordinates
+            median_node = []  # median lat, long to define optimal quadrants
             # set starting point for survey being resumed
             if self.logged_progress:
                 logger.info("Restarting incomplete survey")
@@ -440,7 +455,8 @@ class ABSurveyByBoundingBox(ABSurvey):
                 for room_type in self.room_types:
                     logger.info("-" * 70)
                     logger.info("Beginning of search for %s", room_type)
-                    self.recurse_quadtree(quadtree_node, median_node, room_type, flag)
+                    self.recurse_quadtree(
+                        quadtree_node, median_node, room_type, flag)
             else:
                 self.recurse_quadtree(quadtree_node, median_node, None, flag)
             self.fini()
@@ -468,7 +484,8 @@ class ABSurveyByBoundingBox(ABSurvey):
         try:
             zoomable = True
             if self.is_subtree_previously_completed(quadtree_node, room_type):
-                logger.info("Resuming survey: subtree previously completed: %s", quadtree_node)
+                logger.info(
+                    "Resuming survey: subtree previously completed: %s", quadtree_node)
                 # This node is part of a tree that has already been searched
                 # completely in a previous attempt to run this survey.
                 # Go immediately to the next quadrant at the current level,
@@ -507,13 +524,14 @@ class ABSurveyByBoundingBox(ABSurvey):
                     quadtree_node, median_node, room_type, flag)
             else:
                 median_leaf = self.logged_progress["median"][-1]
-                logger.info("Resuming survey: node previously searched: %s", quadtree_node)
+                logger.info(
+                    "Resuming survey: node previously searched: %s", quadtree_node)
 
             # Recurse through the tree
             if zoomable:
                 # and len(self.logged_progress["quadtree"]) >= len(quadtree_node)):
                 # append a node to the quadtree for a new level
-                quadtree_node.append([0,0])
+                quadtree_node.append([0, 0])
                 median_node.append(median_leaf)
                 for int_leaf in range(4):
                     # Loop over [0,0], [0,1], [1,0], [1,1]
@@ -528,7 +546,8 @@ class ABSurveyByBoundingBox(ABSurvey):
                     del quadtree_node[-1]
                 if len(median_node) > 0:
                     del median_node[-1]
-            logger.debug("Returning from recurse_quadtree for %s", quadtree_node)
+            logger.debug(
+                "Returning from recurse_quadtree for %s", quadtree_node)
             if flag == self.config.FLAGS_PRINT:
                 # for FLAGS_PRINT, fetch one page and print it
                 sys.exit(0)
@@ -549,7 +568,8 @@ class ABSurveyByBoundingBox(ABSurvey):
         """
         try:
             logger.info("-" * 70)
-            rectangle = self.get_rectangle_from_quadtree_node(quadtree_node, median_node)
+            rectangle = self.get_rectangle_from_quadtree_node(
+                quadtree_node, median_node)
             logger.info("Searching rectangle: zoom factor = %s, node = %s",
                         len(quadtree_node), str(quadtree_node))
             logger.debug("Rectangle: N={n:+.5f}, E={e:+.5f}, S={s:+.5f}, W={w:+.5f}"
@@ -561,7 +581,7 @@ class ABSurveyByBoundingBox(ABSurvey):
             zoomable = True
 
             # median_lists are collected from results on each page and used to
-            # calculate the median values, which will be used to divide the 
+            # calculate the median values, which will be used to divide the
             # volume into optimal "quadrants".
             median_lists = {}
             median_lists["latitude"] = []
@@ -629,9 +649,9 @@ class ABSurveyByBoundingBox(ABSurvey):
                     params["zoom"] = str(True)
                     # params["version"] = "1.4.8"
                     if items_offset > 0:
-                        params["items_offset"]   = str(items_offset)
+                        params["items_offset"] = str(items_offset)
                         # params["items_offset"]   = str(18*items_offset)
-                        params["section_offset"]   = str(8)
+                        params["section_offset"] = str(8)
                     # make the http request
 
                     response = airbnb_ws.ws_request_with_repeats(
@@ -711,7 +731,8 @@ class ABSurveyByBoundingBox(ABSurvey):
                         comment = spaspabundlejs_set[0].contents[0]
                         # strip out the comment tags (everything outside the
                         # outermost curly braces)
-                        json_doc = json.loads(comment[comment.find("{"):comment.rfind("}")+1])
+                        json_doc = json.loads(
+                            comment[comment.find("{"):comment.rfind("}")+1])
                         logger.debug("results-containing json found")
                     else:
                         logger.warning("json results-containing script node "
@@ -728,6 +749,7 @@ class ABSurveyByBoundingBox(ABSurvey):
                 # Steal a function from StackOverflow which searches for items
                 # with a given list of keys (in this case just one: "listing")
                 # https://stackoverflow.com/questions/14048948/how-to-find-a-particular-json-value-by-key
+
                 def search_json_keys(key, json_doc):
                     """ Return a list of the values for each occurrence of key
                     in json_doc, at all levels. In particular, "listings"
@@ -738,7 +760,8 @@ class ABSurveyByBoundingBox(ABSurvey):
                             found.append(json_doc[key])
                         elif json_doc.keys():
                             for json_key in json_doc.keys():
-                                result_list = search_json_keys(key, json_doc[json_key])
+                                result_list = search_json_keys(
+                                    key, json_doc[json_key])
                                 if result_list:
                                     found.extend(result_list)
                     elif isinstance(json_doc, list):
@@ -765,28 +788,31 @@ class ABSurveyByBoundingBox(ABSurvey):
                         if json_listings is None:
                             continue
                         for json_listing in json_listings:
-                            # print(json_listing)
                             room_id = int(json_listing["listing"]["id"])
                             if room_id is not None:
                                 room_count += 1
-                                listing = self.listing_from_search_page_json(json_listing, room_id)
+                                listing = self.listing_from_search_page_json(
+                                    json_listing, room_id)
                                 if listing is None:
                                     continue
                                 if listing.latitude is not None:
-                                    median_lists["latitude"].append(listing.latitude)
+                                    median_lists["latitude"].append(
+                                        listing.latitude)
                                 if listing.longitude is not None:
-                                    median_lists["longitude"].append(listing.longitude)
+                                    median_lists["longitude"].append(
+                                        listing.longitude)
                                 if listing.host_id is not None:
                                     listing.deleted = 0
                                     if flag == self.config.FLAGS_ADD:
                                         if listing.save(self.config.FLAGS_INSERT_NO_REPLACE):
                                             new_rooms += 1
                                     elif flag == self.config.FLAGS_PRINT:
-                                        print(listing.room_type, listing.room_id)
+                                        print(listing.room_type,
+                                              listing.room_id)
 
                 # Log page-level results
                 logger.info("Page {page_number:02d} returned {room_count:02d} listings"
-                        .format(page_number=page_number, room_count=room_count))
+                            .format(page_number=page_number, room_count=room_count))
                 if flag == self.config.FLAGS_PRINT:
                     # for FLAGS_PRINT, fetch one page and print it
                     sys.exit(0)
@@ -804,8 +830,6 @@ class ABSurveyByBoundingBox(ABSurvey):
                 logger.info("Results: %s pages, %s new rooms",
                             page_number, new_rooms)
 
-
-
             # Median-based partitioning not currently in use: may use later
             if len(median_node) == 0:
                 median_leaf = "[]"
@@ -815,10 +839,10 @@ class ABSurveyByBoundingBox(ABSurvey):
             if room_count > 0:
                 median_lat = round(sorted(median_lists["latitude"])
                                    [int(len(median_lists["latitude"])/2)], 5
-                                  )
+                                   )
                 median_lng = round(sorted(median_lists["longitude"])
                                    [int(len(median_lists["longitude"])/2)], 5
-                                  )
+                                   )
                 median_leaf = [median_lat, median_lng]
             else:
                 # values not needed, but we need to fill in an item anyway
@@ -844,7 +868,8 @@ class ABSurveyByBoundingBox(ABSurvey):
                 logger.debug("Quadtrees: %s", node)
                 logger.debug("Medians: %s", medians)
                 [n_lat, e_lng, s_lat, w_lng] = rectangle
-                blur = abs(n_lat - s_lat) * self.config.SEARCH_RECTANGLE_EDGE_BLUR
+                blur = abs(n_lat - s_lat) * \
+                    self.config.SEARCH_RECTANGLE_EDGE_BLUR
                 # find the mindpoints of the rectangle
                 mid_lat = (n_lat + s_lat)/2.0
                 mid_lng = (e_lng + w_lng)/2.0
@@ -853,22 +878,22 @@ class ABSurveyByBoundingBox(ABSurvey):
                 # overlap quadrants to ensure coverage at high zoom levels
                 # Airbnb max zoom (18) is about 0.004 on a side.
                 rectangle = []
-                if node == [0, 0]: # NE
+                if node == [0, 0]:  # NE
                     rectangle = [round(n_lat + blur, 5),
                                  round(e_lng + blur, 5),
                                  round(mid_lat - blur, 5),
                                  round(mid_lng - blur, 5),]
-                elif node == [0, 1]: # NW
+                elif node == [0, 1]:  # NW
                     rectangle = [round(n_lat + blur, 5),
                                  round(mid_lng + blur, 5),
                                  round(mid_lat - blur, 5),
                                  round(w_lng - blur, 5),]
-                elif node == [1, 0]: # SE
+                elif node == [1, 0]:  # SE
                     rectangle = [round(mid_lat + blur, 5),
                                  round(e_lng + blur, 5),
                                  round(s_lat - blur, 5),
                                  round(mid_lng - blur, 5),]
-                elif node == [1, 1]: # SW
+                elif node == [1, 1]:  # SW
                     rectangle = [round(mid_lat + blur, 5),
                                  round(mid_lng + blur, 5),
                                  round(s_lat - blur, 5),
@@ -889,14 +914,14 @@ class ABSurveyByBoundingBox(ABSurvey):
             # Compare the current node to the logged progress node by
             # converting into strings, then comparing the integer value.
             logger.debug("room_type=%s, self.logged_progress['room_type']=%s",
-                             room_type, self.logged_progress["room_type"])
+                         room_type, self.logged_progress["room_type"])
             if self.config.SEARCH_DO_LOOP_OVER_ROOM_TYPES == 1:
                 if (self.room_types.index(room_type)
-                    < self.room_types.index(self.logged_progress["room_type"])):
+                        < self.room_types.index(self.logged_progress["room_type"])):
                     subtree_previously_completed = True
                     return subtree_previously_completed
                 if (self.room_types.index(room_type)
-                    > self.room_types.index(self.logged_progress["room_type"])):
+                        > self.room_types.index(self.logged_progress["room_type"])):
                     subtree_previously_completed = False
                     return subtree_previously_completed
             common_length = min(len(quadtree_node),
@@ -909,10 +934,9 @@ class ABSurveyByBoundingBox(ABSurvey):
                 for j in range(0, 2)
                 for i in range(0, common_length))
             if (s_this_quadrant != ""
-                and int(s_this_quadrant) < int(s_logged_progress)):
+                    and int(s_this_quadrant) < int(s_logged_progress)):
                 subtree_previously_completed = True
         return subtree_previously_completed
-
 
     def log_progress(self, room_type, quadtree_node, median_node):
         try:
@@ -931,8 +955,10 @@ class ABSurveyByBoundingBox(ABSurvey):
             conn = self.config.connect()
             cur = conn.cursor()
             cur.execute(sql, (self.survey_id,
-                              room_type, repr(quadtree_node), repr(median_node),
-                              room_type, repr(quadtree_node), repr(median_node),
+                              room_type, repr(quadtree_node), repr(
+                                  median_node),
+                              room_type, repr(quadtree_node), repr(
+                                  median_node),
                               self.survey_id))
             cur.close()
             conn.commit()
@@ -941,7 +967,8 @@ class ABSurveyByBoundingBox(ABSurvey):
         except Exception as e:
             logger.warning("""Progress not logged: survey not affected, but
                     resume will not be available if survey is truncated.""")
-            logger.exception("Exception in log_progress: {e}".format(e=type(e)))
+            logger.exception(
+                "Exception in log_progress: {e}".format(e=type(e)))
             conn.close()
             return False
 
@@ -977,4 +1004,3 @@ def ABSurveyGlobal(ABSurvey):
                 logger.exception("Error in search:" + str(type(ex)))
                 raise
         self.fini()
-
