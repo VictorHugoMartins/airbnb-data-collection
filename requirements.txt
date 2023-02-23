@@ -28,7 +28,7 @@ jsonschema==2.5.1
 jupyter==1.0.0
 jupyter-client==4.4.0
 jupyter-console==4.0.3
-jupyter-core==4.2.0
+jupyter-core==4.11.2
 logilab-common==0.63.2
 lxml==4.9.1
 MarkupSafe==0.23
