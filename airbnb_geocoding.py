@@ -386,7 +386,7 @@ class BoundingBox():
                             bounds[0],
                             bounds[1],)
 
-            print(bounding_box)
+            # print(bounding_box)
             return cls(bounding_box)
         except:
             LOGGER.exception("Exception in BoundingBox_from_geopy: exiting")

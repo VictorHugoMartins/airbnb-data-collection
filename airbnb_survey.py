@@ -119,6 +119,7 @@ class ABSurvey():
             listing = ABListing(self.config, room_id, self.survey_id)
             # listing
             json_listing = json["listing"] if "listing" in json else None
+            # print(json_listing)
             json_pricing = json["pricing_quote"] if "pricing_quote" in json else None
             # print("O JSON LISTING: ", json_pricing)
             if json_listing is None:

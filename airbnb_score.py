@@ -61,7 +61,7 @@ def update_comodities(config, driver, city, room_id):
         comodities = []
         comodidades = driver.find_elements(By.CLASS_NAME, 'iikjzje')
         for c in comodidades:
-            print(c.text)
+            # print(c.text)
             if (('Indisponível' not in c.text) and ('\n' not in c.text)):
                 comodities.append(c.text)
         # print(comodities)

@@ -77,9 +77,13 @@ def ws_individual_request(config, url, attempt_id, params=None):
         # Now make the request
         # cookie to avoid auto-redirect
         cookies = dict(sticky_locale='en')
+        # print(url, params, headers, cookies)
+        # params=None
+        print(params)
         response = requests.get(url, params, timeout=timeout,
                                 headers=headers, cookies=cookies, proxies=proxies)
         if response.status_code < 300:
+            print(response)
             return response
         else:
             if http_proxy:

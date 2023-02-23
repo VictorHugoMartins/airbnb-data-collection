@@ -197,19 +197,19 @@ class ABListing():
 
     def __insert(self):
         """ Insert a room into the database. Raise an error if it fails """
-        print(
-                self.room_id, self.host_id, self.room_type, self.country,
-                self.city, self.neighborhood, self.address, self.reviews,
-                self.overall_satisfaction, self.accommodates, self.bedrooms,
-                self.bathrooms, self.price, self.deleted, self.minstay,
-                self.latitude, self.longitude, self.survey_id,
-                self.coworker_hosted, self.extra_host_languages, self.name,
-                self.property_type, self.currency, self.rate_type,
-                self.sublocality, self.route,
-                self.is_superhost,
-                self.max_nights, self.avg_rating,
-                self.pictures, self.bathroom
-                )
+        # print(
+        #         self.room_id, self.host_id, self.room_type, self.country,
+        #         self.city, self.neighborhood, self.address, self.reviews,
+        #         self.overall_satisfaction, self.accommodates, self.bedrooms,
+        #         self.bathrooms, self.price, self.deleted, self.minstay,
+        #         self.latitude, self.longitude, self.survey_id,
+        #         self.coworker_hosted, self.extra_host_languages, self.name,
+        #         self.property_type, self.currency, self.rate_type,
+        #         self.sublocality, self.route,
+        #         self.is_superhost,
+        #         self.max_nights, self.avg_rating,
+        #         self.pictures, self.bathroom
+        #         )
                 
         # return
         try:
