@@ -1,6 +1,4 @@
 import os
-# import redis
-# import pyarrow as pa
 import pandas as pd
 import numpy as np
 import re
@@ -255,44 +253,3 @@ def get_corr_columns(df, site):
     df_corr = pd.get_dummies(df_corr)
     # df_corr = df_corr.corr().sort_values(by='price')
     return df_corr.index.tolist()
-
-'''
-for index, row in df.iterrows():
-
-def insert(self, row):
-    logger.debug("Values: ")
-        logger.debug("\troom: {}".format(self.room_id))
-        conn = config.connect()
-        cur = conn.cursor()
-
-        banco = sqlite3.connect('airbnb.db')
-        cursor = banco.cursor()
-
-        sql == """INSERT INTO prepared_data(name,cidade, room_id, host_id, price,
-        overall_satisfaction, accommodates, bedrooms,
-        bathrooms, bathroo,, latitude, longitude, region, room_type, property_type,
-        route, sublocality, comoditiesi, collected, price_pc, qtd_comodities,
-        deleted, count_host_id, hotel_id, count_hotel_id, qtd, republica, private_bathroom,
-        shared_bathroom, category, qtd_rooms, ar-condicionado, café, espaco, estacionamento,
-        máquina, piscina, tv, wifi, cluster, total_clusters, inserted, site)
-        VALUES (?, ?, ?,?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-        ?, ?, ?,?,?, ?, ?,?,?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """;
-        
-        insert_args = (
-            self.room_id, self.hotel_id, self.name, self.room_name, self.address, self.popular_facilities,
-            self.overall_satisfaction, self.reviews, self.property_type, self.bed_type, self.adults_accommodates,
-            self.children_accommodates, self.price, self.latitude, self.longitude,
-            self.city, self.state, self.country, self.currency, self.comodities,
-            self.images, self.bedroom_type, self.qtd_rooms
-            )
-        cur.execute(sql, insert_args)
-        conn.commit()
-
-        cursor.execute(sql, insert_args)
-        cursor.close()
-        cur.close()
-        banco.commit()
-        print("FOOOOOOOOOI")
-        
-'''
