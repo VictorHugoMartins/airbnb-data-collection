@@ -308,33 +308,44 @@ WITH (
 CREATE TABLE public.booking_room
 (
   room_id integer NOT NULL,
-	hotel_id integer,
-  host_id integer,
-	room_name character varying(255),
-	hotel_name character varying(255),
-  room_type character varying(255),
-  country character varying(255),
-  city character varying(255),
-  neighborhood character varying(255),
+	accommodates integer,
   address character varying(1023),
-  reviews integer,
-  overall_satisfaction double precision,
-  accommodates integer,
-  bedrooms numeric(5,2),
-  bathrooms numeric(5,2),
-  price double precision,
-  deleted integer,
-  minstay integer,
+  bathroom_type numeric(5,2),
+  bed_type character varying(255)
+  comodities character varying(3000),
+  hotel_name character varying(255)
   last_modified timestamp without time zone DEFAULT now(),
   latitude numeric(30,6),
   longitude numeric(30,6),
-  survey_id integer NOT NULL DEFAULT 999999,
-  location geometry,
+  overall_satisfaction double precision,
+  price double precision,
   property_type character varying(255),
-  currency character varying(20),
   rate_type character varying(20),
-  comodities character varying(3000),
-  bed_type character varying(255)
+  reviews integer,
+	room_name character varying(255),
+  survey_id integer NOT NULL DEFAULT 999999,
+  checkin_date varchar(15),
+  checkout_date varchar(15)
+)
+WITH (
+  OIDS=FALSE
+);
+
+CREATE SEQUENCE address_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE TABLE public.address
+(
+  adress_id integer NOT NULL DEFAULT nextval('address_id_seq'::regclass),
+	route character varying(255),
+	sublocality character varying(255),
+  city character varying(255),
+  state character varying(255),
+  country character varying(255),
 )
 WITH (
   OIDS=FALSE

@@ -1,5 +1,5 @@
 import os
-import redis
+# import redis
 import pyarrow as pa
 import pandas as pd
 import numpy as np
@@ -19,25 +19,25 @@ CITY_OPTIONS = [ 'Diamantina', 'Ouro Preto', 'Tiradentes']
 
 colors = ['red', 'orange', 'blue', 'green', 'gray']
 
-def connect_redis():
-    try:
-        return redis.from_url(os.environ.get("REDIS_URL"))
-    except:
-        return redis.from_url('redis://:p0a5ac88ade982df103ad8617909c3dc69d90d86f2de775ffdc2c1f0e07c1a905@ec2-23-21-231-30.compute-1.amazonaws.com:13679')
+# def connect_redis():
+#     try:
+#         return redis.from_url(os.environ.get("REDIS_URL"))
+#     except:
+#         return redis.from_url('redis://:p0a5ac88ade982df103ad8617909c3dc69d90d86f2de775ffdc2c1f0e07c1a905@ec2-23-21-231-30.compute-1.amazonaws.com:13679')
 
-def storeInRedis(r, alias, df):
-    df_compressed = pa.serialize(df).to_buffer().to_pybytes()
-    res = r.set(alias,df_compressed)
-    if res == True:
-        print(f'{alias} cached')
+# def storeInRedis(r, alias, df):
+#     df_compressed = pa.serialize(df).to_buffer().to_pybytes()
+#     res = r.set(alias,df_compressed)
+#     if res == True:
+#         print(f'{alias} cached')
 
-def loadFromRedis(r, alias):
-    data = r.get(alias)
-    try:
-        return pa.deserialize(data)
-    except:
-        #print("No data")
-        return None
+# def loadFromRedis(r, alias):
+#     data = r.get(alias)
+#     try:
+#         return pa.deserialize(data)
+#     except:
+#         #print("No data")
+#         return None
 
 def houve_mudanca(r, valorAtual, chave):
     if ( r.get(chave) != valorAtual ):
@@ -69,16 +69,16 @@ def storeNewFilterValues(r, inps):
     r.set('category', inps.category.value)
     r.set('kclusters', inps.kclusters.value)
 
-def carregamento_redis(city, kclusters, ksite, site, regiao, tipoDeQuarto, categoria, price):
-    ub.storeInRedis('cidade', city)
-    ub.storeInRedis('kclusters', kClusters)
-    ub.storeInRedis('ksite', kSite)
-    ub.storeInRedis('site', site)
-    ub.storeInRedis('regiao', regiao)
-    ub.storeInRedis('tipodequarto', tipoDeQuarto)
-    ub.storeInRedis('categoria', categoria)
-    ub.storeInRedis('cluster', cluster)
-    ub.storeInRedis('price', price)
+# def carregamento_redis(city, kclusters, ksite, site, regiao, tipoDeQuarto, categoria, price):
+#     ub.storeInRedis('cidade', city)
+#     ub.storeInRedis('kclusters', kClusters)
+#     ub.storeInRedis('ksite', kSite)
+#     ub.storeInRedis('site', site)
+#     ub.storeInRedis('regiao', regiao)
+#     ub.storeInRedis('tipodequarto', tipoDeQuarto)
+#     ub.storeInRedis('categoria', categoria)
+#     ub.storeInRedis('cluster', cluster)
+#     ub.storeInRedis('price', price)
 
 def get_chave(tipo, inps):
     chave = tipo

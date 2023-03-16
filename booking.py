@@ -25,7 +25,7 @@ from booking_reviews import BReview
 from geopy import distance
 import datetime as dt
 import utils
-
+from airbnb import db_add_survey
 
 SCRIPT_VERSION_NUMBER = "4.0"
 DOMAIN = 'https://www.booking.com'
@@ -38,21 +38,25 @@ class BListing():
 	# room_id, survey_id is the primary key.
 	"""
 
-	def __init__(self, config, driver, url):
+	def __init__(self, config, driver, url, survey_id, checkin_date, checkout_date):
 		self.config = config
 
-		room_id = None
-		room_name = None
-		accommodates = None
-		price = None
-		bedtype = None
-		lat = None
-		lng = None
-		overall_satisfaction = None
-		comodities = None
-		hotel_name = None
-		localized_address = None
-		property_type = None
+		self.room_id = None
+		self.room_name = None
+		self.accommodates = None
+		self.price = None
+		self.bedtype = None
+		self.lat = None
+		self.lng = None
+		self.overall_satisfaction = None
+		self.comodities = None
+		self.hotel_name = None
+		self.localized_address = None
+		self.property_type = None
+		self.reviews = None
+		self.survey_id = survey_id
+		self.checkin_date = checkin_date
+		self.checkout_date = checkout_date
 
 		# time.sleep(5)
 		# try:
@@ -75,41 +79,6 @@ class BListing():
 
 		self.start_date = None
 		self.finish_date = None
-
-	def get_address(self, driver):
-		# Get the accommodation address
-		try:
-			return driver.find_element_by_id('showMap2')\
-			.find_element_by_class_name('hp_address_subtitle').text
-		except:
-			return None
-
-	def get_overall_satisfaction(self, driver):
-		# Get the accommodation overall_satisfaction
-		try:
-			return driver.find_element(By.XPATH, '/html/body/div[5]/div/div[3]/div[2]/div[2]/div[13]/div[1]/a/div/div[1]').text.\
-					replace(',', '.')
-		except:
-			try:
-				return driver.find_element_by_class_name(
-					'bui-review-score--end').find_element_by_class_name(
-					'bui-review-score__badge').text.replace(',', '.')
-			except:
-				return None
-
-	def get_property_type(self, driver):
-		# Get the accommodation type
-		try:
-			return driver.find_elements_by_xpath('//*[@id="hp_hotel_name"]/span')[0].text
-		except:
-			return None
-
-	def get_name(self, driver):
-		try:
-			return driver.find_element_by_id('hp_hotel_name')\
-			.text.strip(str(self.property_type))
-		except:
-			return None
 
 	def get_hotel_id(self, driver):
 		try:
@@ -163,33 +132,6 @@ class BListing():
 		except:
 			return None
 
-	def get_rooms_id(self, driver):  # unused
-		rooms_id = []
-		x = driver.find_elements_by_xpath(
-				'//*[@id="maxotel_rooms"]/tbody/tr/td[@class="ftd roomType"]/div')
-		n_rows = len(x)
-
-		logger.debug("len de rooms id", n_rows)
-
-		if (n_rows == 0):  # in case of search with checkin-checkout date
-			x = driver.find_elements_by_xpath('//*[@class="hprt-roomtype-link"]')
-			n_rows = len(x)
-
-			for j in range(n_rows):
-				try:
-					rooms_id.append(x[j].get_attribute("id").split('room_type_id_')[1])
-				except:
-					logger.debug("Room id not finded")
-					rooms_id.append(None)
-		else:
-			for j in range(n_rows):
-				try:
-					rooms_id.append(x[j].get_attribute("id"))
-				except:
-					logger.debug("Room id not finded")
-
-		return rooms_id
-
 	def get_facilities(self, driver):  # unused
 		facilities = []
 		y = driver.find_elements_by_class_name('hprt-facilities-block')
@@ -207,119 +149,6 @@ class BListing():
 
 		return facilities
 
-	def get_beds_type(self, driver):  # unused
-		room_name = []
-		x = driver.find_elements_by_xpath('//*[@id="maxotel_rooms"]/tbody/tr'
-					'td[@class="ftd roomType"]/div/div[@class="room-info"]/a')
-		n_rows = len(x)
-
-		i = 0
-		if (n_rows == 0):
-			x = driver.find_elements_by_xpath('//*[@class="bedroom_bed_type"]/span')
-			n_rows = len(x)
-			for j in range(n_rows):
-				try:
-					room_name.append(x[j].text)
-				except:
-					logger.debug("Bed type not finded")
-					room_name.append(None)
-		else:
-			for j in range(n_rows):
-				logger.debug(j, "veio no else")
-				try:
-					room_name.append(x[j].get_attribute("data-room-name-en"))
-				except:
-					logger.debug("Bed type not finded")
-					room_name.append(None)
-		return room_name
-
-	def get_room_name(self, driver):  # unused
-		beds_type = []
-		x = driver.find_elements_by_xpath('//*[@id="maxotel_rooms"]/tbody/tr/'
-					'td[@class="ftd roomType"]/div/div[@class="room-info"]/div/'
-					'/ul/li/span')
-		n_rows = len(x)
-
-		if (n_rows == 0):
-			y = driver.find_elements_by_xpath('//*[@class="hprt-roomtype-icon-link "]')
-			n_rows = len(y)
-			for j in range(n_rows):
-				try:
-					beds_type.append(y[j].text)
-				except:
-					beds_type.append(None)
-					logger.debug("Bed not finded")
-		else:
-			for j in range(n_rows):
-				try:
-					beds_type.append(x[j].text)
-				except:
-					logger.debug("Bed not finded")
-		return beds_type
-
-	def get_price(self, driver):  # unused
-		prices = []
-		x = driver.find_elements_by_xpath(
-				'//*[@class="bui-price-display__value prco-text-nowrap-helper prco-font16-helper"]')
-		n_rows = len(x)
-
-		for elem in x:
-			try:
-				prices.append(elem.text.split('R$ ')[1])
-			except:
-				prices.append(None)
-				logger.debug("Price not finded")
-
-		return prices
-
-	def get_accommodates(self, driver):  # unused
-		# Get the rooms person capacity
-		x = driver.find_elements_by_xpath('//*[@id="maxotel_rooms"]/tbody/tr/td')
-		n_rows = len(x)
-		accommodates = []
-		if (n_rows == 0):
-			x = driver.find_elements_by_xpath('//*[@id="hprt-table"]/tbody/tr/td[2]')
-			n_rows = len(x)
-			for elem in x:
-				try:
-					accommodates.append(elem.find_element_by_class_name(
-							'bui-u-sr-only').text.split('Máx. pessoas: ')[1])
-				except:
-					accommodates.append(None)
-		else:
-			for j in range(0, n_rows, 4):
-				try:
-					s = x[j].find_element_by_class_name('bui-u-sr-only').text.split(': ')
-					if len(s) == 3:
-						accommodates.append(int(s[1].split('.')[0]))
-					else:
-						accommodates.append(int(s[1]))
-				except:
-					accommodates.append(None)
-
-		return accommodates
-
-	def get_children_accommodates(self, driver):  # unused
-		# Get the rooms person capacity
-		x = driver.find_elements_by_xpath('//*[@id="maxotel_rooms"]/tbody/tr/td')
-
-		n_rows = len(x)
-		accommodates = []
-
-		if (n_rows == 0):
-			return None
-		for j in range(0, n_rows, 4):
-			try:
-				s = x[j].find_element_by_class_name('bui-u-sr-only').text.split(': ')
-				if len(s) == 3:
-					accommodates.append(s[2])
-				else:
-					accommodates.append('0')
-			except:
-				logger.debug("Accomodate not finded")
-
-		return accommodates
-
 	def get_lat_lng(self, driver):
 		try:
 			x = driver.find_element(By.XPATH, '//*[@id="hotel_surroundings"]')
@@ -329,18 +158,6 @@ class BListing():
 			return (latitude, longitude)
 		except:
 			return (None, None)
-
-	def get_images(self, driver):
-		m_images = []
-		images = driver.find_elements_by_xpath(
-				'//div[@class="b_nha_hotel_small_images hp_thumbgallery_with_counter"]/a')
-		tamanho = len(images)
-		for elem in images:
-			linha = []
-			linha.append(elem.get_attribute("href"))
-			linha.append(elem.get_attribute("aria-label"))
-			m_images.append(linha)
-		return m_images
 
 	def get_reviews_text(self, driver):
 		try:
@@ -444,32 +261,18 @@ class BListing():
 			logger.debug("\troom: {}".format(self.room_id))
 			conn = self.config.connect()
 			cur = conn.cursor()
-			# sql = """
-			# 	insert into booking_room (
-			# 		room_id, hotel_id, name, room_name, address, popular_facilities,
-			# 		overall_satisfaction, reviews, property_type, bed_type, accommodates, children_accommodates,
-			# 		price, latitude, longitude, city, state, country, currency, comodities,
-			# 		images, bedroom_type, qtd_rooms
-			# 		)
-			# 	values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
-			# insert_args = (
-			# 	self.room_id, self.hotel_id, self.name, self.room_name, self.address, self.popular_facilities,
-			# 	self.overall_satisfaction, self.reviews, self.property_type, self.bed_type, self.adults_accommodates,
-			# 	self.children_accommodates, self.price, self.latitude, self.longitude,
-			# 	self.city, self.state, self.country, self.currency, self.comodities,
-			# 	self.images, self.bedroom_type, self.qtd_rooms
-			# 	)
 			sql = """
 				insert into booking_room (
 					room_id, room_name, hotel_name, address, comodities,
 					overall_satisfaction, property_type, bed_type, accommodates,
-					price, latitude, longitude, reviews
+					price, latitude, longitude, reviews, survey_id,
+					checkin_date, checkout_date
 					)
-				values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+				values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
 			insert_args = (
 				self.room_id, self.hotel_name, self.room_name, self.localized_address, self.comodities,
 				self.overall_satisfaction, self.property_type, self.bedtype, self.accomodates,
-				self.price, self.lat, self.lng, self.reviews
+				self.price, self.lat, self.lng, self.reviews, self.survey_id, self.checkin_date, self.checkout_date
 				)
 
 			cur.execute(sql, insert_args)
@@ -702,9 +505,10 @@ def find_principal_comodities(driver, listing):
 	listing.comodities = comodities
 
 def find_reviews_quantity(driver, listing):
-	element = driver.find_element(By.CSS_SELECTOR, '.b5cd09854e.c90c0a70d3.db63693c62')
-	listing.reviews = element.text.split(' ')[0]
-	print(listing.reviews)
+	element = driver.find_element(By.XPATH, '//*[@rel="reviews"]')
+	if element.text is not None:
+		r = element.text.split('Avaliações de hóspedes (')[1].split(')')[0]
+		listing.reviews = float(r)
 
 def update_cities(config, city):
 	try:
@@ -787,9 +591,21 @@ def update_routes(config, city):
 	except:
 		raise
 
-def search(config, area, start_date, finish_date, search_reviews):
-	driver = prepare_driver('https://www.booking.com/searchresults.pt-br.html?ss=Ouro+Preto&ssne=Ouro+Preto&ssne_untouched=Ouro+Preto&checkin=2023-02-24&checkout=2023-02-25')
-	
+def search(config, area, start_date, finish_date, search_reviews, survey_id):
+	city = area.split(',')[0]
+
+	checkin_date = start_date
+	if checkin_date is None:
+		checkin_date = dt.date.today() + dt.timedelta(days=7)
+
+	checkout_date = finish_date
+	if checkout_date is None:
+		checkout_date = dt.date.today() + dt.timedelta(days=8)
+
+	url = "https://www.booking.com/searchresults.pt-br.html?ss={}&ssne={}&ssne_untouched={}&checkin={}&checkout={}".format(
+					city, city, city, checkin_date, checkout_date)
+	driver = prepare_driver(url)
+
 	wait = WebDriverWait(driver, timeout=10).until(
 		EC.presence_of_all_elements_located(
 			(By.XPATH, '//*[@data-testid="property-card"]')))
@@ -807,7 +623,7 @@ def search(config, area, start_date, finish_date, search_reviews):
 				for url in urls:
 					hotel_page = prepare_driver(url)
 					
-					listing = BListing(config, driver, url)
+					listing = BListing(config, driver, url, survey_id, checkin_date, checkout_date)
 					
 					find_latlng(hotel_page, listing)
 					find_overall_classification(hotel_page, listing)
@@ -815,8 +631,10 @@ def search(config, area, start_date, finish_date, search_reviews):
 					find_hotel_name(hotel_page, listing)
 					find_localized_address(hotel_page, listing)
 					find_property_type(hotel_page, listing)
-					find_room_informations(hotel_page, listing)
-				
+					find_reviews_quantity(hotel_page, listing)
+					
+					find_room_informations(hotel_page, listing) # needs to be the last call
+					
 				page.click()
 				break
 			except selenium.common.exceptions.TimeoutException:
@@ -960,8 +778,15 @@ def main():
 	
 	try:
 		if args.city:
+			# create/insert in database search area with coordinates
+			bounding_box = BoundingBox.from_geopy(config, args.city)
+			bounding_box.add_search_area(config, args.city)
+
+			# initialize new survey
+			survey_id = db_add_survey(config, args.city)
+
 			search(config, args.city, args.start_date, args.finish_date,
-					args.search_reviews)
+					args.search_reviews, survey_id)
 		elif args.update_routes_with_database:
 			fill_empty_routes(config)
 			update_cities(config, args.update_routes)
@@ -978,5 +803,3 @@ def main():
 
 if __name__ == "__main__":
 	main()
-
-# preço?????

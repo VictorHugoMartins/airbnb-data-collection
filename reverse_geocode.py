@@ -117,8 +117,6 @@ class BoundingBox():
             gmaps = googlemaps.Client(key=config.GOOGLE_API_KEY)
             results = gmaps.geocode((search_area))
 
-            print(results)
-
             bounds = results[0]["geometry"]["viewport"]
             bounding_box = (bounds["southwest"]["lat"],
                             bounds["northeast"]["lat"],
@@ -265,7 +263,6 @@ def main():
     args = parser.parse_args()
     search_area = args.sa
 
-    print(search_area)
     if args.count:
         count = args.count
     else:

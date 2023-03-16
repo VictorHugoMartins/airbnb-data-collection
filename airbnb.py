@@ -793,6 +793,9 @@ def full_process(ab_config, search_area_name):
     # search for the listings
     survey.search(ab_config.FLAGS_ADD)
 
+    fill_search(ab_config, search_area_name, None)
+    update_routes_geolocation(ab_config, search_area_name)
+
 def main():
     """
     Main entry point for the program.
