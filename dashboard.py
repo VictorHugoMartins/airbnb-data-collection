@@ -14,7 +14,7 @@ from bokeh.models.widgets.tables import (
 from bokeh.embed import components
 from bokeh import events
 from bokeh.plotting import figure
-import datetime as dt
+# import datetime as dt
 
 import utils_bokeh as ub
 
@@ -34,7 +34,7 @@ class Inputs():
         self.price = price
         self.consulta = consulta
 
-today = dt.date.today().isoformat()
+# today = dt.date.today().isoformat()
 
 curdoc().clear()
 
