@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3:4.5.4
+FROM python:3.11
 
 WORKDIR app
 
