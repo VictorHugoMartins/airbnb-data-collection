@@ -124,6 +124,7 @@ class ABSurvey():
             # print("O JSON LISTING: ", json_pricing)
             if json_listing is None:
                 return None
+            print(json_listing)
             if "room_type" in json_listing:
                 listing.room_type = json_listing["room_type"]
             else:
@@ -789,6 +790,7 @@ class ABSurveyByBoundingBox(ABSurvey):
                         if json_listings is None:
                             continue
                         for json_listing in json_listings:
+                            print(json_listing)
                             room_id = int(json_listing["listing"]["id"])
                             if room_id is not None:
                                 room_count += 1
