@@ -71,7 +71,7 @@ def variable_plot(source_airbnb, source_booking, source_both):
         ('valor', '@{desc}{0.3f}')
     ]
 
-    p=figure(x_range=[],y_range=(0, 100), min_width=1300, min_height=300,
+    p=figure(x_range=[],y_range=(0, 100), min_width=1300, min_height=300, height=500, width=1300,
             tooltips=TOOLTIPS)
     p.vbar(x=dodge('x', -0.25, range=p.x_range), top='top', width=0.2, source=source_airbnb,
         color="blue")
