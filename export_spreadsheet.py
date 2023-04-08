@@ -3,7 +3,7 @@ import pandas as pd
 import argparse
 import datetime as dt
 import logging
-from airbnb_config import ABConfig
+from general_config import ABConfig
 import os.path
 import os
 

@@ -9,9 +9,8 @@ import psycopg2 as pg
 import argparse
 import datetime as dt
 import logging
-from airbnb_config import ABConfig
+from general_config import ABConfig
 import os.path
-import clustering_quality as cq
 import export_spreadsheet as exs
 import create_map as cm
 from kmodes import kmodes

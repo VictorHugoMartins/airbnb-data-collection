@@ -5,8 +5,7 @@ import psycopg2 as pg
 import argparse
 import datetime as dt
 import logging
-from airbnb_config import ABConfig
-import clustering_quality as cq
+from general_config import ABConfig
 import export_spreadsheet as exs
 from kmodes import kmodes
 from pandas import ExcelWriter

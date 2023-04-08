@@ -124,7 +124,6 @@ class ABSurvey():
             # print("O JSON LISTING: ", json_pricing)
             if json_listing is None:
                 return None
-            print(json_listing)
             if "room_type" in json_listing:
                 listing.room_type = json_listing["room_type"]
             else:
@@ -211,7 +210,8 @@ class ABSurvey():
             if "structured_stay_display_price" in json_pricing:
                 structured_price = json_pricing['structured_stay_display_price']['primary_line']['price']
                 listing.price = structured_price.split('$')[1].split()[0]
-                listing.currency = structured_price.split()[1]
+                if len(structured_price.split()) > 0:
+                    listing.currency = structured_price.split()[1]
 
             # pricing
             # json_pricing = json["pricing_quote"]
@@ -790,7 +790,6 @@ class ABSurveyByBoundingBox(ABSurvey):
                         if json_listings is None:
                             continue
                         for json_listing in json_listings:
-                            print(json_listing)
                             room_id = int(json_listing["listing"]["id"])
                             if room_id is not None:
                                 room_count += 1

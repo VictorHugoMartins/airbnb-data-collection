@@ -24,7 +24,7 @@ import webbrowser
 from lxml import html
 import psycopg2
 import psycopg2.errorcodes
-from airbnb_config import ABConfig
+from general_config import ABConfig
 from airbnb_survey import ABSurveyByBoundingBox
 from airbnb_listing import ABListing
 from airbnb_geocoding import BoundingBox

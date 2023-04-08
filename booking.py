@@ -15,7 +15,7 @@ from airbnb_geocoding import Location
 from airbnb_geocoding import BoundingBox
 from lxml import html
 from selenium import webdriver
-from airbnb_config import ABConfig
+from general_config import ABConfig
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.wait import WebDriverWait

@@ -9,7 +9,7 @@ from functools import partial
 import googlemaps
 import argparse
 import json
-from airbnb_config import ABConfig
+from general_config import ABConfig
 import sys
 import logging
 import os

@@ -250,7 +250,7 @@ class ABListing():
             logger.debug("Room " + str(self.room_id) + ": inserted")
             logger.debug("(lat, long) = ({lat:+.5f}, {lng:+.5f})".format(lat=self.latitude, lng=self.longitude))
         except psycopg2.IntegrityError:
-            logger.info("Room " + str(self.room_id) + ": insert failed")
+            # logger.info("Room " + str(self.room_id) + ": insert failed")
             conn.rollback()
             cur.close()
             raise
