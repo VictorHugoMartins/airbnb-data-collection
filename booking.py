@@ -21,13 +21,12 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-from booking_reviews import BReview
 from geopy import distance
 import datetime as dt
 import utils
 from airbnb import db_add_survey
+from selenium import prepare_driver
 
-SCRIPT_VERSION_NUMBER = "4.0"
 DOMAIN = 'https://www.booking.com'
 logger = logging.getLogger()
 
@@ -58,143 +57,8 @@ class BListing():
 		self.checkin_date = checkin_date
 		self.checkout_date = checkout_date
 
-		# time.sleep(5)
-		# try:
-		# 	self.hotel_id = self.get_hotel_id(driver)
-		# except selenium.common.exceptions.NoSuchElementException:
-		# 	self.hotel_id = None
-		# self.popular_facilities = self.get_popular_facilities(driver)
-		# self.reviews = self.get_reviews(driver)
-		# self.images = self.get_images(driver)
-
-		# (self.latitude, self.longitude) = self.get_lat_lng(driver)
-		# (self.city, self.state, self.country,
-		#  self.currency) = self.get_address_elements(url)
-
-		# self.qtd_rooms = None
-		# self.bed_type = None
-		# self.adults_accommodates = None
-		# self.children_accommodates = None
-		# self.bedroom_type = None
-
 		self.start_date = None
 		self.finish_date = None
-
-	def get_hotel_id(self, driver):
-		try:
-			return int(driver.find_element(By.XPATH, '//*[@id="hprt-form"]/input[1]').
-							get_attribute("value"))
-		except:
-			return int(driver.find_elements_by_xpath('//*[@id="hp_facilities_box"]/div[6]/div[1]/input')[0].
-							get_attribute("value"))
-
-	def get_reviews(self, driver):
-		# Get the accommodation reviews count
-		try:
-			x = driver.find_elements_by_xpath('//*[@id="show_reviews_tab"]/span')
-			try:
-				return int(x[0].text.split('(')[1].split(')')[0])
-			except:
-				return driver.find_elements_by_xpath('//*[@id="left"]/div[11]/div[1]/a/div/div[2]/div[2]').split(' comentários')[0]
-		except:
-			return None
-
-	def get_address_elements(self, accommodation_url):
-		response = requests.get(accommodation_url)
-		page = response.text
-		tree = html.fromstring(page)
-		x = tree.xpath('//*[@id="b2hotelPage"]/script[1]/text()')
-
-		try:
-			self.name = x[0].split("hotel_name: '")[1].split("'")[0]
-			city = x[0].split("city_name: '")[1].split("'")[0]
-			state = x[0].split("region_name: '")[1].split("'")[0]
-			country = x[0].split("country_name: '")[1].split("'")[0]
-			currency = x[0].split("currency: '")[1].split("'")[0]
-
-			return (city, state, country, currency)
-		except:
-			return (None, None, None, None)
-
-		return (city, state, country, currency)
-
-	def get_popular_facilities(self, driver):
-		try:
-			x = []
-			# Get the most popular facilities
-
-			facilities = driver.find_element_by_class_name(
-					'hp_desc_important_facilities')
-
-			for facility in facilities.find_elements_by_class_name('important_facility'):
-				x.append(facility.text)
-			return x
-		except:
-			return None
-
-	def get_facilities(self, driver):  # unused
-		facilities = []
-		y = driver.find_elements_by_class_name('hprt-facilities-block')
-		tamanho = len(y)
-		for x in y:
-			x = x.find_elements_by_class_name('hprt-facilities-facility')
-			n_rows = len(x)
-			linha = []
-			for j in range(n_rows):
-				try:
-					linha.append(x[j].get_attribute("data-name-en"))
-				except:
-					linha.append(None)
-			facilities.append(linha)
-
-		return facilities
-
-	def get_lat_lng(self, driver):
-		try:
-			x = driver.find_element(By.XPATH, '//*[@id="hotel_surroundings"]')
-			l = x.get_attribute("data-atlas-latlng").split(',')
-			latitude = l[0]
-			longitude = l[1]
-			return (latitude, longitude)
-		except:
-			return (None, None)
-
-	def get_reviews_text(self, driver):
-		try:
-
-			driver.find_element(By.XPATH, '//*[@id="show_reviews_tab"]').click()
-			time.sleep(5)
-
-			reviews = driver.find_elements_by_class_name('review_list_new_item_block')
-			size = len(reviews)
-			if size == 0:
-				logger.debug("Unable to find reviews")
-
-			n_review = 1
-			n_page = 1
-
-			new_page = True
-			review_pages = []
-			while new_page:
-				next_page = driver.find_elements_by_class_name('bui-pagination__link')
-				new_page = False
-				for p in next_page:
-					if p.text.split('\n')[0] not in review_pages:
-						n_page = n_page + 1
-						# append(p.text.split(\n)[0]) ??? ai tem q verificar se vai 1 vez em cada 1
-						review_pages.append(p.text.split('\n')[0])
-						new_page = True
-						p.click()
-						time.sleep(5)
-						reviews = driver.find_elements_by_class_name(
-								'review_list_new_item_block')
-						for review in reviews:  # get the reviews
-							r = BReview(self.config, review, self.hotel_id)
-							r.save(self.config.FLAGS_INSERT_REPLACE)
-							n_review = n_review + 1
-						break
-		except selenium.common.exceptions.StaleElementReferenceException:
-			logger.debug("Unable to find all reviews. Last page visited: ", n_page)
 
 	def save(self, insert_replace_flag):
 		"""
@@ -335,96 +199,68 @@ class BListing():
 			logger.warning("Exception in __update: raising")
 			raise
 
+	# ENCONTRANDO DADOS NA NOVA VERSÃO
+	def find_hotel_name(driver):
+		element = driver.find_element(By.CSS_SELECTOR, '.pp-header__title')
+		listing.hotel_name = element.text
 
-def prepare_driver(url):
-	'''Returns a Firefox Webdriver.'''
-	options = Options()
-	# options.add_argument('-headless')
-	binary = FirefoxBinary('C:\\Program Files\\Mozilla Firefox\\firefox.exe')
-	driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-	driver.get(url)
-	# wait = WebDriverWait(driver, 10).until(EC.presence_of_element_located(
-	# 	(By.NAME, 'ss')))
-	return driver
+	def find_localized_address(driver):
+		element = driver.find_element(By.CSS_SELECTOR, '.js-hp_address_subtitle')
+		listing.localized_address = element.text
 
+	def find_room_informations(driver):
+		table_rows = driver.find_elements(By.XPATH, "//*[@id='hprt-table']/tbody/tr")
+		for row in table_rows:
+			try:
+				room_name = row.find_element(By.CLASS_NAME, 'hprt-roomtype-link')
+				listing.room_name = room_name.text
+				listing.room_id = room_name.get_attribute("data-room-id")
 
-def fill_form(driver, config, search_argument, start_date, finish_date):
-	# preenche o campo de área de busca
-	# search_field = driver.find_element(By.NAME, 'ss')
-	# search_field.send_keys(search_argument)
-
-	# # tenta clicar em "checkin/checkout" para exibir calendário com datas disponíveis
-	# driver.find_element(By.CSS_SELECTOR, '.fe211c0731').click()
-	# sd_div = None
-	# if start_date:
-	# 	actual_month = int(dt.date.today().isoformat().split("-")[1])
-	# 	search_month = int(start_date.split("-")[1])
-	# 	while ( search_month > actual_month ):
-	# 		actual_month = actual_month + 1
-	# 		driver.find_element(By.XPATH, "/html/body/div[5]/div/div/div[2]/"
-	# 									+ "form/div[1]/div[2]/div[2]/div/div/div[2]").click()
+				bed_type = row.find_element(By.CSS_SELECTOR, '.hprt-roomtype-bed')
+				listing.bedtype = bed_type.text
+			except selenium.common.exceptions.NoSuchElementException:
+				pass
 			
-	# 	try: # in case start date is in the actual month
-	# 		driver.find_element(By.XPATH, '//*[@data-date="' + start_date + '"]').click()
-	# 	except: # in case is in the next
-	# 		driver.find_element(By.XPATH, '//*[@data-date="' + start_date + '"]').click()
-	# else: # look for the first date in next month
-	# 	sd_div = driver.find_element(By.XPATH, '/html/body/div[5]/div/div/div[2]/form/div[1]/div[2]/div[2]'\
-	# 				'/div/div/div[3]/div[2]/table/tbody/tr[1]/td[@class="bui-calendar__date"]')
-	# 	sd_div.click()
-	# 	start_date = sd_div.get_attribute("data-date")
-	
-	# if finish_date: # if not, the default is the next day to the next to the start
-	# 	try:
-	# 		driver.find_element(By.XPATH, '//*[@data-date="' + finish_date + '"]').click()
-	# 	except:
-	# 		driver.find_element(By.XPATH, '//*[@data-date="' + finish_date + '"]').click()
+			accomodates = row.find_elements(By.CSS_SELECTOR, ".bicon-occupancy")
+			listing.accomodates = len(accomodates)
+
+			# preco
+			price = row.find_element(By.CSS_SELECTOR, '.bui-price-display__value')
+			listing.price = price.text.split('R$ ')[1]		
+
+			listing.save(listing.config.FLAGS_INSERT_REPLACE)
+
+	def find_latlng(driver): # ok
+		element = driver.find_element(By.ID, 'hotel_header')
+		coordinates = element.get_attribute('data-atlas-latlng').split(',')
+		listing.lat = coordinates[0]
+		listing.lng = coordinates[1]
+
+	def find_property_type(driver):
+		element = driver.find_element(By.XPATH, '//*[@data-testid="property-type-badge"]')
+		listing.property_type = element.text
 		
-	# # We look for the search button and click it
-	# driver.find_element_by_class_name('sb-searchbox__button')\
-	# 	.click()
+	def find_overall_classification(driver):
+		element = driver.find_element(By.CSS_SELECTOR, 'div.b5cd09854e.d10a6220b4')
+		if ',' in element.text:
+			listing.overall_satisfaction = float(element.text.replace(',', '.'))
+		else:
+			if len(element.text) > 0:
+				listing.overall_satisfaction = float(element.text)
 
-	wait = WebDriverWait(driver, timeout=10).until(
-		EC.presence_of_all_elements_located(
-			(By.XPATH, '//*[@data-testid="property-card"]')))
+	def find_principal_comodities(driver):
+		element = driver.find_elements(By.CSS_SELECTOR, 'div.a815ec762e.ab06168e66')
+		comodities = []
+		for comodity in element:
+			comodities.append(comodity.text)
 
-	return (start_date, finish_date)
+		listing.comodities = comodities
 
-def get_price(driver):  # unused
-	prices = []
-	x = driver.find_elements_by_xpath('//*[@class="bui-price-display__value prco-inline-block-maker-helper prco-font16-helper"]')
-	n_rows = len(x)
-
-	for elem in x:
-		try:
-			prices.append(elem.text.split('R$ ')[1])
-		except:
-			prices.append(None)
-			logger.debug("Price not finded")
-
-	return prices
-
-def get_room_options(driver):
-	rooms_options = driver.find_elements_by_xpath("//td[contains(@class, ' hprt-table-cell hprt-table-room-select')]")
-	ro = []
-	for t in rooms_options:
-		ro.append(t.text)
-	return ro
-
-def get_room_name(elem, valor_anterior):
-	try:
-		rn = elem.find_element_by_class_name('hprt-roomtype-link').get_attribute("data-room-name")
-		if rn == "":
-			rn = elem.find_element_by_class_name('hprt-roomtype-link').text
-		rn = rn
-	except (TypeError, selenium.common.exceptions.NoSuchElementException):
-		return valor_anterior
-
-def get_room_id(elem, valor_anterior):
-	try:
-		return elem.find_element_by_class_name('hprt-roomtype-link').get_attribute("data-room-id")
-	except (TypeError, selenium.common.exceptions.NoSuchElementException):
-		return valor_anterior # room id anterior
+	def find_reviews_quantity(driver):
+		element = driver.find_element(By.XPATH, '//*[@rel="reviews"]')
+		if element.text is not None:
+			r = element.text.split('Avaliações de hóspedes (')[1].split(')')[0]
+			listing.reviews = float(r)
 
 def fill_empty_routes(config):
 	try:
@@ -447,68 +283,6 @@ def fill_empty_routes(config):
 		logger.debug("Exception in updating")
 		logger.warning("Exception in __update: raising")
 		raise
-
-# ENCONTRANDO DADOS NA NOVA VERSÃO
-def find_hotel_name(driver, listing):
-	element = driver.find_element(By.CSS_SELECTOR, '.pp-header__title')
-	listing.hotel_name = element.text
-
-def find_localized_address(driver, listing):
-	element = driver.find_element(By.CSS_SELECTOR, '.js-hp_address_subtitle')
-	listing.localized_address = element.text
-
-def find_room_informations(driver, listing):
-	table_rows = driver.find_elements(By.XPATH, "//*[@id='hprt-table']/tbody/tr")
-	for row in table_rows:
-		try:
-			room_name = row.find_element(By.CLASS_NAME, 'hprt-roomtype-link')
-			listing.room_name = room_name.text
-			listing.room_id = room_name.get_attribute("data-room-id")
-
-			bed_type = row.find_element(By.CSS_SELECTOR, '.hprt-roomtype-bed')
-			listing.bedtype = bed_type.text
-		except selenium.common.exceptions.NoSuchElementException:
-			pass
-		
-		accomodates = row.find_elements(By.CSS_SELECTOR, ".bicon-occupancy")
-		listing.accomodates = len(accomodates)
-
-		# preco
-		price = row.find_element(By.CSS_SELECTOR, '.bui-price-display__value')
-		listing.price = price.text.split('R$ ')[1]		
-
-		listing.save(listing.config.FLAGS_INSERT_REPLACE)
-
-def find_latlng(driver, listing): # ok
-	element = driver.find_element(By.ID, 'hotel_header')
-	coordinates = element.get_attribute('data-atlas-latlng').split(',')
-	listing.lat = coordinates[0]
-	listing.lng = coordinates[1]
-
-def find_property_type(driver, listing):
-	element = driver.find_element(By.XPATH, '//*[@data-testid="property-type-badge"]')
-	listing.property_type = element.text
-	
-def find_overall_classification(driver, listing):
-	element = driver.find_element(By.CSS_SELECTOR, 'div.b5cd09854e.d10a6220b4')
-	if ',' in element.text:
-		listing.overall_satisfaction = float(element.text.replace(',', '.'))
-	else:
-		listing.overall_satisfaction = float(element.text)
-
-def find_principal_comodities(driver, listing):
-	element = driver.find_elements(By.CSS_SELECTOR, 'div.a815ec762e.ab06168e66')
-	comodities = []
-	for comodity in element:
-		comodities.append(comodity.text)
-
-	listing.comodities = comodities
-
-def find_reviews_quantity(driver, listing):
-	element = driver.find_element(By.XPATH, '//*[@rel="reviews"]')
-	if element.text is not None:
-		r = element.text.split('Avaliações de hóspedes (')[1].split(')')[0]
-		listing.reviews = float(r)
 
 def update_cities(config, city):
 	try:
@@ -591,57 +365,6 @@ def update_routes(config, city):
 	except:
 		raise
 
-def search(config, area, start_date, finish_date, search_reviews, survey_id):
-	city = area.split(',')[0]
-
-	checkin_date = start_date
-	if checkin_date is None:
-		checkin_date = dt.date.today() + dt.timedelta(days=7)
-
-	checkout_date = finish_date
-	if checkout_date is None:
-		checkout_date = dt.date.today() + dt.timedelta(days=8)
-
-	url = "https://www.booking.com/searchresults.pt-br.html?ss={}&ssne={}&ssne_untouched={}&checkin={}&checkout={}".format(
-					city, city, city, checkin_date, checkout_date)
-	driver = prepare_driver(url)
-
-	wait = WebDriverWait(driver, timeout=10).until(
-		EC.presence_of_all_elements_located(
-			(By.XPATH, '//*[@data-testid="property-card"]')))
-	# FIND ALL PAGES
-	all_pages = driver.find_elements(By.CLASS_NAME, 'f32a99c8d1')
-	for page in all_pages[1:len(all_pages):1]:
-		for i in range(config.ATTEMPTS_TO_FIND_PAGE):
-			try:
-				logger.debug("Attempt ", i+1, " to find page")
-				property_cards = driver.find_elements(By.XPATH, '//*[@data-testid="property-card"]//*[@data-testid="title-link"]')
-				urls = []
-				for property_card in property_cards:
-					urls.append(property_card.get_attribute("href"))
-
-				for url in urls:
-					hotel_page = prepare_driver(url)
-					
-					listing = BListing(config, driver, url, survey_id, checkin_date, checkout_date)
-					
-					find_latlng(hotel_page, listing)
-					find_overall_classification(hotel_page, listing)
-					find_principal_comodities(hotel_page, listing)
-					find_hotel_name(hotel_page, listing)
-					find_localized_address(hotel_page, listing)
-					find_property_type(hotel_page, listing)
-					find_reviews_quantity(hotel_page, listing)
-					
-					find_room_informations(hotel_page, listing) # needs to be the last call
-					
-				page.click()
-				break
-			except selenium.common.exceptions.TimeoutException:
-				continue
-
-	driver.quit()
-	
 def add_routes_area_by_bounding_box(config, city):
 	try:
 		conn = config.connect()
@@ -725,6 +448,58 @@ def update_routes_geolocation(config, city):
 		conn.commit()
 
 	add_routes_area_by_bounding_box(config, city)
+
+def search(config, area, start_date, finish_date, search_reviews, survey_id):
+	city = area.split(',')[0]
+
+	checkin_date = start_date
+	if checkin_date is None:
+		checkin_date = dt.date.today() + dt.timedelta(days=7)
+
+	checkout_date = finish_date
+	if checkout_date is None:
+		checkout_date = dt.date.today() + dt.timedelta(days=8)
+
+	url = "https://www.booking.com/searchresults.pt-br.html?ss={}&ssne={}&ssne_untouched={}&checkin={}&checkout={}".format(
+					city, city, city, checkin_date, checkout_date)
+	driver = prepare_driver(url)
+
+	wait = WebDriverWait(driver, timeout=10).until(
+		EC.presence_of_all_elements_located(
+			(By.XPATH, '//*[@data-testid="property-card"]')))
+	# FIND ALL PAGES
+	all_pages = driver.find_elements(By.CLASS_NAME, 'f32a99c8d1')
+	for page in all_pages[1:len(all_pages):1]:
+		for i in range(config.ATTEMPTS_TO_FIND_PAGE):
+			try:
+				logger.debug("Attempt ", i+1, " to find page")
+				property_cards = driver.find_elements(By.XPATH, '//*[@data-testid="property-card"]//*[@data-testid="title-link"]')
+				urls = []
+				for property_card in property_cards:
+					urls.append(property_card.get_attribute("href"))
+
+				for url in urls:
+					hotel_page = prepare_driver(url)
+					
+					listing = BListing(config, driver, url, survey_id, checkin_date, checkout_date)
+					
+					listing.find_latlng(hotel_page)
+					listing.find_overall_classification(hotel_page)
+					listing.find_principal_comodities(hotel_page)
+					listing.find_hotel_name(hotel_page)
+					listing.find_localized_address(hotel_page)
+					listing.find_property_type(hotel_page)
+					listing.find_reviews_quantity(hotel_page)
+					
+					listing.find_room_informations(hotel_page) # needs to be the last call
+					
+				page.click()
+				break
+			except selenium.common.exceptions.TimeoutException:
+				continue
+
+	driver.quit()
+	
 
 def parse_args():
 	"""

@@ -1,5 +1,8 @@
 import psycopg2.errorcodes
 from geopy import distance
+import logging
+
+logging = logging.getLogger()
 
 def get_area_coordinates_from_db(config, area):
     conn = config.connect()
@@ -19,7 +22,7 @@ def get_area_coordinates_from_db(config, area):
 
     return (lat_max, lat_min, lng_max, lng_min)
 
-def is_inside(lat_center, lng_center, lat_test, lng_test):
+def is_inside(lat_center, lng_center, lat_test, lng_test, verbose=False):
     center_point = [{'lat': lat_center, 'lng': lng_center}]
     test_point = [{'lat': lat_test, 'lng': lng_test}]
 
@@ -30,7 +33,35 @@ def is_inside(lat_center, lng_center, lat_test, lng_test):
         dis = distance.distance(center_point_tuple, test_point_tuple).km
         
         if dis <= radius:
-            print("{} point is inside the {} km radius from {} coordinate".\
+            if ( verbose == True ):
+                print("{} point is inside the {} km radius from {} coordinate".\
                     format(test_point_tuple, radius/1000, center_point_tuple))
             return True
     return False
+
+def select_command(config, sql_script, params, initial_message, failure_message):
+		try:
+				rowcount = -1
+				logging.info(initial_message)
+				conn = config.connect()
+				cur = conn.cursor()
+
+				sql = sql_script
+
+				cur.execute(sql, (params))
+				rowcount = cur.rowcount
+				
+				return cur.fetchall()
+		except Exception:
+				logging.error(failure_message)
+				raise
+
+def prepare_driver(url):
+    '''Returns a Firefox Webdriver.'''
+    options = Options()
+    # options.add_argument('-headless')
+    binary = FirefoxBinary('C:\\Program Files\\Mozilla Firefox\\firefox.exe')
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+    driver.get(url)
+    time.sleep(5)
+    return driver

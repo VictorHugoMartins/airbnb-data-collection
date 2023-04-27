@@ -18,7 +18,6 @@ from datetime import date
 from bs4 import BeautifulSoup
 import json
 import airbnb_ws
-from airbnb_reviews import ABReview
 
 logger = logging.getLogger()
 
@@ -197,21 +196,6 @@ class ABListing():
 
     def __insert(self):
         """ Insert a room into the database. Raise an error if it fails """
-        # print(
-        #         self.room_id, self.host_id, self.room_type, self.country,
-        #         self.city, self.neighborhood, self.address, self.reviews,
-        #         self.overall_satisfaction, self.accommodates, self.bedrooms,
-        #         self.bathrooms, self.price, self.deleted, self.minstay,
-        #         self.latitude, self.longitude, self.survey_id,
-        #         self.coworker_hosted, self.extra_host_languages, self.name,
-        #         self.property_type, self.currency, self.rate_type,
-        #         self.sublocality, self.route,
-        #         self.is_superhost,
-        #         self.max_nights, self.avg_rating,
-        #         self.pictures, self.bathroom
-        #         )
-                
-        # return
         try:
             logger.debug("Values: ")
             logger.debug("\troom_id: {}".format(self.room_id))
@@ -351,61 +335,6 @@ class ABListing():
             logger.exception(e)
             self.reviews = None
 
-    def __get_reviews_text(self, tree):
-        try:
-        
-            # 2020-05-10
-            s = tree.xpath("//script[@id='data-state']/text()")
-            
-            if s is not None:
-                # print(s)
-                # print("<- s")
-                j = json.loads(s[0])
-
-                r = j["bootstrapData"]["reduxData"]["homePDP"]["listingInfo"]["listing"]["sorted_reviews"]
-                if r is not None:
-                    if self.reviews is None:
-                        return False
-                    elif int(self.reviews) > 7:
-                        qtd_reviews = 7
-                    elif int(self.reviews) <= 7:
-                        qtd_reviews = int(self.reviews)
-                    for individual_review in r:
-                        review = ABReview(self.config, individual_review, self.room_id)
-                    return True
-        except IndexError:
-            return True
-        except KeyError:
-            # 2020-05-17
-            try: # get reviews from guests
-                x = j["bootstrapData"]["reduxData"]["userProfile"]["api"]["serverData"]["user_profile"]["recent_reviews_from_guest"]
-                # print(x)
-                if x is not None:
-                    logger.info("Reviews from host page")
-                    
-                    for individual_review in x:
-                        review = ABReview(self.config, individual_review, self.room_id)
-                    return True
-            except KeyError:
-                print("Page has unexpected structure")
-                return False
-            try: # get reviews from hosts
-                x = j["bootstrapData"]["reduxData"]["userProfile"]["api"]["serverData"]["user_profile"]["recent_reviews_from_host"]
-                
-                if x is not None:
-                    logger.info("Reviews from host page")
-                    
-                    # print(x)
-                    for individual_review in x:
-                        review = ABReview(self.config, individual_review, self.room_id)
-                    return True
-            except KeyError:
-                print("Page has unexpected structure")
-                return False
-        except Exception as e:
-            logger.exception(e)
-            return False
- 
     def get_location(self):
         location = Location(self.latitude, self.longitude) # initialize a location with coordinates
         location.reverse_geocode(self.config) # find atributes for location with google api key
@@ -440,8 +369,6 @@ class ABListing():
                 elif self.reviews == 0:
                     print("No reviews to find")
                     return True
-                else:
-                    return self.__get_reviews_text(tree)
             else:
                 logger.info("Room %s: not found", self.room_id)
                 return False

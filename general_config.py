@@ -88,7 +88,7 @@ class ABConfig():
                 sys.exit()
             # network
             try:
-                self.HTTP_PROXY_LIST =  getProxies() #config["NETWORK"]["proxy_list"].split(",")
+                self.HTTP_PROXY_LIST =  config["NETWORK"]["proxy_list"].split(",") #getProxies() #
                 self.HTTP_PROXY_LIST = [x.strip() for x in self.HTTP_PROXY_LIST]
                 # Remove any empty strings from the list of proxies
                 self.HTTP_PROXY_LIST = [x for x in self.HTTP_PROXY_LIST if x]

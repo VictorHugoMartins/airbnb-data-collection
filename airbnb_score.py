@@ -18,10 +18,7 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-from booking_reviews import BReview
-from airbnb_reviews import ABReview
 
-SCRIPT_VERSION_NUMBER = "4.0"
 logger = logging.getLogger()
 DOMAIN = 'https://www.airbnb.com.br/rooms/'
 
@@ -34,7 +31,7 @@ def prepare_driver(url):
     driver = webdriver.Firefox(
         firefox_binary=binary, executable_path=r'C:\\geckodriver.exe', options=options)
     driver.get(url)
-    time.sleep(15)
+    time.sleep(5)
     return driver
 
 
@@ -56,24 +53,21 @@ def save_as_deleted(config, room_id):
         raise
 
 
-def update_comodities(config, driver, city, room_id):
+def update_comodities(config, driver, city, room_id, survey_id):
     try:
         comodities = []
         comodidades = driver.find_elements(By.CLASS_NAME, 'iikjzje')
         for c in comodidades:
-            # print(c.text)
             if (('Indisponível' not in c.text) and ('\n' not in c.text)):
                 comodities.append(c.text)
-        # print(comodities)
-        # return
         rowcount = -1
         logging.info("Searching for comodities")
         conn = config.connect()
         cur = conn.cursor()
 
         sql = """UPDATE room set comodities = %s
-				where room_id = %s and comodities is null"""
-        update_args = (comodities, room_id)
+				where room_id = %s and survey_id = %s comodities is null"""
+        update_args = (comodities, room_id, survey_id)
         cur.execute(sql, update_args)
         conn.commit()
 
@@ -112,7 +106,7 @@ def update_overall_satisfaction(config, driver, city, room_id):
         raise
 
 
-def update_bathroom(config, driver, city, room_id):
+def update_bathroom(config, driver, city, room_id, survey_id):
     try:
         # try:
         x = driver.find_element(
@@ -128,8 +122,8 @@ def update_bathroom(config, driver, city, room_id):
         cur = conn.cursor()
 
         sql = """UPDATE room set bathroom = %s
-			where room_id = %s"""
-        update_args = (bathroom, room_id)
+			where room_id = %s and survey_id = %s"""
+        update_args = (bathroom, room_id, survey_id)
         cur.execute(sql, update_args)
         conn.commit()
 
@@ -205,7 +199,7 @@ def update_with_preexistent_comodities(config, city, args):
         raise
 
 
-def search(config, city, args):
+def search(config, city, survey_id, args):
     try:
         driver = None
         rowcount = -1
@@ -214,13 +208,7 @@ def search(config, city, args):
         cur = conn.cursor()
 
         sql = """SELECT distinct(room_id) from room, search_area
-				where latitude <= bb_n_lat
-				and latitude >= bb_s_lat and longitude >= bb_w_lng
-				and longitude <= bb_e_lng
-				and search_area.name = %s
-				and deleted = 0
-				and comodities is null
-				order by room_id"""  # and comodities is null
+				where survey_id = %s"""  # and comodities is null
         # and price is null
         # and overall_satisfaction is null
 
@@ -260,23 +248,13 @@ def search(config, city, args):
                                         By.XPATH, '/html/body/div[6]/div/div/div[1]/section/footer/div[2]/button').click()
                                 except:
                                     print("No cookies privacy")
-                        print("clicou no botão?")
                         time.sleep(3)
-                        print("banheiro:")
                         try:
-                            update_bathroom(config, driver, city, room_id)
+                            update_bathroom(config, driver, city, room_id, survey_id)
                         except:
                             print("No bathroom finded")
-                        print("vai nas comodities")
-                        '''if args.comments:              
-							get_reviews(config, driver, city, room_id)'''
-                        update_comodities(config, driver, city, room_id)
-                        print("Hmm")
-                        '''
-						if args.overall_satisfaction:
-							update_overall_satisfaction(config, driver, city, room_id)
-						if args.price:
-							update_price(config, driver, city, room_id)'''
+                        update_comodities(config, driver, city, room_id, survey_id)
+                        
                         driver.quit()
                         print("Data collected")
                         break
@@ -295,67 +273,6 @@ def search(config, city, args):
     except Exception:
         logger.error("Failed to search overall satisfactions")
         raise
-
-
-def get_reviews(config, driver, city, room_id):
-    try:
-        driver.find_element(
-            By.XPATH, '//*[@class="_19qg1ru"]/a[@class="_1v4ygly5"]').click()
-    except:
-        try:
-            driver.find_element(
-                By.XPATH, '//main/div/div/div[4]/div/div/div[2]/div[4]/a').click()
-        except selenium.common.exceptions.NoSuchElementException:
-            print("No reviews yet")
-            return
-    time.sleep(5)
-    reviews = driver.find_element(
-        By.XPATH, '//*[@class="_16hs373"]/div[@class="_1v5ksyp"]')
-    i = 7
-
-    # try to find the next 7 reviews, if not find try the 6th, then the 5th, then thhe 4th untill find one
-    while True:
-        try:
-            element = driver.find_element(
-                By.XPATH, '/html/body/div[13]/section/div/div/div[3]/div/div/section/div/div[2]/div/div[' + str(i) + ']')
-            driver.execute_script("arguments[0].scrollIntoView();", element)
-            time.sleep(10)
-            # rev = reviews.find_elements(By.XPATH, '//div[@class="_1gjypya"]')
-            i = i + 7
-        except selenium.common.exceptions.NoSuchElementException:
-            for j in range(i + 7, -1, 2):
-                try:
-                    element = driver.find_element(
-                        By.XPATH, '/html/body/div[13]/section/div/div/div[3]/div/div/section/div/div[2]/div/div[' + str(j) + ']')
-                    driver.execute_script(
-                        "arguments[0].scrollIntoView();", element)
-                    break
-                except:
-                    continue
-            break
-
-    rev = reviews.find_elements(By.XPATH, '//div[@class="_1gjypya"]')
-    for r in rev:
-        try:
-            r.find_element_by_class_name('_1d079j1e').click()
-        except selenium.common.exceptions.NoSuchElementException:
-            print("")
-        try:
-            x = r.text.split('\n')
-            review_id = int(r.get_attribute('data-review-id'))
-            review = ABReview(config, review_id)
-            review.room_id = room_id
-            review.localized_data = x[1]
-            review.comment = x[2]
-            review.reviewer_id = r.find_element_by_class_name('_105023be').get_attribute('href').\
-                split('https://www.airbnb.com.br/users/show/')[1]
-            review.save(config.FLAGS_INSERT_REPLACE)
-        except IndexError:
-            continue
-
-    driver.quit()
-    return True
-
 
 def parse_args():
     """
