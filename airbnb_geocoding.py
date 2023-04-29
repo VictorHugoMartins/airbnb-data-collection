@@ -19,7 +19,6 @@ from utils import select_command
 FORMAT_STRING = "%(asctime)-15s %(levelname)-8s%(message)s"
 logging.basicConfig(level=logging.INFO, format=FORMAT_STRING)
 logger = logging.getLogger()
-STRING_NA = "N/A"
 
 # Suppress informational logging from requests module
 logging.getLogger("requests").setLevel(logging.WARNING)
@@ -458,7 +457,7 @@ class BoundingBox():
 								sql = """SELECT name, sublocality_id from search_area, sublocality
 												where bb_s_lat >= %s and bb_n_lat <= %s
 												and bb_w_lng >= %s and bb_e_lng <= %s
-												and strpos(sublocality_name, 'N/A') = 0
+												and sublocality_name is not null
 												and strpos(name, 'Ouro Preto') <> 0
 												limit 1"""
 								args = (bounds["southwest"]["lat"],

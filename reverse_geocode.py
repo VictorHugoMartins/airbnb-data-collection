@@ -14,7 +14,6 @@ from geopy import distance
 FORMAT_STRING = "%(asctime)-15s %(levelname)-8s%(message)s"
 logging.basicConfig(level=logging.INFO, format=FORMAT_STRING)
 LOGGER = logging.getLogger()
-STRING_NA = "N/A"
 
 # Suppress informational logging from requests module
 logging.getLogger("requests").setLevel(logging.WARNING)

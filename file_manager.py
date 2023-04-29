@@ -106,28 +106,33 @@ def main():
     ab_config = ABConfig(args)
     export_airbnb_room(ab_config, """
       SELECT
-        room_id,
-        STRING_AGG(DISTINCT CAST(host_id AS varchar), 'JOIN ') AS host_id,
-        STRING_AGG(DISTINCT name, 'JOIN ') AS names,
-        STRING_AGG(DISTINCT property_type, 'JOIN ') AS property_types,
-        STRING_AGG(DISTINCT room_type, 'JOIN ') AS room_types,
-        AVG(price) AS avg_price,
-        AVG(minstay) AS avg_minstay,
-        AVG(reviews) AS avg_reviews,
-        AVG(avg_rating) AS avg_rating,
-        AVG(accommodates) AS avg_accommodates,
-        AVG(bedrooms) AS avg_bedrooms,
-        AVG(bathrooms) AS avg_bathrooms,
-        STRING_AGG(DISTINCT bathroom, 'JOIN ') AS bathrooms,
-        AVG(latitude) AS avg_latitude,
-        AVG(longitude) AS avg_longitude,
-        STRING_AGG(DISTINCT extra_host_languages, 'JOIN ') AS extra_host_languages,
-        AVG(CAST(is_superhost AS int)) AS avg_is_superhost,
-        STRING_AGG(DISTINCT comodities, 'JOIN ') AS comodities
-      FROM
-        room
-      GROUP BY
-        room_id;
+          room_id,
+          STRING_AGG(DISTINCT CAST(host_id AS varchar), 'JOIN ') AS host_id,
+          STRING_AGG(DISTINCT name, 'JOIN ') AS names,
+          STRING_AGG(DISTINCT property_type, 'JOIN ') AS property_types,
+          STRING_AGG(DISTINCT room_type, 'JOIN ') AS room_types,
+          AVG(price) AS avg_price,
+          AVG(minstay) AS avg_minstay,
+          AVG(reviews) AS avg_reviews,
+          AVG(avg_rating) AS avg_rating,
+          AVG(accommodates) AS avg_accommodates,
+          AVG(bedrooms) AS avg_bedrooms,
+          AVG(bathrooms) AS avg_bathrooms,
+          STRING_AGG(DISTINCT bathroom, 'JOIN ') AS bathrooms,
+          AVG(latitude) AS avg_latitude,
+          AVG(longitude) AS avg_longitude,
+          STRING_AGG(DISTINCT extra_host_languages, 'JOIN ') AS extra_host_languages,
+          AVG(CAST(is_superhost AS int)) AS avg_is_superhost,
+          STRING_AGG(DISTINCT comodities, 'JOIN ') AS comodities,
+          location.route,
+          location.sublocality,
+          location.locality
+        FROM
+          room
+      INNER JOIN location
+      ON location.location_id = room.location_id
+        GROUP BY
+          locality, location.sublocality, location.route, room_id
     """, 'Ouro Preto', args.project.lower(), args.format, args.start_date)
 
 if __name__ == "__main__":

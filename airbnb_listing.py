@@ -345,15 +345,15 @@ class ABListing():
         location = Location(self.latitude, self.longitude) # initialize a location with coordinates
         location.reverse_geocode(self.config) # find atributes for location with google api key
         
-        if location.get_country() != "N/A":
+        if location.get_country() is not None:
             self.country = location.get_country()
-        if location.get_level2() != "N/A":
+        if location.get_level2() is not None:
             self.city = location.get_level2()
-        if location.get_neighborhood() != "N/A":
+        if location.get_neighborhood() is not None:
             self.neighborhood = location.get_neighborhood()
-        if location.get_sublocality() != "N/A":
+        if location.get_sublocality() is not None:
             self.sublocality = location.get_sublocality()
-        if location.get_route() != "N/A":
+        if location.get_route() is not None:
             self.route = location.get_route()
 
         location.insert_in_search_area(self.config)
