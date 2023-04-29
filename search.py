@@ -31,8 +31,8 @@ from airbnb_geocoding import BoundingBox
 from airbnb_geocoding import Location
 from airbnb_geocoding import identify_and_insert_locations
 import airbnb_ws
-from airbnb_score import search as fill_search
-from booking import search as booking_search
+from airbnb_score import airbnb_score_search
+from booking import search_booking_rooms
 from utils import select_command
 
 SCRIPT_VERSION_NUMBER = "5.0"
@@ -176,11 +176,11 @@ def execute_search(ab_config, platform="Airbnb", search_area_name='', fill_airbn
 		if (platform == "Airbnb"):
 				survey.search(ab_config.FLAGS_ADD)
 		else:
-				booking_search(ab_config, search_area_name, start_date, finish_date,
+				search_booking_rooms(ab_config, search_area_name, start_date, finish_date,
 					survey_id)
 
 		if (fill_airbnb_with_selenium):
-				fill_search(ab_config, search_area_name, survey_id, None)
+				airbnb_score_search(ab_config, search_area_name, survey_id, None)
 
 		return survey_id
 		# update_routes_geolocation(ab_config, search_area_name)

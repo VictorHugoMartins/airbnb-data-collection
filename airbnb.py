@@ -31,22 +31,6 @@ from airbnb_geocoding import BoundingBox
 from airbnb_geocoding import Location
 import airbnb_ws
 import utils
-from airbnb_score import search as fill_search
-
-def db_ping(config):
-		"""
-		Test database connectivity, and print success or failure.
-		"""
-		try:
-				conn = config.connect()
-				if conn is not None:
-						print("Connection test succeeded: {db_name}@{db_host}"
-									.format(db_name=config.DB_NAME, db_host=config.DB_HOST))
-				else:
-						print("Connection test failed")
-		except Exception:
-				logging.exception("Connection test failed")
-
 
 def db_add_survey(config, search_area):
 		"""

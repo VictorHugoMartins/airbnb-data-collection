@@ -59,6 +59,7 @@ class BListing():
 
 		self.start_date = None
 		self.finish_date = None
+		self.location_id = None
 
 	def save(self, insert_replace_flag):
 		"""
@@ -77,7 +78,7 @@ class BListing():
 			if (rowcount == 0 or
 					insert_replace_flag == self.config.FLAGS_INSERT_NO_REPLACE):
 				try:
-					# self.get_address()
+					if (self.config.FLAGS_INSERT_IN_LOCATION): self.location_id = reverse_geocode_coordinates_and_insert(self.config, self.latitude, self.longitude)
 					self.__insert()
 					return True
 				except psycopg2.IntegrityError:
@@ -130,13 +131,14 @@ class BListing():
 					room_id, room_name, hotel_name, address, comodities,
 					overall_satisfaction, property_type, bed_type, accommodates,
 					price, latitude, longitude, reviews, survey_id,
-					checkin_date, checkout_date
+					checkin_date, checkout_date, location_id
 					)
-				values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+				values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
 			insert_args = (
 				self.room_id, self.hotel_name, self.room_name, self.localized_address, self.comodities,
 				self.overall_satisfaction, self.property_type, self.bedtype, self.accomodates,
-				self.price, self.lat, self.lng, self.reviews, self.survey_id, self.checkin_date, self.checkout_date
+				self.price, self.lat, self.lng, self.reviews, self.survey_id, self.checkin_date, self.checkout_date,
+				self.location_id
 				)
 
 			cur.execute(sql, insert_args)
@@ -226,9 +228,7 @@ class BListing():
 
 			# preco
 			price = row.find_element(By.CSS_SELECTOR, '.bui-price-display__value')
-			listing.price = price.text.split('R$ ')[1]		
-
-			listing.save(listing.config.FLAGS_INSERT_REPLACE)
+			listing.price = price.text.split('R$ ')[1]
 
 	def find_latlng(driver): # ok
 		element = driver.find_element(By.ID, 'hotel_header')
@@ -385,7 +385,7 @@ def add_routes_area_by_bounding_box(config, city):
 	except:
 		raise
 
-def search(config, area, start_date, finish_date, search_reviews, survey_id):
+def search_booking_rooms(config, area, start_date, finish_date, search_reviews, survey_id):
 	city = area.split(',')[0]
 
 	checkin_date = start_date
@@ -428,6 +428,7 @@ def search(config, area, start_date, finish_date, search_reviews, survey_id):
 					listing.find_reviews_quantity(hotel_page)
 					
 					listing.find_room_informations(hotel_page) # needs to be the last call
+					listing.save(listing.config.FLAGS_INSERT_REPLACE)
 					
 				page.click()
 				break
