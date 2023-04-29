@@ -29,6 +29,7 @@ from airbnb_survey import ABSurveyByBoundingBox
 from airbnb_listing import ABListing
 from airbnb_geocoding import BoundingBox
 from airbnb_geocoding import Location
+from airbnb_geocoding import identify_and_insert_locations
 import airbnb_ws
 from airbnb_score import search as fill_search
 from booking import search as booking_search

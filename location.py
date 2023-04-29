@@ -24,7 +24,8 @@ from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from geopy import distance
 import datetime as dt
 from utils import select_command
-from airbnb import db_add_survey
+from search import db_add_survey
+from airbnb_geocoding import reverse_geocode_coordinates_and_insert
 
 class Localization():
 	"""
@@ -99,53 +100,20 @@ class Localization():
 			logger.error("Exception saving room")
 			raise
 
-	def __insert(self):
-		""" Insert a room into the database. Raise an error if it fails """
-		try:
-			logger.debug("Values: ")
-			logger.debug("\troom: {}".format(self.room_id))
-			conn = self.config.connect()
-			cur = conn.cursor()
-			sql = """
-				insert into location (
-					route, sublocality, city, state, country
-					)
-				values (%s, %s, %s, %s, %s)"""
-			insert_args = (
-				self.route, self.sublocality, self.city, self.state, self.country
-				)
-
-			cur.execute(sql, insert_args)
-			cur.close()
-			conn.commit()
-			logger.debug("Location %s, %s inserted".format(
-					lat=self.route, lng=self.sublocality))
-		except psycopg2.IntegrityError:
-			logger.info("Location %s, %s: insert failed".format(
-					lat=self.route, lng=self.sublocality))
-			conn.rollback()
-			cur.close()
-			raise
-		except:
-			conn.rollback()
-			raise
-
 def get_coordinates_list(config, platform="Airbnb", survey_id=1):
 		return select_command(config,
 						sql_script="""SELECT DISTINCT latitude, longitude from room where survey_id >= %s""" if platform == "Airbnb" else """SELECT DISTINCT latitude, longitude from booking_room where survey_id >= %s""",
 						params=((survey_id,)),
 						initial_message="Selecting coordinates list from " + platform,
 						failure_message="Failed to search coordinates list")
-		
+
 def identify_and_insert_locations(config, platform, survey_id):
 	coordinates_list = get_coordinates_list(config, platform, survey_id)
 	for coordinate in coordinates_list:
 			lat = coordinate[0]
 			lng = coordinate[1]
 			if ( lat is not None) and (lng is not None):
-					location = Location(config, str(lat), str(lng)) 
-					location.reverse_geocode(config)
-					location.insert()
+					reverse_geocode_coordinates_and_insert(config, lat, lng)
 
 def parse_args():
 	"""

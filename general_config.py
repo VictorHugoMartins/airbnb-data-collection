@@ -53,6 +53,7 @@ class ABConfig():
         self.GOOGLE_API_KEY = None
         self.ATTEMPTS_TO_FIND_PAGE = 10
         self.SEARCH_WITH_DATE = True
+        self.FLAGS_INSERT_IN_LOCATION = True
         '''if args.check_date is not None and not args.check_date:
             self.SEARCH_WITH_DATE = False
         self.SEARCH_ONLY_REVIEWS = False

@@ -398,6 +398,8 @@ ALTER TABLE ONLY zipcode
     ADD CONSTRAINT z PRIMARY KEY (zipcode);
 
 
+ALTER TABLE ONLY location
+    ADD CONSTRAINT location_pkey PRIMARY KEY (route, sublocality, locality, level1, level2, country);
 --
 -- TOC entry 4457 (class 1259 OID 22687)
 -- Name: ix_survey; Type: INDEX; Schema: public; Owner: -; Tablespace: 

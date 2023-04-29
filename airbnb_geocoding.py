@@ -14,6 +14,7 @@ import sys
 import logging
 import os
 import psycopg2
+from utils import select_command
 
 FORMAT_STRING = "%(asctime)-15s %(levelname)-8s%(message)s"
 logging.basicConfig(level=logging.INFO, format=FORMAT_STRING)
@@ -115,25 +116,40 @@ class Location():
 		def insert(self):
 			""" Insert a room into the database. Raise an error if it fails """
 			try:
-				logger.debug("Values: ")
+				location_id = None
+				logger.debug("Inserting location")
 				# logger.debug("\tlocation: {}".format(self.address))
 				conn = self.config.connect()
 				cur = conn.cursor()
 				sql = """
-					insert into location (
-						route, sublocality, locality, level1, country
-						)
-					values (%s, %s, %s, %s, %s)"""
+							INSERT INTO LOCATION(route, sublocality, locality, level1, level2, country)
+								values (%s, %s, %s, %s, %s, %s)
+							ON CONFLICT (route, sublocality, locality, level1, country)
+							DO UPDATE SET
+									route = excluded.route,
+									sublocality=excluded.sublocality,
+									locality=excluded.locality,
+									level1=excluded.level1,
+									country=excluded.country
+							RETURNING location_id"""
 				insert_args = (
-					self.route, self.sublocality, self.locality, self.level1, self.country
+					self.route, self.sublocality, self.locality, self.level1, self.level2, self.country
 					)
 				cur.execute(sql, insert_args)
+				
+				location_id = cur.fetchone()[0]
+				
 				cur.close()
 				conn.commit()
 				logger.debug("Location %s, %s inserted".format(
 						lat=self.route, lng=self.sublocality))
+			except psycopg2.errors.UniqueViolation:
+				logger.info("Location {lat}, {lng}: already exists".format(
+						lat=self.route, lng=self.sublocality))
+				conn.rollback()
+				cur.close()
 			except psycopg2.IntegrityError:
-				logger.info("Location %s, %s: insert failed".format(
+				logger.info("Location {lat}, {lng}: insert failed".format(
 						lat=self.route, lng=self.sublocality))
 				conn.rollback()
 				cur.close()
@@ -141,6 +157,8 @@ class Location():
 			except:
 				conn.rollback()
 				raise
+			finally:
+				return location_id
 
 
 		@classmethod
@@ -149,91 +167,6 @@ class Location():
 				Get a location (address etc) by reading from the database
 				"""
 				return cls(lat_round, lng_round)
-
-		def insert_in_table_location(self, config):
-
-				print(self.route,
-							 self.neighborhood,
-							 self.sublocality,
-							 self.locality,
-							 self.level2,
-							 self.level1,
-							 self.country,
-							 self.lat_round,
-							 self.lng_round)
-				"""
-				Insert or update a location with the required address information
-				"""
-
-				rowcount = -1
-				#logging.info("Adding location to database")
-				conn = config.connect()
-				cur = conn.cursor()
-				
-				# check if it exists
-				cur.execute("""
-						SELECT location_id from location
-						where route = %s and
-						sublocality = %s and
-						neighborhood = %s and
-						locality = %s and
-						level2 = %s and
-						level1 = %s and
-						country = %s
-				""", (self.route, self.sublocality,
-						self.neighborhood,
-						self.locality, self.level2,
-						self.level1, self.country))
-				rowcount = cur.rowcount
-				
-				if rowcount > 0:
-						( self.id ) = cur.fetchone()[0]
-						logger.debug("Location {} already exists".format(self.id))
-						return self.id
-
-				sql = """
-				SELECT max(location_id) from location limit 1"""
-				cur.execute(sql)
-				result = cur.fetchall()
-				self.id = result[0][0]
-
-				sql = """
-				INSERT into location(
-				route,
-				neighborhood,
-				sublocality,
-				locality,
-				level2,
-				level1,
-				country,
-				lat_round,
-				lng_round)
-				VALUES
-				(%s, %s, %s, %s, %s, %s, %s, %s, %s)
-				"""
-				update_args = (self.route,
-											 self.neighborhood,
-											 self.sublocality,
-											 self.locality,
-											 self.level2,
-											 self.level1,
-											 self.country,
-											 self.lat_round,
-											 self.lng_round
-											)
-				logger.debug(update_args)
-				cur.execute(sql, update_args)
-				cur.close()
-				conn.commit()
-				logger.debug(self.route, " from ", self.locality, " inserted")
-				print(self.route, " from ", self.locality, " inserted")
-				return self.id
-
-		def update_self_address(address, api_field, field):
-				try:
-						if (address.raw['address'][api_field]): self[field] = address.raw['address'][api_field]
-				except KeyError:
-						pass
 
 		def reverse_geocode(self, config):
 				"""
@@ -293,10 +226,7 @@ class Location():
 							if (address.raw['address']['country']): self.country = address.raw['address']['country']
 						except KeyError:
 							pass
-
-
-						print(self.route, self.neighborhood, self.sublocality, self.locality, self.level1, self.level2, self.postcode, self.country)
-
+	
 		def reverse_geocode_from_google(self, config):
 				"""
 				Return address information from the Google API as a Location object for a given lat lng
@@ -485,16 +415,13 @@ class BoundingBox():
 						# geolocator = Nominatim(user_agent="specify_your_app_name_here")
 						geolocator = Nominatim(user_agent="airbnb_and_booking_scrap")
 						location = geolocator.geocode((search_area))
-						print(location.address)
-						print(location.raw['boundingbox'])
 						bounds = location.raw['boundingbox']
 
 						bounding_box = (bounds[2],
 														bounds[3],
 														bounds[0],
 														bounds[1],)
-
-						# print(bounding_box)
+														
 						return cls(bounding_box)
 				except:
 						logger.exception("Exception in BoundingBox_from_geopy: exiting")
@@ -586,7 +513,7 @@ class BoundingBox():
 								self.bb_s_lat,
 								self.bb_w_lng))
 						if cur.fetchone() is not None:
-								print("Area already exists: {}".format(search_area))
+								logger.debug("Area already exists: {}".format(search_area))
 								return True
 						# Compute an abbreviation, which is optional and can be used
 						# as a suffix for search_area views (based on a shapefile)
@@ -615,11 +542,11 @@ class BoundingBox():
 						cur.close()
 						conn.commit()
 
-						print("Search area {} added: search_area_id = {}"
+						logger.debug("Search area {} added: search_area_id = {}"
 									.format(search_area, search_area_id))
 									 
 				except Exception:
-						print("Error adding search area to database")
+						logger.debug("Error adding search area to database")
 						raise
 
 
@@ -817,6 +744,25 @@ def insert_sublocality(config, sublocality, level2_id, level2):
 				logger.exception("Exception in insert_sublocality")
 				raise
 
+def reverse_geocode_coordinates_and_insert(config, lat, lng):
+    location = Location(config, str(lat), str(lng)) 
+    location.reverse_geocode(config)
+    return location.insert()
+
+def get_coordinates_list(config, platform="Airbnb", survey_id=1):
+		return select_command(config,
+						sql_script="""SELECT DISTINCT latitude, longitude from room where survey_id >= %s""" if platform == "Airbnb" else """SELECT DISTINCT latitude, longitude from booking_room where survey_id >= %s""",
+						params=((survey_id,)),
+						initial_message="Selecting coordinates list from " + platform,
+						failure_message="Failed to search coordinates list")
+
+def identify_and_insert_locations(config, platform, survey_id):
+	coordinates_list = get_coordinates_list(config, platform, survey_id)
+	for coordinate in coordinates_list:
+			lat = coordinate[0]
+			lng = coordinate[1]
+			if ( lat is not None) and (lng is not None):
+					reverse_geocode_coordinates_and_insert(config, lat, lng)
 
 def main():
 		""" Controlling routine that calls the others """
@@ -863,10 +809,6 @@ def main():
 
 		if args.update:
 				results = select_rooms(config, args.update)
-		elif args.lat and args.lng:
-				location = Location(args.lat, args.lng)
-				location.reverse_geocode(config)
-				location.insert_in_table_location(config)
 		elif args.insert:
 				bounding_box = BoundingBox.from_geopy(config, args.insert)
 				logger.info("Bounding box for %s from Google = (%s, %s, %s, %s)",

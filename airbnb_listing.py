@@ -10,14 +10,17 @@ from lxml import html
 import psycopg2
 import json
 import airbnb_ws
-from airbnb_geocoding import Location
 import sys
 import random
 import time
 from datetime import date
 from bs4 import BeautifulSoup
 import json
+
 import airbnb_ws
+
+from airbnb_geocoding import Location
+from airbnb_geocoding import reverse_geocode_coordinates_and_insert
 
 logger = logging.getLogger()
 
@@ -71,6 +74,7 @@ class ABListing():
         self.person_capacity = None
         self.pictures = None
         self.bathroom = None
+        self.location_id = None
 
         logger.setLevel(config.log_level)
 
@@ -153,7 +157,7 @@ class ABListing():
                 if (rowcount == 0 or
                         insert_replace_flag == self.config.FLAGS_INSERT_NO_REPLACE):
                     try:
-                        # self.get_location()
+                        if (self.config.FLAGS_INSERT_IN_LOCATION): self.location_id = reverse_geocode_coordinates_and_insert(self.config, self.latitude, self.longitude)
                         self.__insert()
                         return True
                     except psycopg2.IntegrityError:
@@ -196,6 +200,7 @@ class ABListing():
 
     def __insert(self):
         """ Insert a room into the database. Raise an error if it fails """
+        print("o location id do quarto: ", self.location_id)
         try:
             logger.debug("Values: ")
             logger.debug("\troom_id: {}".format(self.room_id))
@@ -211,10 +216,10 @@ class ABListing():
                     coworker_hosted, extra_host_languages, name,
                     property_type, currency, rate_type,
                     sublocality, route, avg_rating,
-                    is_superhost, max_nights, pictures, bathroom)
+                    is_superhost, max_nights, pictures, bathroom, location_id)
                 values (%s, %s, %s, %s, %s, %s, %s, %s, %s,
                 %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
                 )"""
             insert_args = (
                 self.room_id, self.host_id, self.room_type, self.country,
@@ -226,7 +231,8 @@ class ABListing():
                 self.property_type, self.currency, self.rate_type,
                 self.sublocality, self.route, self.avg_rating,
                  self.is_superhost,
-                self.max_nights, self.pictures, self.bathroom
+                self.max_nights, self.pictures, self.bathroom,
+                self.location_id
                 )
             cur.execute(sql, insert_args)
             cur.close()
@@ -367,7 +373,7 @@ class ABListing():
                 if self.__get_reviews(tree) == False:
                     return False
                 elif self.reviews == 0:
-                    print("No reviews to find")
+                    logger.info("No reviews to find")
                     return True
             else:
                 logger.info("Room %s: not found", self.room_id)
@@ -395,7 +401,7 @@ class ABListing():
                 if self.__get_reviews(tree) == False:
                     return False
                 elif self.reviews == 0:
-                    print("No reviews to find")
+                    logger.info("No reviews to find")
                     return True
                 else:
                     return self.__get_reviews_text(tree)

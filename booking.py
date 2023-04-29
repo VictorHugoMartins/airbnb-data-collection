@@ -25,7 +25,7 @@ from geopy import distance
 import datetime as dt
 import utils
 from airbnb import db_add_survey
-from selenium import prepare_driver
+from utils import prepare_driver
 
 DOMAIN = 'https://www.booking.com'
 logger = logging.getLogger()
@@ -385,70 +385,6 @@ def add_routes_area_by_bounding_box(config, city):
 	except:
 		raise
 
-def update_routes_geolocation(config, city):
-	(lat_max, lat_min, lng_max, lng_min) = utils.get_area_coordinates_from_db(config, city)
-	
-	conn = config.connect()
-	cur = conn.cursor()
-
-	sql = """SELECT distinct(hotel_id), latitude, longitude
-		from booking_room
-		where route is null
-		order by hotel_id""" # nenhum dos 2 é nulo
-	'''where latitude <= %s and latitude >= %s and longitude <= %s and longitude >= %s
-	'''
-	select_args = (lat_max, lat_min, lng_max, lng_min,)
-	cur.execute(sql, select_args)
-	results = cur.fetchall()
-	logger.debug(str(cur.rowcount) + "routes")
-
-	
-	for result in results:
-		hotel_id = result[0]
-		lat = result[1]
-		lng = result[2]
-
-		if lat is None or lng is None:
-			continue
-
-		location = Location(lat, lng) # initialize a location with coordinates
-		location.reverse_geocode(config) # find atributes for location with google api key
-		
-		if location.get_country() != "N/A":
-			country = location.get_country()
-		else:
-			country = None
-		if location.get_level2() != "N/A":
-			city = location.get_level2()
-		else:
-			city = None
-		if location.get_neighborhood() != "N/A":
-			neighborhood = location.get_neighborhood()
-		else:
-			neighborhood = None
-		if location.get_sublocality() != "N/A":
-			sublocality = location.get_sublocality()
-		else:
-			sublocality = None
-		if location.get_route() != "N/A":
-			route = location.get_route()
-		else:
-			route = None
-
-		location.insert_in_table_location(config)
-		
-		sql = """UPDATE booking_room set route = %s, sublocality = %s
-				where hotel_id = %s"""
-		update_args = (
-			route, sublocality, hotel_id,
-			)
-		cur.execute(sql, update_args)
-		rowcount = cur.rowcount
-		logger.debug("Room ", hotel_id, " updated for ", route)
-		conn.commit()
-
-	add_routes_area_by_bounding_box(config, city)
-
 def search(config, area, start_date, finish_date, search_reviews, survey_id):
 	city = area.split(',')[0]
 
@@ -530,9 +466,6 @@ def parse_args():
 						 metavar='finish_date', type=str,
 						 help="""finish date of travel
 						 """)
-	parser.add_argument("-urdb", "--update_routes_with_database",
-												metavar="city_name", type=str,
-												help="""update geolocation based on already existent data""")
 	parser.add_argument("-urbb", "--update_routes_with_bounding_box",
 												metavar="city_name", type=str,
 												help="""update geolocation based on Google's API""")
@@ -567,8 +500,6 @@ def main():
 			update_cities(config, args.update_routes)
 			update_routes(config, args.update_routes)
 			logger.debug("Data updated")
-		elif args.update_routes_with_bounding_box:
-			update_routes_geolocation(config, args.update_routes_with_bounding_box)
 	except (SystemExit, KeyboardInterrupt):
 		logger.debug("Interrupted execution")
 		exit(0)
