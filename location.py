@@ -26,6 +26,7 @@ import datetime as dt
 from utils import select_command
 from search import db_add_survey
 from airbnb_geocoding import reverse_geocode_coordinates_and_insert
+from airbnb_geocoding import get_coordinates_list_and_update_database
 
 class Localization():
 	"""
@@ -141,8 +142,9 @@ def main():
 	(parser, args) = parse_args()
 	logging.basicConfig(format='%(levelname)-8s%(message)s')
 	config = ABConfig(args)
-	if (args.platform):
-		identify_and_insert_locations(config, args.platform, 1)
+	get_coordinates_list_and_update_database(config)
+	# if (args.platform):
+	# 	identify_and_insert_locations(config, args.platform, 1)
 
 
 if __name__ == "__main__":

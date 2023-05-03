@@ -24,12 +24,12 @@ class Location():
     def __init__(self, lat_round, lng_round):
         self.lat_round = lat_round
         self.lng_round = lng_round
-        self.neighborhood = STRING_NA
-        self.sublocality = STRING_NA
-        self.locality = STRING_NA
-        self.level2 = STRING_NA
-        self.level1 = STRING_NA
-        self.country = STRING_NA
+        self.neighborhood = None
+        self.sublocality = None
+        self.locality = None
+        self.level2 = None
+        self.level1 = None
+        self.country = None
 
     @classmethod
     def from_db(cls, lat_round, lng_round):
@@ -194,33 +194,33 @@ def reverse_geocode(config, location):
     #  In practice, you may wish to only return the first result (results[0])
 
     for result in results:
-        if (location.neighborhood != STRING_NA and
-                location.sublocality != STRING_NA and
-                location.locality != STRING_NA and
-                location.level2 != STRING_NA and
-                location.level1 != STRING_NA and
-                location.country != STRING_NA):
+        if (location.neighborhood is not None and
+                location.sublocality is not None and
+                location.locality is not None and
+                location.level2 is not None and
+                location.level1 is not None and
+                location.country is not None):
             break
         address_components = result['address_components']
         for address_component in address_components:
-            if (location.neighborhood == STRING_NA
+            if (location.neighborhood is None
                     and "neighborhood" in address_component["types"]):
                 location.neighborhood = address_component["long_name"]
-            elif (location.sublocality == STRING_NA
+            elif (location.sublocality is None
                   and "sublocality" in address_component["types"]):
                 location.sublocality = address_component["long_name"]
-            elif (location.locality == STRING_NA
+            elif (location.locality is None
                   and "locality" in address_component["types"]):
                 location.locality = address_component["long_name"]
-            elif (location.level2 == STRING_NA
+            elif (location.level2 is None
                   and "administrative_area_level_2" in
                   address_component["types"]):
                 location.level2 = address_component["long_name"]
-            elif (location.level1 == STRING_NA
+            elif (location.level1 is None
                   and "administrative_area_level_1" in
                   address_component["types"]):
                 location.level1 = address_component["long_name"]
-            elif (location.country == STRING_NA
+            elif (location.country is None
                   and "country" in address_component["types"]):
                 location.country = address_component["long_name"]
     return location

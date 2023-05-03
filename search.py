@@ -163,49 +163,86 @@ def select_routes(config, sublocality):
 						initial_message="Selecting routes from sublocality",
 						failure_message="Failed to search from sublocalities")
 
-def execute_search(ab_config, platform="Airbnb", search_area_name='', fill_airbnb_with_selenium=False, start_date=None, end_date=None):
-		# create/insert in database search area with coordinates
+def create_super_survey(config, city):
+		try:
+				ss_id = None
+				rowcount = -1
+				logging.info("Initializing search by routes")
+				conn = config.connect()
+				cur = conn.cursor()
+
+
+				sql = """INSERT into super_survey(city, date) values (%s, current_date) returning ss_id"""
+				cur.execute(sql, (city,))
+				ss_id = cur.fetchone()[0]
+
+				return ss_id
+		except Exception:
+				logging.error("Failed to search from sublocalities")
+				raise
+		finally:
+				return ss_id
+
+def update_survey_with_super_survey_id(config, super_survey_id, survey_id):
+		try:
+				rowcount = -1
+				logging.info("Initializing update of survey with super survey id")
+				conn = config.connect()
+				cur = conn.cursor()
+
+
+				sql = """UPDATE survey set ss_id = %s where survey_id = %s"""
+				cur.execute(sql, (super_survey_id, survey_id))
+		except Exception:
+				logging.error("Failed to update survey with super survey id")
+				raise
+
+def execute_search(ab_config, platform="Airbnb", search_area_name='', fill_airbnb_with_selenium=False, start_date=None, finish_date=None, super_survey_id=None):
+		#create/insert in database search area with coordinates
 		bounding_box = BoundingBox.from_geopy(ab_config, search_area_name)
 		bounding_box.add_search_area(ab_config, search_area_name)
 
 		# initialize new survey
 		survey_id = db_add_survey(ab_config, search_area_name)
+		if (super_survey_id): update_survey_with_super_survey_id(ab_config, super_survey_id, survey_id)
 		survey = ABSurveyByBoundingBox(ab_config, survey_id)
 
 		# search for the listings
 		if (platform == "Airbnb"):
 				survey.search(ab_config.FLAGS_ADD)
 		else:
-				search_booking_rooms(ab_config, search_area_name, start_date, finish_date,
-					survey_id)
+				search_booking_rooms(ab_config, search_area_name, start_date, finish_date, survey_id)
 
 		if (fill_airbnb_with_selenium):
-				airbnb_score_search(ab_config, search_area_name, survey_id, None)
+				airbnb_score_search(ab_config, search_area_name, 252, None)
 
 		return survey_id
 		# update_routes_geolocation(ab_config, search_area_name)
 
-def search_sublocalities(ab_config, search_area_name='', fill_airbnb_with_selenium=True):
+def search_sublocalities(ab_config, super_survey_id, search_area_name='', fill_airbnb_with_selenium=True):
 		sa_name = search_area_name.split(',')[0]
 		city_sublocalities = select_sublocalities(ab_config, search_area_name)
 		for city in city_sublocalities:
 			if (city[0] is not None):
 					city_name = city[0] + ', ' + city[1]
-					survey_id = execute_search(ab_config, "Airbnb", city_name, fill_airbnb_with_selenium)
+					survey_id = execute_search(ab_config, "Airbnb", city_name, fill_airbnb_with_selenium, super_survey_id=super_survey_id)
 					identify_and_insert_locations(ab_config, platform, survey_id)
 
-def search_routes(ab_config, search_area_name='', fill_airbnb_with_selenium=True):
+def search_routes(ab_config, search_area_name='', fill_airbnb_with_selenium=True, super_survey_id=None):
 		sa_name = search_area_name.split(',')[0]
 		sublocalities_routes = select_routes(ab_config, search_area_name)
 		print(sublocalities_routes)
 		for route in sublocalities_routes:
 			if (route[0] is not None):
 					route_name = route[0] + ', ' + route[1]
-					execute_search(ab_config, "Airbnb", route_name, fill_airbnb_with_selenium)
+					execute_search(ab_config, "Airbnb", route_name, fill_airbnb_with_selenium, super_survey_id=super_survey_id)
 
-def full_process(ab_config, platform="Airbnb", search_area_name='', fill_airbnb_with_selenium=None, start_date=None, end_date=None):
-		survey_id = execute_search(ab_config, platform, search_area_name, fill_airbnb_with_selenium, start_date, end_date)
-		identify_and_insert_locations(ab_config, platform, survey_id)
+def full_process(ab_config, platform="Airbnb", search_area_name='', fill_airbnb_with_selenium=None, start_date=None, finish_date=None):
+		fill_bnb_with_selenium = platform == 'Airbnb'
+		
+		super_survey_id = create_super_survey(ab_config, search_area_name)
+		survey_id = execute_search(ab_config, platform, search_area_name, fill_bnb_with_selenium, start_date, finish_date, super_survey_id)
+		# identify_and_insert_locations(ab_config, platform, survey_id) #not necessary since is inserting locations at the same time its inserting rooms
 		search_sublocalities(ab_config, search_area_name)
 		search_routes(ab_config, search_area_name)
 
@@ -282,6 +319,9 @@ def parse_args():
 		group.add_argument('-fs', '--full_survey',
 											 metavar='full survey area', type=str,
 											 help="""make a full survey ininterrumptly""")
+		parser.add_argument('-pt', '--platform',
+											 metavar='platform search', type=str,
+											 help="""platform to search""")	
 		group.add_argument('-V', '--version',
 											 action='version',
 											 version='%(prog)s, version ' +
@@ -315,8 +355,9 @@ def main():
 						search_sublocalities(ab_config, args.search_sublocalities, fill_airbnb_with_selenium=True)
 				elif args.search_routes:
 						search_routes(ab_config, args.search_routes, fill_airbnb_with_selenium=True)
-				elif args.full_survey:
-						full_process(ab_config, "Airbnb", args.full_survey)
+				elif args.full_survey and args.platform:
+						print(args.full_survey, args.platform)
+						full_process(ab_config,args.platform, args.full_survey)
 				else:
 						parser.print_help()
 		except (SystemExit, KeyboardInterrupt):

@@ -3,6 +3,7 @@
 Reverse geocoding
 """
 
+import geopy
 from geopy.geocoders import Nominatim
 from functools import partial
 
@@ -14,7 +15,7 @@ import sys
 import logging
 import os
 import psycopg2
-from utils import select_command
+from utils import select_command, update_command
 
 FORMAT_STRING = "%(asctime)-15s %(levelname)-8s%(message)s"
 logging.basicConfig(level=logging.INFO, format=FORMAT_STRING)
@@ -30,28 +31,28 @@ class Location():
 				self.id = None
 				self.lat_round = lat_round
 				self.lng_round = lng_round
-				self.neighborhood = STRING_NA
-				self.sublocality = STRING_NA
-				self.locality = STRING_NA
-				self.level2 = STRING_NA
-				self.level1 = STRING_NA
-				self.country = STRING_NA
-				self.route = STRING_NA
-				self.postcode = STRING_NA
+				self.neighborhood = None
+				self.sublocality = None
+				self.locality = None
+				self.level2 = None
+				self.level1 = None
+				self.country = None
+				self.route = None
+				self.postcode = None
 
 		def __init__(self, config, lat_round, lng_round):
 				self.config = config
 				self.id = None
 				self.lat_round = lat_round
 				self.lng_round = lng_round
-				self.neighborhood = STRING_NA
-				self.sublocality = STRING_NA
-				self.locality = STRING_NA
-				self.level2 = STRING_NA
-				self.level1 = STRING_NA
-				self.country = STRING_NA
-				self.route = STRING_NA
-				self.postcode = STRING_NA
+				self.neighborhood = None
+				self.sublocality = None
+				self.locality = None
+				self.level2 = None
+				self.level1 = None
+				self.country = None
+				self.route = None
+				self.postcode = None
 
 		
 		def save(self, insert_replace_flag):
@@ -115,6 +116,7 @@ class Location():
 		def insert(self):
 			""" Insert a room into the database. Raise an error if it fails """
 			try:
+				print(self.route, self.sublocality, self.locality, self.level1, self.level2, self.country)
 				location_id = None
 				logger.debug("Inserting location")
 				# logger.debug("\tlocation: {}".format(self.address))
@@ -181,7 +183,11 @@ class Location():
 				geolocator = Nominatim(user_agent="airbnb_and_booking_scrap")
 				reverse = partial(geolocator.reverse, language="es")
 				if ( (self.lat_round is not None) and (self.lng_round is not None )):
-						address = reverse(self.lat_round + ", " + self.lng_round)
+						try:
+								address = reverse(self.lat_round + ", " + self.lng_round)
+						except geopy.exc.GeocoderUnavailable:
+								print("Failed to reverse geocode")
+								raise
 				else:
 						return
 
@@ -247,36 +253,36 @@ class Location():
 
 				if (len(results)) > 0:
 						for result in results:
-								if (self.neighborhood != STRING_NA and
-												self.sublocality != STRING_NA and
-												self.locality != STRING_NA and
-												self.level2 != STRING_NA and
-												self.level1 != STRING_NA and
-												self.country != STRING_NA):
+								if (self.neighborhood is not None and
+												self.sublocality is not None and
+												self.locality is not None and
+												self.level2 is not None and
+												self.level1 is not None and
+												self.country is not None):
 										break
 								address_components = result['address_components']
 								for address_component in address_components:
-										if (self.neighborhood == STRING_NA
+										if (self.neighborhood is None
 												and "neighborhood" in address_component["types"]):
 												self.neighborhood = address_component["long_name"]
-										elif (self.sublocality == STRING_NA
+										elif (self.sublocality is None
 													and "sublocality" in address_component["types"]):
 												self.sublocality = address_component["long_name"]
-										elif (self.locality == STRING_NA
+										elif (self.locality is None
 													and "locality" in address_component["types"]):
 												self.locality = address_component["long_name"]
-										elif (self.level2 == STRING_NA
+										elif (self.level2 is None
 													and "administrative_area_level_2" in
 													address_component["types"]):
 												self.level2 = address_component["long_name"]
-										elif (self.level1 == STRING_NA
+										elif (self.level1 is None
 													and "administrative_area_level_1" in
 													address_component["types"]):
 												self.level1 = address_component["long_name"]
-										elif (self.country == STRING_NA
+										elif (self.country is None
 													and "country" in address_component["types"]):
 												self.country = address_component["long_name"]
-										elif (self.route == STRING_NA
+										elif (self.route is None
 													and "route" in address_component["types"]):
 												self.route = address_component["long_name"]
 
@@ -743,10 +749,55 @@ def insert_sublocality(config, sublocality, level2_id, level2):
 				logger.exception("Exception in insert_sublocality")
 				raise
 
+def get_coordinates_list_and_update_database(config, platform="Airbnb", survey_id=1):
+		print("aqui")
+		coordinates_list = select_command(config,
+						sql_script="""SELECT DISTINCT latitude, longitude, room_id from room where survey_id >= %s and location_id is null""" if platform == "Airbnb" else """SELECT DISTINCT latitude, longitude from booking_room where survey_id >= %s""",
+						params=((survey_id,)),
+						initial_message="Selecting coordinates list from " + platform + " to update location ids",
+						failure_message="Failed to search coordinates list")
+		for coordinate in coordinates_list:
+			lat = coordinate[0]
+			lng = coordinate[1]
+			room_id = coordinate[2]
+			if ( lat is not None) and (lng is not None):
+					reverse_geocode_coordinates_and_update_airbnb_room(config, lat, lng, room_id)
+
+def reverse_geocode_coordinates_and_update_airbnb_room(config, lat, lng, room_id):
+		location = Location(config, str(lat), str(lng)) 
+		location.reverse_geocode(config)
+
+		location_id = select_command(config,
+						sql_script="""SELECT location_id FROM location
+													WHERE (route is null or route = %s) AND
+																(sublocality is null or sublocality = %s) and
+																(locality is null or locality = %s) and
+																(level1 is null or level1 = %s ) and
+																(level2 is null or level2 = %s ) and
+																(country is null or country = %s )""",
+						params=((location.route, location.sublocality, location.locality, location.level1, location.level2, location.country,)),
+						initial_message="Selecting coordinates list to update location ids",
+						failure_message="Failed to search coordinates list")
+		if ( len(location_id) == 0): location_id = location.insert()
+		else: location_id = location_id[0][0]
+		print("o location id", location_id, room_id)
+
+		update_airbnb_room_with_location_id(config, room_id, location_id)
+
+def update_airbnb_room_with_location_id(config, room_id, location_id):
+		update_command(config,
+									sql_script="""
+															update room
+															set location_id = %s where room_id = %s
+														""",
+									params=(location_id, room_id,),
+									initial_message="Updating location_id of room: " + str(room_id) + " for " + str(location_id),
+									failure_message="Failed to save room as deleted")
+
 def reverse_geocode_coordinates_and_insert(config, lat, lng):
-    location = Location(config, str(lat), str(lng)) 
-    location.reverse_geocode(config)
-    return location.insert()
+		location = Location(config, str(lat), str(lng)) 
+		location.reverse_geocode(config)
+		return location.insert()
 
 def get_coordinates_list(config, platform="Airbnb", survey_id=1):
 		return select_command(config,
@@ -815,13 +866,6 @@ def main():
 										bounding_box.bb_s_lat, bounding_box.bb_n_lat,
 										bounding_box.bb_w_lng, bounding_box.bb_e_lng)
 				bounding_box.add_search_area(config, args.insert)
-		'''elif args.sa:
-				bounding_box = BoundingBox.from_geopy(config, args.sa)
-				logger.info("Bounding box for %s from Google = (%s, %s, %s, %s)",
-										args.sa,
-										bounding_box.bb_s_lat, bounding_box.bb_n_lat,
-										bounding_box.bb_w_lng, bounding_box.bb_e_lng)
-				update_location(config, args.sa, bounding_box) '''
 
 if __name__ == "__main__":
 		main()

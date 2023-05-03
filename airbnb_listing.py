@@ -200,7 +200,6 @@ class ABListing():
 
     def __insert(self):
         """ Insert a room into the database. Raise an error if it fails """
-        print("o location id do quarto: ", self.location_id)
         try:
             logger.debug("Values: ")
             logger.debug("\troom_id: {}".format(self.room_id))

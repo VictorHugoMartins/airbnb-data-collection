@@ -119,11 +119,12 @@ def main():
           AVG(bedrooms) AS avg_bedrooms,
           AVG(bathrooms) AS avg_bathrooms,
           STRING_AGG(DISTINCT bathroom, 'JOIN ') AS bathrooms,
-          AVG(latitude) AS avg_latitude,
-          AVG(longitude) AS avg_longitude,
+          MAX(latitude) AS latitude,
+          MAX(longitude) AS longitude,
           STRING_AGG(DISTINCT extra_host_languages, 'JOIN ') AS extra_host_languages,
           AVG(CAST(is_superhost AS int)) AS avg_is_superhost,
           STRING_AGG(DISTINCT comodities, 'JOIN ') AS comodities,
+		      location.location_id,
           location.route,
           location.sublocality,
           location.locality
@@ -132,7 +133,7 @@ def main():
       INNER JOIN location
       ON location.location_id = room.location_id
         GROUP BY
-          locality, location.sublocality, location.route, room_id
+          locality, location.sublocality, location.route, location.location_id, room_id
     """, 'Ouro Preto', args.project.lower(), args.format, args.start_date)
 
 if __name__ == "__main__":

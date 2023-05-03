@@ -201,7 +201,7 @@ def airbnb_score_search(config, city, survey_id, args):
         # and price is null
         # and overall_satisfaction is null
 
-        cur.execute(sql, (city,))
+        cur.execute(sql, (survey_id,))
         rowcount = cur.rowcount
         logging.info(rowcount, " results")
 
@@ -212,7 +212,7 @@ def airbnb_score_search(config, city, survey_id, args):
                 url = DOMAIN + str(result[0])
                 for i in range(config.ATTEMPTS_TO_FIND_PAGE):
                     try:
-                        logging.info("Attempt ", i+1, " to find room ", room_id)
+                        logging.info("Attempt " + str(i+1) + " to find room " + room_id)
                         driver = prepare_driver(url)
 
                         if url not in driver.current_url:

@@ -15,7 +15,6 @@ from airbnb_geocoding import Location
 from airbnb_geocoding import BoundingBox
 from lxml import html
 from selenium import webdriver
-from general_config import ABConfig
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.wait import WebDriverWait
@@ -23,8 +22,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from geopy import distance
 import datetime as dt
-import utils
+
 from airbnb import db_add_survey
+from airbnb_geocoding import reverse_geocode_coordinates_and_insert
+from general_config import ABConfig
+import utils
 from utils import prepare_driver
 
 DOMAIN = 'https://www.booking.com'
@@ -45,8 +47,8 @@ class BListing():
 		self.accommodates = None
 		self.price = None
 		self.bedtype = None
-		self.lat = None
-		self.lng = None
+		self.latitude = None
+		self.longitude = None
 		self.overall_satisfaction = None
 		self.comodities = None
 		self.hotel_name = None
@@ -137,7 +139,7 @@ class BListing():
 			insert_args = (
 				self.room_id, self.hotel_name, self.room_name, self.localized_address, self.comodities,
 				self.overall_satisfaction, self.property_type, self.bedtype, self.accomodates,
-				self.price, self.lat, self.lng, self.reviews, self.survey_id, self.checkin_date, self.checkout_date,
+				self.price, self.latitude, self.longitude, self.reviews, self.survey_id, self.checkin_date, self.checkout_date,
 				self.location_id
 				)
 
@@ -146,7 +148,7 @@ class BListing():
 			conn.commit()
 			logger.debug("Room " + str(self.room_name) + ": inserted")
 			logger.debug("(lat, long) = (%s, %s)".format(
-					lat=self.lat, lng=self.lng))
+					lat=self.latitude, lng=self.longitude))
 		except psycopg2.IntegrityError:
 			logger.info("Room " + str(self.room_name) + ": insert failed")
 			conn.rollback()
@@ -202,65 +204,93 @@ class BListing():
 			raise
 
 	# ENCONTRANDO DADOS NA NOVA VERSÃO
-	def find_hotel_name(driver):
-		element = driver.find_element(By.CSS_SELECTOR, '.pp-header__title')
-		listing.hotel_name = element.text
+	def find_hotel_name(self, driver):
+		try:
+				element = driver.find_element(By.CSS_SELECTOR, '.pp-header__title')
+				self.hotel_name = element.text
+		except selenium.common.exceptions.NoSuchElementException:
+				raise
 
-	def find_localized_address(driver):
-		element = driver.find_element(By.CSS_SELECTOR, '.js-hp_address_subtitle')
-		listing.localized_address = element.text
+	def find_localized_address(self, driver):
+		try:
+				element = driver.find_element(By.CSS_SELECTOR, '.js-hp_address_subtitle')
+				self.localized_address = element.text
+		except selenium.common.exceptions.NoSuchElementException:
+				raise
 
-	def find_room_informations(driver):
-		table_rows = driver.find_elements(By.XPATH, "//*[@id='hprt-table']/tbody/tr")
-		for row in table_rows:
-			try:
-				room_name = row.find_element(By.CLASS_NAME, 'hprt-roomtype-link')
-				listing.room_name = room_name.text
-				listing.room_id = room_name.get_attribute("data-room-id")
+	def find_room_informations(self, driver):
+		try:
+				table_rows = driver.find_elements(By.XPATH, "//*[@id='hprt-table']/tbody/tr")
+				for row in table_rows:
+					try:
+						room_name = row.find_element(By.CLASS_NAME, 'hprt-roomtype-link')
+						self.room_name = room_name.text
+						self.room_id = room_name.get_attribute("data-room-id")
 
-				bed_type = row.find_element(By.CSS_SELECTOR, '.hprt-roomtype-bed')
-				listing.bedtype = bed_type.text
-			except selenium.common.exceptions.NoSuchElementException:
-				pass
-			
-			accomodates = row.find_elements(By.CSS_SELECTOR, ".bicon-occupancy")
-			listing.accomodates = len(accomodates)
+						bed_type = row.find_element(By.CSS_SELECTOR, '.hprt-roomtype-bed')
+						self.bedtype = bed_type.text
+					except selenium.common.exceptions.NoSuchElementException:
+						pass
+					
+					accomodates = row.find_elements(By.CSS_SELECTOR, ".bicon-occupancy")
+					self.accomodates = len(accomodates)
 
-			# preco
-			price = row.find_element(By.CSS_SELECTOR, '.bui-price-display__value')
-			listing.price = price.text.split('R$ ')[1]
+					# preco
+					price = row.find_element(By.CSS_SELECTOR, '.bui-price-display__value')
+					self.price = price.text.split('R$ ')[1]
+		except selenium.common.exceptions.NoSuchElementException:
+				raise
 
-	def find_latlng(driver): # ok
-		element = driver.find_element(By.ID, 'hotel_header')
-		coordinates = element.get_attribute('data-atlas-latlng').split(',')
-		listing.lat = coordinates[0]
-		listing.lng = coordinates[1]
-
-	def find_property_type(driver):
-		element = driver.find_element(By.XPATH, '//*[@data-testid="property-type-badge"]')
-		listing.property_type = element.text
+	def find_latlng(self, driver): # ok
+		try:
+				element = driver.find_element(By.ID, 'hotel_header')
+				coordinates = element.get_attribute('data-atlas-latlng').split(',')
+				self.latitude = coordinates[0]
+				self.longitude = coordinates[1]
+		except selenium.common.exceptions.NoSuchElementException:
+				raise
+	
+	def find_property_type(self, driver):
+		try:
+				element = driver.find_element(By.XPATH, '//*[@data-testid="property-type-badge"]')
+				self.property_type = element.text
+		except selenium.common.exceptions.NoSuchElementException:
+				raise
 		
-	def find_overall_classification(driver):
-		element = driver.find_element(By.CSS_SELECTOR, 'div.b5cd09854e.d10a6220b4')
-		if ',' in element.text:
-			listing.overall_satisfaction = float(element.text.replace(',', '.'))
-		else:
-			if len(element.text) > 0:
-				listing.overall_satisfaction = float(element.text)
+	def find_overall_classification(self, driver):
+		try:
+				element = driver.find_element(By.CSS_SELECTOR, 'div.b5cd09854e.d10a6220b4')
+				if ',' in element.text:
+					self.overall_satisfaction = float(element.text.replace(',', '.'))
+				else:
+					if len(element.text) > 0:
+						self.overall_satisfaction = float(element.text)
+		except selenium.common.exceptions.NoSuchElementException:
+				raise
+		except:
+				raise
 
-	def find_principal_comodities(driver):
-		element = driver.find_elements(By.CSS_SELECTOR, 'div.a815ec762e.ab06168e66')
-		comodities = []
-		for comodity in element:
-			comodities.append(comodity.text)
+	def find_principal_comodities(self, driver):
+		try:
+				element = driver.find_elements(By.CSS_SELECTOR, 'div.a815ec762e.ab06168e66')
+				comodities = []
+				for comodity in element:
+					comodities.append(comodity.text)
 
-		listing.comodities = comodities
+				self.comodities = comodities
+		except selenium.common.exceptions.NoSuchElementException:
+				raise
 
-	def find_reviews_quantity(driver):
-		element = driver.find_element(By.XPATH, '//*[@rel="reviews"]')
-		if element.text is not None:
-			r = element.text.split('Avaliações de hóspedes (')[1].split(')')[0]
-			listing.reviews = float(r)
+	def find_reviews_quantity(self, driver):
+		try:
+				element = driver.find_element(By.XPATH, '//*[@rel="reviews"]')
+				if element.text is not None:
+					r = element.text.split('Avaliações de hóspedes (')[1].split(')')[0]
+					self.reviews = float(r)
+		except selenium.common.exceptions.NoSuchElementException:
+				raise
+		except:
+				raise
 
 def fill_empty_routes(config):
 	try:
@@ -385,7 +415,7 @@ def add_routes_area_by_bounding_box(config, city):
 	except:
 		raise
 
-def search_booking_rooms(config, area, start_date, finish_date, search_reviews, survey_id):
+def search_booking_rooms(config, area, start_date, finish_date, survey_id, search_reviews=False):
 	city = area.split(',')[0]
 
 	checkin_date = start_date
@@ -408,7 +438,7 @@ def search_booking_rooms(config, area, start_date, finish_date, search_reviews, 
 	for page in all_pages[1:len(all_pages):1]:
 		for i in range(config.ATTEMPTS_TO_FIND_PAGE):
 			try:
-				logger.debug("Attempt ", i+1, " to find page")
+				logger.debug("Attempt " + str(i+1) + " to find page")
 				property_cards = driver.find_elements(By.XPATH, '//*[@data-testid="property-card"]//*[@data-testid="title-link"]')
 				urls = []
 				for property_card in property_cards:
@@ -420,12 +450,12 @@ def search_booking_rooms(config, area, start_date, finish_date, search_reviews, 
 					listing = BListing(config, driver, url, survey_id, checkin_date, checkout_date)
 					
 					listing.find_latlng(hotel_page)
-					listing.find_overall_classification(hotel_page)
 					listing.find_principal_comodities(hotel_page)
 					listing.find_hotel_name(hotel_page)
 					listing.find_localized_address(hotel_page)
 					listing.find_property_type(hotel_page)
 					listing.find_reviews_quantity(hotel_page)
+					listing.find_overall_classification(hotel_page)
 					
 					listing.find_room_informations(hotel_page) # needs to be the last call
 					listing.save(listing.config.FLAGS_INSERT_REPLACE)
