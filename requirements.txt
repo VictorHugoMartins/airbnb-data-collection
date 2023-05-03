@@ -8,7 +8,7 @@ dl==0.1.0
 HTMLParser==0.0.2
 ipython==8.11.0
 ipywidgets==8.0.4
-Jinja2==2.10.1
+Jinja2==3.0
 keyring>=18.0.1
 lockfile>=0.12.2
 numpy>=1.24.0
