@@ -1,0 +1,86 @@
+2023-04-08 15:21:10,421 INFO    ======================================================================
+2023-04-08 15:21:10,422 INFO    Survey 226, for Ouro Preto, Minas Gerais
+2023-04-08 15:21:10,423 INFO    Searching by bounding box, max_zoom=24
+2023-04-08 15:21:10,424 INFO    ----------------------------------------------------------------------
+2023-04-08 15:21:10,424 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
+2023-04-08 15:21:10,425 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-04-08 15:21:11,696 WARNING Network request 0: connectionError. Bad proxy 8.222.243.27:80?
+2023-04-08 15:21:13,000 WARNING Network request 1: connectionError. Bad proxy 210.148.141.1:8080?
+2023-04-08 15:21:13,825 WARNING Network request 2: connectionError. Bad proxy 201.217.49.2:80?
+2023-04-08 15:21:19,878 WARNING HTTP status 403 from web site: IP address 110.34.3.229:3128 may be blocked
+2023-04-08 15:21:19,878 WARNING Removing 110.34.3.229:3128 from proxy list; 299 of 300 remain
+2023-04-08 15:21:30,047 WARNING Network request 4: connectionError. Bad proxy 184.95.3.154:8888?
+2023-04-08 15:21:30,722 WARNING Network request 5: connectionError. Bad proxy 23.144.56.65:80?
+2023-04-08 15:21:31,638 WARNING Network request 6: connectionError. Bad proxy 165.154.236.174:80?
+2023-04-08 15:21:32,640 WARNING Network request 7: connectionError. Bad proxy 93.180.222.134:8080?
+2023-04-08 15:21:43,018 WARNING Network request 8: connectionError. Bad proxy 180.178.98.94:2526?
+2023-04-08 15:21:44,839 WARNING HTTP status 403 from web site: IP address 51.159.115.233:3128 may be blocked
+2023-04-08 15:21:44,841 WARNING Removing 51.159.115.233:3128 from proxy list; 298 of 300 remain
+2023-04-08 15:21:45,847 WARNING Network request 10: connectionError. Bad proxy 139.99.237.62:80?
+2023-04-08 15:21:46,627 WARNING Network request 11: connectionError. Bad proxy 86.48.1.23:80?
+2023-04-08 15:21:52,741 WARNING Network request 12: connectionError. Bad proxy 192.248.125.3:80?
+2023-04-08 15:22:03,065 WARNING Network request 13: connectionError. Bad proxy 200.69.210.59:80?
+2023-04-08 15:22:04,507 WARNING Network request 14: connectionError. Bad proxy 139.59.1.14:3128?
+2023-04-08 15:22:05,553 WARNING Network request 15: connectionError. Bad proxy 103.75.196.121:80?
+2023-04-08 15:22:06,710 WARNING Network request 16: connectionError. Bad proxy 47.244.32.96:80?
+2023-04-08 15:22:07,781 WARNING Network request 17: connectionError. Bad proxy 95.183.140.89:80?
+2023-04-08 15:22:18,303 WARNING Network request 18: connectionError. Bad proxy 64.225.8.82:9995?
+2023-04-08 15:22:18,943 WARNING Network request 19: connectionError. Bad proxy 95.183.140.94:80?
+2023-04-08 15:22:18,945 WARNING No response received from request despite multiple attempts: {'_format': 'for_explore_search_web', '_intents': 'p1', 'adults': '0', 'allow_override[]': '', 'auto_ib': 'False', 'children': '0', 'client_session_id': '', 'experiences_per_grid': '20', 'federated_search_session_id': '45de42ea-60d4-49a9-9335-9e52789cd306', 'fetch_filters': 'True', 'guests': '0', 'guidebooks_per_grid': '20', 'has_zero_guest_treatment': 'True', 'infants': '0', 'is_guided_search': 'True', 'is_new_cards_experiment': 'True', 'is_standard_search': 'True', 'items_offset': '18', 'items_per_grid': '18', 'key': 'd306zoyjsyarp7ifhu67rjxn52tv0t20', 'luxury_pre_launch': 'False', 'metadata_only': 'False', 'query_understanding_enabled': 'True', 'refinement_paths[]': '/homes', 'search_type': 'PAGINATION', 'search_by_map': 'True', 'section_offset': 0, 'selected_tab_id': 'home_tab', 'show_groupings': 'True', 'supports_for_you_v3': 'True', 'timezone_offset': '-240', 'ne_lat': '-20.2519', 'ne_lng': '-43.4372', 'sw_lat': '-20.5229', 'sw_lng': '-43.7846', 'screen_size': 'medium', 'zoom': 'True'}
+2023-04-08 15:22:29,165 WARNING Network request 0: connectionError. Bad proxy 190.83.3.35:999?
+2023-04-08 15:22:39,416 WARNING Network request 1: connectionError. Bad proxy 207.244.248.97:80?
+2023-04-08 15:22:43,851 WARNING Network request 2: connectionError. Bad proxy 45.120.136.104:80?
+2023-04-08 15:22:44,540 WARNING Network request 3: connectionError. Bad proxy 143.244.205.72:1080?
+2023-04-08 15:22:54,575 WARNING Network request 4: connectionError. Bad proxy 196.1.95.124:80?
+2023-04-08 15:23:00,935 WARNING Network request 5: connectionError. Bad proxy 206.81.26.113:80?
+2023-04-08 15:23:02,877 WARNING Network request 6: connectionError. Bad proxy 103.234.55.173:80?
+2023-04-08 15:23:13,570 WARNING Network request 7: connectionError. Bad proxy 196.223.129.21:80?
+2023-04-08 15:23:31,000 WARNING Network request 8: connectionError. Bad proxy 198.49.68.80:80?
+2023-04-08 15:23:48,615 WARNING Network request 9: connectionError. Bad proxy 137.184.232.148:80?
+2023-04-08 15:23:58,763 WARNING Network request 10: connectionError. Bad proxy 162.240.75.37:80?
+2023-04-08 15:24:08,950 WARNING Network request 11: connectionError. Bad proxy 45.129.41.2:80?
+2023-04-08 15:24:19,311 WARNING Network request 12: connectionError. Bad proxy 46.101.126.180:42223?
+2023-04-08 15:24:29,401 WARNING Network request 13: connectionError. Bad proxy 65.108.9.181:80?
+2023-04-08 15:24:30,380 WARNING Network request 14: connectionError. Bad proxy 92.27.165.234:80?
+2023-04-08 15:24:31,760 WARNING Network request 15: connectionError. Bad proxy 210.148.141.5:8080?
+2023-04-08 15:24:32,758 WARNING Network request 16: connectionError. Bad proxy 129.150.36.169:8090?
+2023-04-08 15:24:36,160 WARNING Network request 17: connectionError. Bad proxy 174.138.184.82:46706?
+2023-04-08 15:24:48,946 WARNING Network request 18: connectionError. Bad proxy 74.208.51.197:5000?
+2023-04-08 15:24:51,505 WARNING Network request 19: connectionError. Bad proxy 41.93.71.15:80?
+2023-04-08 15:24:51,507 WARNING No response received from request despite multiple attempts: {'_format': 'for_explore_search_web', '_intents': 'p1', 'adults': '0', 'allow_override[]': '', 'auto_ib': 'False', 'children': '0', 'client_session_id': '', 'experiences_per_grid': '20', 'federated_search_session_id': '45de42ea-60d4-49a9-9335-9e52789cd306', 'fetch_filters': 'True', 'guests': '0', 'guidebooks_per_grid': '20', 'has_zero_guest_treatment': 'True', 'infants': '0', 'is_guided_search': 'True', 'is_new_cards_experiment': 'True', 'is_standard_search': 'True', 'items_offset': '18', 'items_per_grid': '18', 'key': 'd306zoyjsyarp7ifhu67rjxn52tv0t20', 'luxury_pre_launch': 'False', 'metadata_only': 'False', 'query_understanding_enabled': 'True', 'refinement_paths[]': '/homes', 'search_type': 'PAGINATION', 'search_by_map': 'True', 'section_offset': 1, 'selected_tab_id': 'home_tab', 'show_groupings': 'True', 'supports_for_you_v3': 'True', 'timezone_offset': '-240', 'ne_lat': '-20.2519', 'ne_lng': '-43.4372', 'sw_lat': '-20.5229', 'sw_lng': '-43.7846', 'screen_size': 'medium', 'zoom': 'True'}
+2023-04-08 15:24:52,855 WARNING Network request 0: connectionError. Bad proxy 103.151.41.7:80?
+2023-04-08 15:24:53,682 WARNING Network request 1: connectionError. Bad proxy 146.59.147.70:8888?
+2023-04-08 15:24:56,028 WARNING Network request 2: connectionError. Bad proxy 41.93.71.15:80?
+2023-04-08 15:24:57,165 WARNING Network request 3: connectionError. Bad proxy 103.152.9.153:80?
+2023-04-08 15:25:07,895 WARNING Network request 4: connectionError. Bad proxy 103.225.11.135:80?
+2023-04-08 15:25:17,930 WARNING Network request 5: connectionError. Bad proxy 65.109.84.104:80?
+2023-04-08 15:25:19,319 WARNING Network request 6: connectionError. Bad proxy 103.152.9.140:80?
+2023-04-08 15:25:29,663 WARNING Network request 7: connectionError. Bad proxy 190.83.3.35:999?
+2023-04-08 15:25:32,102 WARNING Network request 8: connectionError. Bad proxy 216.137.184.253:80?
+2023-04-08 15:25:45,364 WARNING Network request 9: connectionError. Bad proxy 89.117.32.209:80?
+2023-04-08 15:25:46,624 WARNING Network request 10: connectionError. Bad proxy 192.248.125.3:80?
+2023-04-08 15:26:00,011 WARNING Network request 11: connectionError. Bad proxy 102.130.192.231:8080?
+2023-04-08 15:26:10,667 WARNING Network request 12: connectionError. Bad proxy 185.103.87.30:8081?
+2023-04-08 15:26:21,297 WARNING Network request 13: connectionError. Bad proxy 64.225.8.82:9995?
+2023-04-08 15:26:22,567 WARNING Network request 14: connectionError. Bad proxy 192.248.125.3:80?
+2023-04-08 15:26:24,296 WARNING Network request 15: connectionError. Bad proxy 58.27.59.249:80?
+2023-04-08 15:26:34,577 WARNING Network request 16: connectionError. Bad proxy 5.189.184.6:80?
+2023-04-08 15:26:44,643 WARNING Network request 17: connectionError. Bad proxy 95.154.76.20:3128?
+2023-04-08 15:26:45,631 WARNING Network request 18: connectionError. Bad proxy 13.81.217.201:80?
+2023-04-08 15:26:46,711 WARNING Network request 19: connectionError. Bad proxy 129.150.36.169:8090?
+2023-04-08 15:26:46,712 WARNING No response received from request despite multiple attempts: {'_format': 'for_explore_search_web', '_intents': 'p1', 'adults': '0', 'allow_override[]': '', 'auto_ib': 'False', 'children': '0', 'client_session_id': '', 'experiences_per_grid': '20', 'federated_search_session_id': '45de42ea-60d4-49a9-9335-9e52789cd306', 'fetch_filters': 'True', 'guests': '0', 'guidebooks_per_grid': '20', 'has_zero_guest_treatment': 'True', 'infants': '0', 'is_guided_search': 'True', 'is_new_cards_experiment': 'True', 'is_standard_search': 'True', 'items_offset': '18', 'items_per_grid': '18', 'key': 'd306zoyjsyarp7ifhu67rjxn52tv0t20', 'luxury_pre_launch': 'False', 'metadata_only': 'False', 'query_understanding_enabled': 'True', 'refinement_paths[]': '/homes', 'search_type': 'PAGINATION', 'search_by_map': 'True', 'section_offset': 2, 'selected_tab_id': 'home_tab', 'show_groupings': 'True', 'supports_for_you_v3': 'True', 'timezone_offset': '-240', 'ne_lat': '-20.2519', 'ne_lng': '-43.4372', 'sw_lat': '-20.5229', 'sw_lng': '-43.7846', 'screen_size': 'medium', 'zoom': 'True'}
+2023-04-08 15:26:47,541 WARNING Network request 0: connectionError. Bad proxy 121.159.41.244:8001?
+2023-04-08 15:26:55,908 WARNING HTTP status 403 from web site: IP address 217.146.217.178:3128 may be blocked
+2023-04-08 15:26:55,911 WARNING Removing 217.146.217.178:3128 from proxy list; 297 of 300 remain
+2023-04-08 15:27:06,040 WARNING Network request 2: connectionError. Bad proxy 61.7.177.137:8080?
+2023-04-08 15:27:06,905 WARNING Network request 3: connectionError. Bad proxy 103.152.9.140:80?
+2023-04-08 15:27:17,238 WARNING Network request 4: connectionError. Bad proxy 14.207.146.159:8080?
+2023-04-08 15:27:27,395 WARNING Network request 5: connectionError. Bad proxy 157.245.97.60:80?
+2023-04-08 15:27:28,404 WARNING Network request 6: connectionError. Bad proxy 139.99.237.62:80?
+2023-04-08 15:27:29,528 WARNING Network request 7: connectionError. Bad proxy 210.148.141.5:8080?
+2023-04-08 15:27:33,131 ERROR   Error in survey.listing_from_search_page_json: returning None
+Traceback (most recent call last):
+  File "C:\mono\airbnb-data-collection\airbnb_survey.py", line 213, in listing_from_search_page_json
+    listing.currency = structured_price.split()[1]
+                       ~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range

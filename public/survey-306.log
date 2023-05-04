@@ -1,0 +1,22 @@
+2023-04-29 17:53:59,019 INFO    ====== WebDriver manager ======
+2023-04-29 17:54:00,746 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-04-29 17:54:01,492 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-04-29 17:54:21,962 INFO    ====== WebDriver manager ======
+2023-04-29 17:54:22,534 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-04-29 17:54:23,516 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-04-29 17:54:41,168 ERROR   Exception saving room
+2023-04-29 17:54:41,580 ERROR   Top level exception handler: quitting.
+Traceback (most recent call last):
+  File "C:\mono\airbnb-data-collection\search.py", line 360, in main
+    full_process(ab_config,args.platform, args.full_survey)
+  File "C:\mono\airbnb-data-collection\search.py", line 244, in full_process
+    survey_id = execute_search(ab_config, platform, search_area_name, fill_bnb_with_selenium, start_date, finish_date, super_survey_id)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\mono\airbnb-data-collection\search.py", line 214, in execute_search
+    search_booking_rooms(ab_config, search_area_name, start_date, finish_date, survey_id)
+  File "C:\mono\airbnb-data-collection\booking.py", line 455, in search_booking_rooms
+    listing.save(listing.config.FLAGS_INSERT_REPLACE)
+  File "C:\mono\airbnb-data-collection\booking.py", line 81, in save
+    if (self.config.FLAGS_INSERT_IN_LOCATION): self.location_id = reverse_geocode_coordinates_and_insert(self.config, self.latitude, self.longitude)
+                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+NameError: name 'reverse_geocode_coordinates_and_insert' is not defined

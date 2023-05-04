@@ -1,0 +1,12 @@
+2023-01-30 17:21:24,564 INFO    ======================================================================
+2023-01-30 17:21:24,565 INFO    Survey 94, for Ouro Preto, Minas Gerais
+2023-01-30 17:21:24,565 INFO    Searching by bounding box, max_zoom=24
+2023-01-30 17:21:24,566 INFO    ----------------------------------------------------------------------
+2023-01-30 17:21:24,566 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
+2023-01-30 17:21:24,567 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-01-30 17:21:25,563 ERROR   Error in survey.listing_from_search_page_json: returning None
+Traceback (most recent call last):
+  File "C:\mono\airbnb-data-collection\airbnb_survey.py", line 205, in listing_from_search_page_json
+    print(json_listing["pricing_quote"])
+          ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+KeyError: 'pricing_quote'

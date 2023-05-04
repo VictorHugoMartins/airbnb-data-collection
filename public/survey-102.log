@@ -1,0 +1,10 @@
+2023-01-30 17:41:07,831 INFO    ======================================================================
+2023-01-30 17:41:07,831 INFO    Survey 102, for Ouro Preto, Minas Gerais
+2023-01-30 17:41:07,832 INFO    Searching by bounding box, max_zoom=24
+2023-01-30 17:41:07,833 INFO    ----------------------------------------------------------------------
+2023-01-30 17:41:07,833 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
+2023-01-30 17:41:07,833 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-01-30 17:41:08,797 INFO    Page 01 returned 00 listings
+2023-01-30 17:41:08,799 INFO    Final page of listings for this search
+2023-01-30 17:41:08,800 INFO    Results: 1 pages, 0 new rooms
+2023-01-30 17:41:08,950 INFO    Finishing survey 102, for Ouro Preto, Minas Gerais

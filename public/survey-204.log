@@ -1,0 +1,233 @@
+2023-04-08 15:04:39,428 INFO    ======================================================================
+2023-04-08 15:04:39,430 INFO    Survey 204, for Ouro Preto, Minas Gerais
+2023-04-08 15:04:39,466 INFO    Searching by bounding box, max_zoom=24
+2023-04-08 15:04:39,467 INFO    ----------------------------------------------------------------------
+2023-04-08 15:04:39,468 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
+2023-04-08 15:04:39,468 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-04-08 15:04:42,417 INFO    Page 01 returned 18 listings
+2023-04-08 15:04:43,029 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-04-08 15:04:50,153 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-04-08 15:04:57,684 INFO    Room 17026884: insert failed
+2023-04-08 15:04:57,697 INFO    Room 674480918327652240: insert failed
+2023-04-08 15:04:57,707 INFO    Room 746180031205447491: insert failed
+2023-04-08 15:04:57,717 INFO    Room 836055458674161628: insert failed
+2023-04-08 15:04:57,727 INFO    Room 42270186: insert failed
+2023-04-08 15:04:57,736 INFO    Room 821878521802580722: insert failed
+2023-04-08 15:04:57,746 INFO    Room 54222723: insert failed
+2023-04-08 15:04:57,756 INFO    Room 50874807: insert failed
+2023-04-08 15:04:57,766 INFO    Room 794011987542751252: insert failed
+2023-04-08 15:04:57,772 INFO    Room 788297148039165888: insert failed
+2023-04-08 15:04:57,781 INFO    Room 43805080: insert failed
+2023-04-08 15:04:57,789 INFO    Room 716470613579510590: insert failed
+2023-04-08 15:04:57,797 INFO    Room 40172480: insert failed
+2023-04-08 15:04:57,813 INFO    Room 42158217: insert failed
+2023-04-08 15:04:57,823 INFO    Room 16945404: insert failed
+2023-04-08 15:04:57,833 INFO    Room 48449210: insert failed
+2023-04-08 15:04:57,843 INFO    Room 45223353: insert failed
+2023-04-08 15:04:57,853 INFO    Room 41502392: insert failed
+2023-04-08 15:04:57,853 INFO    Page 02 returned 18 listings
+2023-04-08 15:04:59,438 INFO    Page 03 returned 18 listings
+2023-04-08 15:05:02,036 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-04-08 15:05:11,757 INFO    Room 42270186: insert failed
+2023-04-08 15:05:11,867 INFO    Room 583893388625003253: insert failed
+2023-04-08 15:05:11,898 INFO    Room 42733162: insert failed
+2023-04-08 15:05:11,945 INFO    Room 858460300172119446: insert failed
+2023-04-08 15:05:11,960 INFO    Room 592675399304286750: insert failed
+2023-04-08 15:05:12,065 INFO    Room 53991861: insert failed
+2023-04-08 15:05:12,068 INFO    Page 04 returned 18 listings
+2023-04-08 15:05:15,388 INFO    Room 51558179: insert failed
+2023-04-08 15:05:15,407 INFO    Room 26571636: insert failed
+2023-04-08 15:05:15,611 INFO    Page 05 returned 18 listings
+2023-04-08 15:05:18,047 INFO    Room 47334727: insert failed
+2023-04-08 15:05:18,135 INFO    Room 54222723: insert failed
+2023-04-08 15:05:18,150 INFO    Room 24299849: insert failed
+2023-04-08 15:05:18,161 INFO    Room 50240014: insert failed
+2023-04-08 15:05:18,205 INFO    Page 06 returned 18 listings
+2023-04-08 15:05:19,708 INFO    Room 768127937409154509: insert failed
+2023-04-08 15:05:19,720 INFO    Room 50921868: insert failed
+2023-04-08 15:05:19,729 INFO    Room 46012698: insert failed
+2023-04-08 15:05:19,737 INFO    Room 575305736383949677: insert failed
+2023-04-08 15:05:19,745 INFO    Room 47334727: insert failed
+2023-04-08 15:05:19,751 INFO    Room 581919309488175741: insert failed
+2023-04-08 15:05:19,756 INFO    Room 849309871493925988: insert failed
+2023-04-08 15:05:19,761 INFO    Room 809950782977138894: insert failed
+2023-04-08 15:05:19,766 INFO    Room 24299849: insert failed
+2023-04-08 15:05:19,771 INFO    Room 50240014: insert failed
+2023-04-08 15:05:19,776 INFO    Room 764557968381075096: insert failed
+2023-04-08 15:05:19,781 INFO    Room 581931967539015866: insert failed
+2023-04-08 15:05:19,787 INFO    Room 40752066: insert failed
+2023-04-08 15:05:19,809 INFO    Page 07 returned 18 listings
+2023-04-08 15:05:23,528 INFO    Page 08 returned 18 listings
+2023-04-08 15:05:24,995 INFO    Room 37010164: insert failed
+2023-04-08 15:05:25,005 INFO    Room 12470975: insert failed
+2023-04-08 15:05:25,028 INFO    Room 35494295: insert failed
+2023-04-08 15:05:25,035 INFO    Room 581931967539015866: insert failed
+2023-04-08 15:05:25,073 INFO    Room 772573713164148240: insert failed
+2023-04-08 15:05:25,085 INFO    Page 09 returned 18 listings
+2023-04-08 15:05:28,027 INFO    Page 10 returned 18 listings
+2023-04-08 15:05:30,857 INFO    Room 42580052: insert failed
+2023-04-08 15:05:30,979 INFO    Room 643990855880440095: insert failed
+2023-04-08 15:05:31,083 INFO    Room 606286830999515353: insert failed
+2023-04-08 15:05:31,114 INFO    Page 11 returned 18 listings
+2023-04-08 15:05:32,597 INFO    Room 52778432: insert failed
+2023-04-08 15:05:32,607 INFO    Room 664029616084197185: insert failed
+2023-04-08 15:05:32,614 INFO    Room 35197814: insert failed
+2023-04-08 15:05:32,623 INFO    Room 32615870: insert failed
+2023-04-08 15:05:32,643 INFO    Room 818815520092815295: insert failed
+2023-04-08 15:05:32,661 INFO    Room 32350721: insert failed
+2023-04-08 15:05:32,734 INFO    Room 51684495: insert failed
+2023-04-08 15:05:32,741 INFO    Room 46378338: insert failed
+2023-04-08 15:05:32,741 INFO    Page 12 returned 18 listings
+2023-04-08 15:05:34,898 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-04-08 15:05:42,602 INFO    Room 32075488: insert failed
+2023-04-08 15:05:42,622 INFO    Room 32350721: insert failed
+2023-04-08 15:05:42,656 INFO    Room 814607979056899161: insert failed
+2023-04-08 15:05:42,691 INFO    Room 644939540156995153: insert failed
+2023-04-08 15:05:42,717 INFO    Room 50167985: insert failed
+2023-04-08 15:05:42,722 INFO    Room 32322372: insert failed
+2023-04-08 15:05:42,753 INFO    Page 13 returned 18 listings
+2023-04-08 15:05:47,248 INFO    Room 46892841: insert failed
+2023-04-08 15:05:47,262 INFO    Room 742108294608089058: insert failed
+2023-04-08 15:05:47,269 INFO    Room 36040045: insert failed
+2023-04-08 15:05:47,328 INFO    Room 833306856028758728: insert failed
+2023-04-08 15:05:47,340 INFO    Room 821878521802580722: insert failed
+2023-04-08 15:05:47,430 INFO    Page 14 returned 18 listings
+2023-04-08 15:05:50,111 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-04-08 15:06:01,013 INFO    Room 17188084: insert failed
+2023-04-08 15:06:01,045 INFO    Room 52205856: insert failed
+2023-04-08 15:06:01,078 INFO    Room 50169659: insert failed
+2023-04-08 15:06:01,110 INFO    Room 813631489092885535: insert failed
+2023-04-08 15:06:01,204 INFO    Page 15 returned 18 listings
+2023-04-08 15:06:02,288 INFO    Room 52200787: insert failed
+2023-04-08 15:06:02,299 INFO    Room 814607979056899161: insert failed
+2023-04-08 15:06:02,307 INFO    Room 52205856: insert failed
+2023-04-08 15:06:02,358 INFO    Room 50169659: insert failed
+2023-04-08 15:06:02,366 INFO    Room 644265453763372279: insert failed
+2023-04-08 15:06:02,383 INFO    Room 738836026349953483: insert failed
+2023-04-08 15:06:02,390 INFO    Room 45753453: insert failed
+2023-04-08 15:06:02,470 INFO    Page 16 returned 18 listings
+2023-04-08 15:06:03,727 INFO    Room 35806673: insert failed
+2023-04-08 15:06:03,782 INFO    Room 31688177: insert failed
+2023-04-08 15:06:03,811 INFO    Room 17187548: insert failed
+2023-04-08 15:06:03,835 INFO    Room 31281458: insert failed
+2023-04-08 15:06:03,843 INFO    Room 21736111: insert failed
+2023-04-08 15:06:03,864 INFO    Page 17 returned 18 listings
+2023-04-08 15:06:05,846 INFO    Room 809950782977138894: insert failed
+2023-04-08 15:06:05,919 INFO    Room 669273367805914895: insert failed
+2023-04-08 15:06:05,975 INFO    Room 7369109: insert failed
+2023-04-08 15:06:05,984 INFO    Room 675488767542051573: insert failed
+2023-04-08 15:06:06,001 INFO    Page 18 returned 18 listings
+2023-04-08 15:06:07,507 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-04-08 15:06:17,977 INFO    Room 53396207: insert failed
+2023-04-08 15:06:17,983 INFO    Room 845048844046926512: insert failed
+2023-04-08 15:06:18,069 INFO    Room 50754918: insert failed
+2023-04-08 15:06:18,085 INFO    Room 758155821012645834: insert failed
+2023-04-08 15:06:18,093 INFO    Room 691335827230295819: insert failed
+2023-04-08 15:06:18,107 INFO    Room 35653805: insert failed
+2023-04-08 15:06:18,107 INFO    Page 19 returned 18 listings
+2023-04-08 15:06:19,313 INFO    Room 53424235: insert failed
+2023-04-08 15:06:19,323 INFO    Room 813625191524741859: insert failed
+2023-04-08 15:06:19,336 INFO    Room 35806673: insert failed
+2023-04-08 15:06:19,355 INFO    Room 607805053290140363: insert failed
+2023-04-08 15:06:19,361 INFO    Room 718192438204832258: insert failed
+2023-04-08 15:06:19,389 INFO    Room 601457326889853745: insert failed
+2023-04-08 15:06:19,416 INFO    Room 604853029409645966: insert failed
+2023-04-08 15:06:19,424 INFO    Room 47302584: insert failed
+2023-04-08 15:06:19,450 INFO    Page 20 returned 18 listings
+2023-04-08 15:06:24,929 INFO    Room 45753453: insert failed
+2023-04-08 15:06:24,938 INFO    Room 664029616084197185: insert failed
+2023-04-08 15:06:24,950 INFO    Room 601457326889853745: insert failed
+2023-04-08 15:06:24,981 INFO    Room 792934048761436059: insert failed
+2023-04-08 15:06:25,006 INFO    Room 31984199: insert failed
+2023-04-08 15:06:25,015 INFO    Room 53396207: insert failed
+2023-04-08 15:06:25,032 INFO    Room 822557399330900736: insert failed
+2023-04-08 15:06:25,087 INFO    Room 37899299: insert failed
+2023-04-08 15:06:25,088 INFO    Page 21 returned 18 listings
+2023-04-08 15:06:26,277 INFO    Room 35767529: insert failed
+2023-04-08 15:06:26,297 INFO    Room 660267255077510572: insert failed
+2023-04-08 15:06:26,306 INFO    Room 52347468: insert failed
+2023-04-08 15:06:26,312 INFO    Room 37445074: insert failed
+2023-04-08 15:06:26,334 INFO    Room 647140903274852613: insert failed
+2023-04-08 15:06:26,359 INFO    Room 35653805: insert failed
+2023-04-08 15:06:26,374 INFO    Room 39886210: insert failed
+2023-04-08 15:06:26,383 INFO    Room 4474713: insert failed
+2023-04-08 15:06:26,383 INFO    Page 22 returned 18 listings
+2023-04-08 15:06:28,086 INFO    Room 669243908464951588: insert failed
+2023-04-08 15:06:28,105 INFO    Room 53424235: insert failed
+2023-04-08 15:06:28,123 INFO    Room 813625191524741859: insert failed
+2023-04-08 15:06:28,141 INFO    Room 765949477577576033: insert failed
+2023-04-08 15:06:28,159 INFO    Room 35806673: insert failed
+2023-04-08 15:06:28,180 INFO    Room 809290017282170716: insert failed
+2023-04-08 15:06:28,199 INFO    Room 16763283: insert failed
+2023-04-08 15:06:28,220 INFO    Room 607805053290140363: insert failed
+2023-04-08 15:06:28,237 INFO    Room 718192438204832258: insert failed
+2023-04-08 15:06:28,249 INFO    Room 4474713: insert failed
+2023-04-08 15:06:28,253 INFO    Room 51492046: insert failed
+2023-04-08 15:06:28,265 INFO    Room 601457326889853745: insert failed
+2023-04-08 15:06:28,269 INFO    Room 852110888701305370: insert failed
+2023-04-08 15:06:28,285 INFO    Room 604853029409645966: insert failed
+2023-04-08 15:06:28,294 INFO    Room 47302584: insert failed
+2023-04-08 15:06:28,302 INFO    Room 552739932749007014: insert failed
+2023-04-08 15:06:28,309 INFO    Room 12582377: insert failed
+2023-04-08 15:06:28,315 INFO    Room 42833318: insert failed
+2023-04-08 15:06:28,315 INFO    Page 23 returned 18 listings
+2023-04-08 15:06:28,808 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-04-08 15:06:37,938 INFO    Room 669243908464951588: insert failed
+2023-04-08 15:06:37,953 INFO    Room 53424235: insert failed
+2023-04-08 15:06:37,974 INFO    Room 813625191524741859: insert failed
+2023-04-08 15:06:37,990 INFO    Room 765949477577576033: insert failed
+2023-04-08 15:06:38,006 INFO    Room 35806673: insert failed
+2023-04-08 15:06:38,020 INFO    Room 809290017282170716: insert failed
+2023-04-08 15:06:38,039 INFO    Room 16763283: insert failed
+2023-04-08 15:06:38,056 INFO    Room 607805053290140363: insert failed
+2023-04-08 15:06:38,073 INFO    Room 718192438204832258: insert failed
+2023-04-08 15:06:38,088 INFO    Room 4474713: insert failed
+2023-04-08 15:06:38,101 INFO    Room 51492046: insert failed
+2023-04-08 15:06:38,116 INFO    Room 601457326889853745: insert failed
+2023-04-08 15:06:38,132 INFO    Room 852110888701305370: insert failed
+2023-04-08 15:06:38,148 INFO    Room 604853029409645966: insert failed
+2023-04-08 15:06:38,166 INFO    Room 47302584: insert failed
+2023-04-08 15:06:38,181 INFO    Room 552739932749007014: insert failed
+2023-04-08 15:06:38,188 INFO    Room 12582377: insert failed
+2023-04-08 15:06:38,212 INFO    Room 42833318: insert failed
+2023-04-08 15:06:38,212 INFO    Page 24 returned 18 listings
+2023-04-08 15:06:39,669 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-04-08 15:06:46,536 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-04-08 15:07:00,641 INFO    Room 18155168: insert failed
+2023-04-08 15:07:00,652 INFO    Room 648773258186391924: insert failed
+2023-04-08 15:07:00,662 INFO    Room 22690736: insert failed
+2023-04-08 15:07:00,671 INFO    Room 660748109226639952: insert failed
+2023-04-08 15:07:00,679 INFO    Room 52824589: insert failed
+2023-04-08 15:07:00,687 INFO    Room 35767529: insert failed
+2023-04-08 15:07:00,695 INFO    Room 861741971283715471: insert failed
+2023-04-08 15:07:00,705 INFO    Room 660267255077510572: insert failed
+2023-04-08 15:07:00,713 INFO    Room 52347468: insert failed
+2023-04-08 15:07:00,722 INFO    Room 37445074: insert failed
+2023-04-08 15:07:00,732 INFO    Room 54030048: insert failed
+2023-04-08 15:07:00,740 INFO    Room 52636732: insert failed
+2023-04-08 15:07:00,751 INFO    Room 647140903274852613: insert failed
+2023-04-08 15:07:00,754 INFO    Room 47515417: insert failed
+2023-04-08 15:07:00,765 INFO    Room 35653805: insert failed
+2023-04-08 15:07:00,772 INFO    Room 53822226: insert failed
+2023-04-08 15:07:00,784 INFO    Room 39886210: insert failed
+2023-04-08 15:07:00,793 INFO    Room 4474713: insert failed
+2023-04-08 15:07:00,793 INFO    Page 25 returned 18 listings
+2023-04-08 15:07:06,678 INFO    Room 18155168: insert failed
+2023-04-08 15:07:06,690 INFO    Room 648773258186391924: insert failed
+2023-04-08 15:07:06,699 INFO    Room 22690736: insert failed
+2023-04-08 15:07:06,706 INFO    Room 660748109226639952: insert failed
+2023-04-08 15:07:06,714 INFO    Room 52824589: insert failed
+2023-04-08 15:07:06,719 INFO    Room 35767529: insert failed
+2023-04-08 15:07:06,727 INFO    Room 861741971283715471: insert failed
+2023-04-08 15:07:06,735 INFO    Room 660267255077510572: insert failed
+2023-04-08 15:07:06,747 INFO    Room 52347468: insert failed
+2023-04-08 15:07:06,757 INFO    Room 37445074: insert failed
+2023-04-08 15:07:06,765 INFO    Room 54030048: insert failed
+2023-04-08 15:07:06,773 INFO    Room 52636732: insert failed
+2023-04-08 15:07:06,782 INFO    Room 647140903274852613: insert failed
+2023-04-08 15:07:06,791 INFO    Room 47515417: insert failed
+2023-04-08 15:07:06,800 INFO    Room 35653805: insert failed
+2023-04-08 15:07:06,807 INFO    Room 53822226: insert failed
+2023-04-08 15:07:06,815 INFO    Room 39886210: insert failed
+2023-04-08 15:07:06,822 INFO    Room 4474713: insert failed
+2023-04-08 15:07:06,823 INFO    Page 26 returned 18 listings

@@ -1,0 +1,24 @@
+2023-02-22 19:49:32,607 INFO    ======================================================================
+2023-02-22 19:49:32,607 INFO    Survey 144, for Ouro Preto, Minas Gerais
+2023-02-22 19:49:32,608 INFO    Searching by bounding box, max_zoom=24
+2023-02-22 19:49:32,608 INFO    ----------------------------------------------------------------------
+2023-02-22 19:49:32,609 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
+2023-02-22 19:49:32,609 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-02-22 19:49:33,399 WARNING HTTP status 400 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-02-22 19:49:39,938 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-02-22 19:49:47,667 WARNING HTTP status 400 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-02-22 19:49:54,033 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-02-22 19:50:02,586 WARNING HTTP status 400 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-02-22 19:50:12,962 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-02-22 19:50:21,547 WARNING HTTP status 400 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-02-22 19:50:29,315 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-02-22 19:50:38,438 WARNING HTTP status 400 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-02-22 19:50:50,206 WARNING HTTP status 400 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-02-22 19:51:05,446 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-02-22 19:51:12,677 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-02-22 19:51:21,946 WARNING HTTP status 400 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-02-22 19:51:35,083 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-02-22 19:51:43,977 WARNING HTTP status 400 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-02-22 19:51:53,187 WARNING HTTP status 400 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-02-22 19:52:04,977 WARNING HTTP status 400 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-02-22 19:52:18,473 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.

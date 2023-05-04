@@ -1,0 +1,29 @@
+2023-01-30 17:51:31,248 INFO    ======================================================================
+2023-01-30 17:51:31,249 INFO    Survey 132, for Ouro Preto, Minas Gerais
+2023-01-30 17:51:31,250 INFO    Searching by bounding box, max_zoom=24
+2023-01-30 17:51:31,251 INFO    ----------------------------------------------------------------------
+2023-01-30 17:51:31,251 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
+2023-01-30 17:51:31,251 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-01-30 17:51:31,714 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-01-30 17:51:39,794 INFO    Page 01 returned 18 listings
+2023-01-30 17:51:41,267 INFO    Room 752794433692563075: insert failed
+2023-01-30 17:51:41,275 INFO    Room 794011987542751252: insert failed
+2023-01-30 17:51:41,291 INFO    Room 50723507: insert failed
+2023-01-30 17:51:41,298 INFO    Room 562077789327146603: insert failed
+2023-01-30 17:51:41,307 INFO    Room 568273495067211791: insert failed
+2023-01-30 17:51:41,314 INFO    Room 813266356122086543: insert failed
+2023-01-30 17:51:41,331 INFO    Room 43805080: insert failed
+2023-01-30 17:51:41,339 INFO    Room 52305704: insert failed
+2023-01-30 17:51:41,351 INFO    Room 47939876: insert failed
+2023-01-30 17:51:41,373 INFO    Room 52024666: insert failed
+2023-01-30 17:51:41,390 INFO    Room 42158217: insert failed
+2023-01-30 17:51:41,406 INFO    Room 40752066: insert failed
+2023-01-30 17:51:41,407 INFO    Page 02 returned 18 listings
+2023-01-30 17:51:43,310 INFO    Room 40752066: insert failed
+2023-01-30 17:51:43,493 INFO    Page 03 returned 18 listings
+2023-01-30 17:51:44,731 INFO    Room 51558179: insert failed
+2023-01-30 17:51:44,892 INFO    Room 740983683035077351: insert failed
+2023-01-30 17:51:45,124 INFO    Page 04 returned 18 listings
+2023-01-30 17:51:46,388 INFO    Room 54077901: insert failed
+2023-01-30 17:51:46,609 INFO    Page 05 returned 18 listings
+2023-01-30 17:51:48,007 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.

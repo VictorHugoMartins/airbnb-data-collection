@@ -1,0 +1,54 @@
+2023-04-29 17:49:17,551 INFO    ====== WebDriver manager ======
+2023-04-29 17:49:18,245 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-04-29 17:49:18,780 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-04-29 17:49:30,707 INFO    ====== WebDriver manager ======
+2023-04-29 17:49:31,094 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-04-29 17:49:31,610 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-04-29 17:49:45,392 ERROR   Top level exception handler: quitting.
+Traceback (most recent call last):
+  File "C:\mono\airbnb-data-collection\search.py", line 360, in main
+    full_process(ab_config,args.platform, args.full_survey)
+  File "C:\mono\airbnb-data-collection\search.py", line 244, in full_process
+    survey_id = execute_search(ab_config, platform, search_area_name, fill_bnb_with_selenium, start_date, finish_date, super_survey_id)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\mono\airbnb-data-collection\search.py", line 214, in execute_search
+    search_booking_rooms(ab_config, search_area_name, start_date, finish_date, survey_id)
+  File "C:\mono\airbnb-data-collection\booking.py", line 423, in search_booking_rooms
+    listing.find_overall_classification(hotel_page)
+  File "C:\mono\airbnb-data-collection\booking.py", line 244, in find_overall_classification
+    element = driver.find_element(By.CSS_SELECTOR, 'div.b5cd09854e.d10a6220b4')
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 861, in find_element
+    return self.execute(Command.FIND_ELEMENT, {"using": by, "value": value})["value"]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 444, in execute
+    self.error_handler.check_response(response)
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\selenium\webdriver\remote\errorhandler.py", line 249, in check_response
+    raise exception_class(message, screen, stacktrace)
+selenium.common.exceptions.NoSuchElementException: Message: no such element: Unable to locate element: {"method":"css selector","selector":"div.b5cd09854e.d10a6220b4"}
+  (Session info: chrome=112.0.5615.138)
+Stacktrace:
+Backtrace:
+	GetHandleVerifier [0x0068DCE3+50899]
+	(No symbol) [0x0061E111]
+	(No symbol) [0x00525588]
+	(No symbol) [0x005508F9]
+	(No symbol) [0x00550AFB]
+	(No symbol) [0x0057F902]
+	(No symbol) [0x0056B944]
+	(No symbol) [0x0057E01C]
+	(No symbol) [0x0056B6F6]
+	(No symbol) [0x00547708]
+	(No symbol) [0x0054886D]
+	GetHandleVerifier [0x008F3EAE+2566302]
+	GetHandleVerifier [0x009292B1+2784417]
+	GetHandleVerifier [0x0092327C+2759788]
+	GetHandleVerifier [0x00725740+672048]
+	(No symbol) [0x00628872]
+	(No symbol) [0x006241C8]
+	(No symbol) [0x006242AB]
+	(No symbol) [0x006171B7]
+	BaseThreadInitThunk [0x763D0099+25]
+	RtlGetAppContainerNamedObjectPath [0x77247B6E+286]
+	RtlGetAppContainerNamedObjectPath [0x77247B3E+238]
+

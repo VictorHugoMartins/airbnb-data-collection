@@ -1,0 +1,243 @@
+2023-04-26 21:42:29,860 INFO    ======================================================================
+2023-04-26 21:42:29,862 INFO    Survey 258, for Barra, Ouro Preto
+2023-04-26 21:42:29,866 INFO    Searching by bounding box, max_zoom=24
+2023-04-26 21:42:29,868 INFO    ----------------------------------------------------------------------
+2023-04-26 21:42:29,870 INFO    Rectangle calculated: [-43.4824422, -20.3710681, -43.5224422, -20.4110681]
+2023-04-26 21:42:29,872 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-04-26 21:42:30,771 INFO    Page 01 returned 00 listings
+2023-04-26 21:42:30,774 INFO    Final page of listings for this search
+2023-04-26 21:42:30,775 INFO    Results: 1 pages, 0 new rooms
+2023-04-26 21:42:30,780 INFO    Finishing survey 258, for Barra, Ouro Preto
+2023-04-26 21:42:30,783 INFO    Initialing search by overall satisfactions
+2023-04-26 21:42:33,151 INFO    ======================================================================
+2023-04-26 21:42:33,154 INFO    Survey 259, for Paragem do Tripuí, Ouro Preto
+2023-04-26 21:42:33,157 INFO    Searching by bounding box, max_zoom=24
+2023-04-26 21:42:33,160 INFO    ----------------------------------------------------------------------
+2023-04-26 21:42:33,162 INFO    Rectangle calculated: [-43.6655979, -20.3004786, -43.7055979, -20.3404786]
+2023-04-26 21:42:33,164 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-04-26 21:42:34,175 INFO    Page 01 returned 00 listings
+2023-04-26 21:42:34,214 INFO    Final page of listings for this search
+2023-04-26 21:42:34,216 INFO    Results: 1 pages, 0 new rooms
+2023-04-26 21:42:34,220 INFO    Finishing survey 259, for Paragem do Tripuí, Ouro Preto
+2023-04-26 21:42:34,227 INFO    Initialing search by overall satisfactions
+2023-04-26 21:42:36,357 INFO    ======================================================================
+2023-04-26 21:42:36,358 INFO    Survey 260, for Antônio Dias, Ouro Preto
+2023-04-26 21:42:36,359 INFO    Searching by bounding box, max_zoom=24
+2023-04-26 21:42:36,360 INFO    ----------------------------------------------------------------------
+2023-04-26 21:42:36,361 INFO    Rectangle calculated: [-43.4786908, -20.3668244, -43.5186908, -20.4068244]
+2023-04-26 21:42:36,362 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-04-26 21:42:37,453 INFO    Page 01 returned 00 listings
+2023-04-26 21:42:37,465 INFO    Final page of listings for this search
+2023-04-26 21:42:37,473 INFO    Results: 1 pages, 0 new rooms
+2023-04-26 21:42:37,477 INFO    Finishing survey 260, for Antônio Dias, Ouro Preto
+2023-04-26 21:42:37,485 INFO    Initialing search by overall satisfactions
+2023-04-26 21:42:40,013 INFO    ======================================================================
+2023-04-26 21:42:40,015 INFO    Survey 261, for JARDIM ITACOLOMI, Ouro Preto
+2023-04-26 21:42:40,019 INFO    Searching by bounding box, max_zoom=24
+2023-04-26 21:42:40,023 INFO    ----------------------------------------------------------------------
+2023-04-26 21:42:40,025 INFO    Rectangle calculated: [-43.4985753, -20.4042211, -43.5029254, -20.4083086]
+2023-04-26 21:42:40,029 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-04-26 21:42:42,361 INFO    Page 01 returned 00 listings
+2023-04-26 21:42:42,367 INFO    Final page of listings for this search
+2023-04-26 21:42:42,369 INFO    Results: 1 pages, 0 new rooms
+2023-04-26 21:42:42,373 INFO    Finishing survey 261, for JARDIM ITACOLOMI, Ouro Preto
+2023-04-26 21:42:42,393 INFO    Initialing search by overall satisfactions
+2023-04-26 21:42:44,913 INFO    ======================================================================
+2023-04-26 21:42:44,914 INFO    Survey 262, for Piedade, Ouro Preto
+2023-04-26 21:42:44,917 INFO    Searching by bounding box, max_zoom=24
+2023-04-26 21:42:44,918 INFO    ----------------------------------------------------------------------
+2023-04-26 21:42:44,918 INFO    Rectangle calculated: [-43.4682601, -20.3653478, -43.5082601, -20.4053478]
+2023-04-26 21:42:44,919 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-04-26 21:42:46,674 INFO    Page 01 returned 00 listings
+2023-04-26 21:42:46,677 INFO    Final page of listings for this search
+2023-04-26 21:42:46,680 INFO    Results: 1 pages, 0 new rooms
+2023-04-26 21:42:46,684 INFO    Finishing survey 262, for Piedade, Ouro Preto
+2023-04-26 21:42:46,728 INFO    Initialing search by overall satisfactions
+2023-04-26 21:42:49,379 INFO    ======================================================================
+2023-04-26 21:42:49,383 INFO    Survey 263, for Pilar, Ouro Preto
+2023-04-26 21:42:49,387 INFO    Searching by bounding box, max_zoom=24
+2023-04-26 21:42:49,390 INFO    ----------------------------------------------------------------------
+2023-04-26 21:42:49,393 INFO    Rectangle calculated: [-43.4908186, -20.3655836, -43.5308186, -20.4055836]
+2023-04-26 21:42:49,395 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-04-26 21:42:51,896 INFO    Page 01 returned 00 listings
+2023-04-26 21:42:51,896 INFO    Final page of listings for this search
+2023-04-26 21:42:52,000 INFO    Results: 1 pages, 0 new rooms
+2023-04-26 21:42:52,004 INFO    Finishing survey 263, for Pilar, Ouro Preto
+2023-04-26 21:42:52,007 INFO    Initialing search by overall satisfactions
+2023-04-26 21:42:54,149 ERROR   Invalid bounding box: e_lng must be > w_lng
+2023-04-26 21:42:54,152 INFO    ======================================================================
+2023-04-26 21:42:54,155 INFO    Survey 264, for Bauxita, Ouro Preto
+2023-04-26 21:42:54,161 INFO    Searching by bounding box, max_zoom=24
+2023-04-26 21:42:54,162 INFO    ----------------------------------------------------------------------
+2023-04-26 21:42:54,165 ERROR   Exception in get_rectangle_from_quadtree_node
+Traceback (most recent call last):
+  File "C:\mono\airbnb-data-collection\airbnb_survey.py", line 868, in get_rectangle_from_quadtree_node
+    rectangle = self.bounding_box[0:4]
+                ~~~~~~~~~~~~~~~~~^^^^^
+TypeError: 'NoneType' object is not subscriptable
+2023-04-26 21:42:54,170 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-04-26 21:42:54,170 ERROR   Exception in get_search_page_info_rectangle
+Traceback (most recent call last):
+  File "C:\mono\airbnb-data-collection\airbnb_survey.py", line 578, in search_node
+    .format(n=rectangle[0], e=rectangle[1],
+              ~~~~~~~~~^^^
+TypeError: 'NoneType' object is not subscriptable
+2023-04-26 21:42:54,173 ERROR   TypeError in recurse_quadtree
+Traceback (most recent call last):
+  File "C:\mono\airbnb-data-collection\airbnb_survey.py", line 525, in recurse_quadtree
+    (zoomable, median_leaf) = self.search_node(
+                              ^^^^^^^^^^^^^^^^^
+  File "C:\mono\airbnb-data-collection\airbnb_survey.py", line 578, in search_node
+    .format(n=rectangle[0], e=rectangle[1],
+              ~~~~~~~~~^^^
+TypeError: 'NoneType' object is not subscriptable
+2023-04-26 21:42:54,177 ERROR   ("'NoneType' object is not subscriptable",)
+2023-04-26 21:42:54,178 ERROR   Error
+Traceback (most recent call last):
+  File "C:\mono\airbnb-data-collection\airbnb_survey.py", line 463, in search
+    self.recurse_quadtree(quadtree_node, median_node, None, flag)
+  File "C:\mono\airbnb-data-collection\airbnb_survey.py", line 525, in recurse_quadtree
+    (zoomable, median_leaf) = self.search_node(
+                              ^^^^^^^^^^^^^^^^^
+  File "C:\mono\airbnb-data-collection\airbnb_survey.py", line 578, in search_node
+    .format(n=rectangle[0], e=rectangle[1],
+              ~~~~~~~~~^^^
+TypeError: 'NoneType' object is not subscriptable
+2023-04-26 21:42:54,180 INFO    Initialing search by overall satisfactions
+2023-04-26 21:43:46,972 INFO    Searching for comodities
+2023-04-26 21:44:28,134 INFO    Searching for comodities
+2023-04-26 21:45:02,851 INFO    Searching for comodities
+2023-04-26 21:45:37,845 INFO    Searching for comodities
+2023-04-26 21:46:13,304 INFO    Searching for comodities
+2023-04-26 21:47:03,867 INFO    Searching for comodities
+2023-04-26 21:47:38,962 INFO    Searching for comodities
+2023-04-26 21:48:14,061 INFO    Searching for comodities
+2023-04-26 21:48:49,796 INFO    Searching for comodities
+2023-04-26 21:49:24,860 INFO    Searching for comodities
+2023-04-26 21:50:20,887 INFO    Searching for comodities
+2023-04-26 21:51:00,212 INFO    Searching for comodities
+2023-04-26 21:51:37,481 INFO    Searching for comodities
+2023-04-26 21:52:11,745 INFO    Searching for comodities
+2023-04-26 21:52:47,025 INFO    Searching for comodities
+2023-04-26 21:53:22,125 INFO    Searching for comodities
+2023-04-26 21:54:17,136 INFO    Searching for comodities
+2023-04-26 21:54:55,867 INFO    Searching for comodities
+2023-04-26 21:55:31,595 INFO    Searching for comodities
+2023-04-26 21:56:10,366 INFO    Searching for comodities
+2023-04-26 21:56:45,463 INFO    Searching for comodities
+2023-04-26 21:57:21,512 INFO    Searching for comodities
+2023-04-26 21:58:16,636 INFO    Searching for comodities
+2023-04-26 21:58:55,312 INFO    Searching for comodities
+2023-04-26 21:59:30,050 INFO    Searching for comodities
+2023-04-26 22:00:04,794 INFO    Searching for comodities
+2023-04-26 22:00:39,151 INFO    Searching for comodities
+2023-04-26 22:01:14,382 INFO    Searching for comodities
+2023-04-26 22:02:10,628 INFO    Searching for comodities
+2023-04-26 22:02:49,330 INFO    Searching for comodities
+2023-04-26 22:03:24,004 INFO    Searching for comodities
+2023-04-26 22:03:58,990 INFO    Searching for comodities
+2023-04-26 22:04:33,168 INFO    Searching for comodities
+2023-04-26 22:05:07,920 INFO    Searching for comodities
+2023-04-26 22:06:02,835 WARNING Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001BD894C6890>: Failed to establish a new connection: [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente')': /session/445d53ab-32dc-4c48-b709-644843bf84c0/element
+2023-04-26 22:06:06,904 WARNING Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001BD894C6310>: Failed to establish a new connection: [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente')': /session/445d53ab-32dc-4c48-b709-644843bf84c0/element
+2023-04-26 22:06:10,977 WARNING Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001BD89490E10>: Failed to establish a new connection: [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente')': /session/445d53ab-32dc-4c48-b709-644843bf84c0/element
+2023-04-26 22:06:22,129 WARNING Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001BD894C4150>: Failed to establish a new connection: [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente')': /session/445d53ab-32dc-4c48-b709-644843bf84c0/element
+2023-04-26 22:06:26,191 WARNING Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001BD894BBA10>: Failed to establish a new connection: [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente')': /session/445d53ab-32dc-4c48-b709-644843bf84c0/element
+2023-04-26 22:06:30,270 WARNING Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001BD894BBFD0>: Failed to establish a new connection: [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente')': /session/445d53ab-32dc-4c48-b709-644843bf84c0/element
+2023-04-26 22:06:36,384 WARNING Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001BD894B8890>: Failed to establish a new connection: [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente')': /session/445d53ab-32dc-4c48-b709-644843bf84c0/elements
+2023-04-26 22:06:40,445 WARNING Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001BD894A3250>: Failed to establish a new connection: [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente')': /session/445d53ab-32dc-4c48-b709-644843bf84c0/elements
+2023-04-26 22:06:44,524 WARNING Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001BD883EAA50>: Failed to establish a new connection: [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente')': /session/445d53ab-32dc-4c48-b709-644843bf84c0/elements
+2023-04-26 22:06:48,595 ERROR   Failed to search overall satisfactions
+2023-04-26 22:06:48,598 ERROR   Top level exception handler: quitting.
+Traceback (most recent call last):
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\urllib3\connection.py", line 174, in _new_conn
+    conn = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\urllib3\util\connection.py", line 95, in create_connection
+    raise err
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\urllib3\util\connection.py", line 85, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\urllib3\connectionpool.py", line 703, in urlopen
+    httplib_response = self._make_request(
+                       ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\urllib3\connectionpool.py", line 398, in _make_request
+    conn.request(method, url, **httplib_request_kw)
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\urllib3\connection.py", line 239, in request
+    super(HTTPConnection, self).request(method, url, body=body, headers=headers)
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\http\client.py", line 1282, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\http\client.py", line 1328, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\http\client.py", line 1277, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\http\client.py", line 1037, in _send_output
+    self.send(msg)
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\http\client.py", line 975, in send
+    self.connect()
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\urllib3\connection.py", line 205, in connect
+    conn = self._new_conn()
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\urllib3\connection.py", line 186, in _new_conn
+    raise NewConnectionError(
+urllib3.exceptions.NewConnectionError: <urllib3.connection.HTTPConnection object at 0x000001BD894E2F90>: Failed to establish a new connection: [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\mono\airbnb-data-collection\search.py", line 330, in main
+    elif args.search_routes:
+      ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\mono\airbnb-data-collection\search.py", line 302, in full_process
+    str(SCRIPT_VERSION_NUMBER))
+  File "C:\mono\airbnb-data-collection\search.py", line 290, in search_sublocalities
+    group.add_argument('-css', '--continue_super_survey_by_sublocality',
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\mono\airbnb-data-collection\search.py", line 281, in execute_search
+    group.add_argument('-sbs', '--search_sublocalities',
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\mono\airbnb-data-collection\airbnb_score.py", line 273, in search
+    exit(0)
+  File "C:\mono\airbnb-data-collection\airbnb_score.py", line 62, in update_comodities
+    comodidades = driver.find_elements(By.CLASS_NAME, 'iikjzje')
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 892, in find_elements
+    return self.execute(Command.FIND_ELEMENTS, {"using": by, "value": value})["value"] or []
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\selenium\webdriver\remote\webdriver.py", line 442, in execute
+    response = self.command_executor.execute(driver_command, params)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\selenium\webdriver\remote\remote_connection.py", line 294, in execute
+    return self._request(command_info[0], url, body=data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\selenium\webdriver\remote\remote_connection.py", line 316, in _request
+    response = self._conn.request(method, url, body=body, headers=headers)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\urllib3\request.py", line 78, in request
+    return self.request_encode_body(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\urllib3\request.py", line 170, in request_encode_body
+    return self.urlopen(method, url, **extra_kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\urllib3\poolmanager.py", line 376, in urlopen
+    response = conn.urlopen(method, u.request_uri, **kw)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\urllib3\connectionpool.py", line 815, in urlopen
+    return self.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\urllib3\connectionpool.py", line 815, in urlopen
+    return self.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\urllib3\connectionpool.py", line 815, in urlopen
+    return self.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\urllib3\connectionpool.py", line 787, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Usuario\AppData\Local\Programs\Python\Python311\Lib\site-packages\urllib3\util\retry.py", line 592, in increment
+    raise MaxRetryError(_pool, url, error or ResponseError(cause))
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='localhost', port=56321): Max retries exceeded with url: /session/445d53ab-32dc-4c48-b709-644843bf84c0/elements (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001BD894E2F90>: Failed to establish a new connection: [WinError 10061] Nenhuma conexão pôde ser feita porque a máquina de destino as recusou ativamente'))

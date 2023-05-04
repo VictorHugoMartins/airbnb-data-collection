@@ -1,0 +1,12 @@
+2023-04-08 15:20:18,478 INFO    ======================================================================
+2023-04-08 15:20:18,479 INFO    Survey 224, for Ouro Preto, Minas Gerais
+2023-04-08 15:20:18,480 INFO    Searching by bounding box, max_zoom=24
+2023-04-08 15:20:18,481 INFO    ----------------------------------------------------------------------
+2023-04-08 15:20:18,482 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
+2023-04-08 15:20:18,482 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-04-08 15:20:20,773 WARNING Network request 0: connectionError. Bad proxy 98.96.174.54:8118?
+2023-04-08 15:20:21,394 WARNING Network request 1: connectionError. Bad proxy 104.248.162.93:80?
+2023-04-08 15:20:22,217 WARNING Network request 2: connectionError. Bad proxy 178.128.45.231:80?
+2023-04-08 15:20:23,161 WARNING Network request 3: connectionError. Bad proxy 142.93.38.219:80?
+2023-04-08 15:20:23,748 WARNING Network request 4: connectionError. Bad proxy 167.172.63.68:80?
+2023-04-08 15:20:24,774 WARNING Network request 5: connectionError. Bad proxy 104.248.174.70:80?

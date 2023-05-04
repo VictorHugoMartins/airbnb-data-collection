@@ -1,0 +1,36 @@
+2023-04-29 18:10:54,956 INFO    ====== WebDriver manager ======
+2023-04-29 18:10:55,932 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-04-29 18:10:56,767 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-04-29 18:11:08,980 INFO    ====== WebDriver manager ======
+2023-04-29 18:11:09,650 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-04-29 18:11:10,284 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-04-29 18:11:27,697 INFO    ====== WebDriver manager ======
+2023-04-29 18:11:29,164 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-04-29 18:11:31,392 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-04-29 18:12:01,654 INFO    ====== WebDriver manager ======
+2023-04-29 18:12:03,874 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-04-29 18:12:04,714 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-04-29 18:12:25,332 INFO    ====== WebDriver manager ======
+2023-04-29 18:12:26,417 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-04-29 18:12:27,215 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-04-29 18:12:56,246 INFO    ====== WebDriver manager ======
+2023-04-29 18:13:00,351 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-04-29 18:13:01,203 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-04-29 18:13:26,845 INFO    ====== WebDriver manager ======
+2023-04-29 18:13:27,925 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-04-29 18:13:28,704 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-04-29 18:13:51,576 ERROR   Top level exception handler: quitting.
+Traceback (most recent call last):
+  File "C:\mono\airbnb-data-collection\search.py", line 360, in main
+    full_process(ab_config,args.platform, args.full_survey)
+  File "C:\mono\airbnb-data-collection\search.py", line 244, in full_process
+    survey_id = execute_search(ab_config, platform, search_area_name, fill_bnb_with_selenium, start_date, finish_date, super_survey_id)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\mono\airbnb-data-collection\search.py", line 214, in execute_search
+    search_booking_rooms(ab_config, search_area_name, start_date, finish_date, survey_id)
+  File "C:\mono\airbnb-data-collection\booking.py", line 455, in search_booking_rooms
+    listing.find_reviews_quantity(hotel_page)
+  File "C:\mono\airbnb-data-collection\booking.py", line 288, in find_reviews_quantity
+    r = element.text.split('Avaliações de hóspedes (')[1].split(')')[0]
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range

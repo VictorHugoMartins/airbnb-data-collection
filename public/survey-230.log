@@ -1,0 +1,27 @@
+2023-04-08 15:35:44,732 INFO    ======================================================================
+2023-04-08 15:35:44,732 INFO    Survey 230, for Ouro Preto, Minas Gerais
+2023-04-08 15:35:44,734 INFO    Searching by bounding box, max_zoom=24
+2023-04-08 15:35:44,734 INFO    ----------------------------------------------------------------------
+2023-04-08 15:35:44,735 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
+2023-04-08 15:35:44,735 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-04-08 15:35:46,887 WARNING Network request 0: connectionError. Bad proxy 58.27.59.249:80?
+2023-04-08 15:35:57,088 WARNING Network request 1: connectionError. Bad proxy 188.132.152.105:8080?
+2023-04-08 15:35:58,151 WARNING Network request 2: connectionError. Bad proxy 80.48.119.28:8080?
+2023-04-08 15:36:08,481 WARNING Network request 3: connectionError. Bad proxy 176.99.2.43:1081?
+2023-04-08 15:36:18,690 WARNING Network request 4: connectionError. Bad proxy 182.253.116.95:3128?
+2023-04-08 15:36:29,534 WARNING Network request 5: connectionError. Bad proxy 216.137.184.253:80?
+2023-04-08 15:36:30,511 WARNING Network request 6: connectionError. Bad proxy 203.232.43.107:8001?
+2023-04-08 15:36:31,538 WARNING Network request 7: connectionError. Bad proxy 91.229.114.144:80?
+2023-04-08 15:36:32,575 WARNING Network request 8: connectionError. Bad proxy 45.120.136.104:80?
+2023-04-08 15:36:35,247 WARNING HTTP status 403 from web site: IP address 85.192.165.18:8080 may be blocked
+2023-04-08 15:36:35,249 WARNING Not removing 85.192.165.18:8080 from proxy list this time; still 300 of 300
+2023-04-08 15:36:42,502 WARNING Network request 10: connectionError. Bad proxy 119.93.129.34:80?
+2023-04-08 15:36:43,822 WARNING Network request 11: connectionError. Bad proxy 121.159.41.244:8001?
+2023-04-08 15:36:44,647 WARNING Network request 12: connectionError. Bad proxy 3.128.142.113:80?
+2023-04-08 15:36:54,902 WARNING Network request 13: connectionError. Bad proxy 196.223.162.206:32650?
+2023-04-08 15:37:05,647 ERROR   Error in survey.listing_from_search_page_json: returning None
+Traceback (most recent call last):
+  File "C:\mono\airbnb-data-collection\airbnb_survey.py", line 214, in listing_from_search_page_json
+    listing.currency = structured_price.split()[1]
+                       ~~~~~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range

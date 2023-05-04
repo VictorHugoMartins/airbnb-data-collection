@@ -1,0 +1,13 @@
+2023-04-08 15:16:07,222 INFO    ======================================================================
+2023-04-08 15:16:07,224 INFO    Survey 222, for Ouro Preto, Minas Gerais
+2023-04-08 15:16:07,226 INFO    Searching by bounding box, max_zoom=24
+2023-04-08 15:16:07,226 INFO    ----------------------------------------------------------------------
+2023-04-08 15:16:07,227 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
+2023-04-08 15:16:07,228 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-04-08 15:16:08,342 INFO    Page 01 returned 18 listings
+2023-04-08 15:16:09,661 INFO    Page 02 returned 18 listings
+2023-04-08 15:16:10,206 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-04-08 15:16:17,495 INFO    Page 03 returned 18 listings
+2023-04-08 15:16:18,495 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-04-08 15:16:27,091 INFO    Page 04 returned 18 listings
+2023-04-08 15:16:27,507 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.

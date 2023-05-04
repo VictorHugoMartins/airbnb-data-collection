@@ -1,0 +1,49 @@
+2023-03-07 14:01:00,258 INFO    ======================================================================
+2023-03-07 14:01:00,259 INFO    Survey 158, for Ouro Preto, Minas Gerais
+2023-03-07 14:01:00,259 INFO    Searching by bounding box, max_zoom=24
+2023-03-07 14:01:00,260 INFO    ----------------------------------------------------------------------
+2023-03-07 14:01:00,261 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
+2023-03-07 14:01:00,261 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-03-07 14:01:01,280 INFO    Page 01 returned 18 listings
+2023-03-07 14:01:02,325 INFO    Room 45452801: insert failed
+2023-03-07 14:01:02,333 INFO    Room 47939876: insert failed
+2023-03-07 14:01:02,336 INFO    Room 770977262407924429: insert failed
+2023-03-07 14:01:02,338 INFO    Room 568273495067211791: insert failed
+2023-03-07 14:01:02,340 INFO    Room 30403033: insert failed
+2023-03-07 14:01:02,342 INFO    Room 811376203986675036: insert failed
+2023-03-07 14:01:02,344 INFO    Room 41502392: insert failed
+2023-03-07 14:01:02,346 INFO    Room 787734071865852313: insert failed
+2023-03-07 14:01:02,349 INFO    Room 41078755: insert failed
+2023-03-07 14:01:02,351 INFO    Room 16844691: insert failed
+2023-03-07 14:01:02,353 INFO    Room 731014935944515463: insert failed
+2023-03-07 14:01:02,355 INFO    Room 52305704: insert failed
+2023-03-07 14:01:02,358 INFO    Room 841172626179134958: insert failed
+2023-03-07 14:01:02,359 INFO    Room 839664200962255692: insert failed
+2023-03-07 14:01:02,362 INFO    Room 660784612721200136: insert failed
+2023-03-07 14:01:02,364 INFO    Room 650587689817510894: insert failed
+2023-03-07 14:01:02,366 INFO    Room 732426078608851583: insert failed
+2023-03-07 14:01:02,368 INFO    Room 780430310985839803: insert failed
+2023-03-07 14:01:02,369 INFO    Page 02 returned 18 listings
+2023-03-07 14:01:03,810 INFO    Room 41502392: insert failed
+2023-03-07 14:01:03,836 INFO    Page 03 returned 18 listings
+2023-03-07 14:01:04,880 INFO    Page 04 returned 18 listings
+2023-03-07 14:01:05,526 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-03-07 14:01:12,802 INFO    Page 05 returned 18 listings
+2023-03-07 14:01:14,030 INFO    Page 06 returned 18 listings
+2023-03-07 14:01:15,311 INFO    Page 07 returned 18 listings
+2023-03-07 14:01:16,605 INFO    Page 08 returned 18 listings
+2023-03-07 14:01:16,867 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-03-07 14:01:23,522 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-03-07 14:01:32,240 INFO    Page 09 returned 18 listings
+2023-03-07 14:01:36,140 INFO    Page 10 returned 00 listings
+2023-03-07 14:01:36,140 INFO    Final page of listings for this search
+2023-03-07 14:01:36,149 INFO    Results: 10 pages, 143 new rooms
+2023-03-07 14:01:36,157 INFO    Finishing survey 158, for Ouro Preto, Minas Gerais
+2023-03-07 14:01:36,177 ERROR   Top level exception handler: quitting.
+Traceback (most recent call last):
+  File "C:\mono\airbnb-data-collection\airbnb.py", line 847, in main
+    full_process(ab_config, args.full_survey)
+  File "C:\mono\airbnb-data-collection\airbnb.py", line 796, in full_process
+    fill_search(ab_config, area, None)
+                           ^^^^
+NameError: name 'area' is not defined

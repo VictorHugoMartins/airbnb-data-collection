@@ -4,5 +4,3 @@ staticfiles
 .env
 db.sqlite3
 getting-started/*
-public/
-geckodriver.log
