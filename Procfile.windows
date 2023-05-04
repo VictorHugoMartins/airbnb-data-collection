@@ -1,1 +1,1 @@
-web: bokeh serve --allow-websocket-origin=*  --address=0.0.0.0 --port=$PORT  --use-xheaders dashboard.py
+web: bokeh serve --address=0.0.0.0 --port=${PORT:3000}  --allow-websocket-origin=https://airbnbandbookingscrap.up.railway.app/  --use-xheaders dashboard.py
