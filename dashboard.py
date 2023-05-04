@@ -14,8 +14,7 @@ from bokeh.models.widgets.tables import (
 from bokeh.embed import components
 from bokeh import events
 from bokeh.plotting import figure
-from bokeh.server.server import Server
-import datetime as dt
+# import datetime as dt
 
 import utils_bokeh as ub
 
@@ -35,7 +34,7 @@ class Inputs():
         self.price = price
         self.consulta = consulta
 
-today = dt.date.today().isoformat()
+# today = dt.date.today().isoformat()
 
 curdoc().clear()
 
@@ -72,7 +71,7 @@ def variable_plot(source_airbnb, source_booking, source_both):
         ('valor', '@{desc}{0.3f}')
     ]
 
-    p=figure(x_range=[],y_range=(0, 100), min_width=1300, min_height=300,
+    p=figure(x_range=[],y_range=(0, 100), min_width=1300, min_height=300, height=500, width=1300,
             tooltips=TOOLTIPS)
     p.vbar(x=dodge('x', -0.25, range=p.x_range), top='top', width=0.2, source=source_airbnb,
         color="blue")
@@ -91,25 +90,25 @@ def variable_plot(source_airbnb, source_booking, source_both):
     return p
 
 # Plot with price correlation values, grouped by distinct sites
-def corr_plot(source_airbnb, source_booking, source_both):
-    TOOLTIPS = [
-        ('site', '@site'),
-        ('valor categórico', '@x'),
-        ('valor numérico', '@{desc}{0.3f}')
-    ]
+# def corr_plot(source_airbnb, source_booking, source_both):
+#     TOOLTIPS = [
+#         ('site', '@site'),
+#         ('valor categórico', '@x'),
+#         ('valor numérico', '@{desc}{0.3f}')
+#     ]
 
-    pc=figure(x_range=[],
-        y_range=(0, 100), min_width=1300, min_height=600,
-        tooltips=TOOLTIPS)
-    pc.vbar(x=dodge('x', -0.25, range=pc.x_range), top='top', width=0.2, source=source_airbnb,
-        color="blue")
-    pc.vbar(x=dodge('x', 0.0, range=pc.x_range), top='top', width=0.2, source=source_booking,
-        color="red")
-    pc.vbar(x=dodge('x', 0.25, range=pc.x_range), top='top', width=0.2, source=source_both,
-        color="purple")
+#     pc=figure(x_range=[],
+#         y_range=(0, 100), min_width=1300, min_height=600,
+#         tooltips=TOOLTIPS)
+#     pc.vbar(x=dodge('x', -0.25, range=pc.x_range), top='top', width=0.2, source=source_airbnb,
+#         color="blue")
+#     pc.vbar(x=dodge('x', 0.0, range=pc.x_range), top='top', width=0.2, source=source_booking,
+#         color="red")
+#     pc.vbar(x=dodge('x', 0.25, range=pc.x_range), top='top', width=0.2, source=source_both,
+#         color="purple")
 
-    pc.xaxis.major_label_orientation = 3.1415/4
-    return pc
+#     pc.xaxis.major_label_orientation = 3.1415/4
+#     return pc
 
 # Set up callbacks
 def button1_callback():
@@ -140,38 +139,38 @@ def button1_callback():
         (plot.y_range.start, plot.y_range.end) = (lat_min, lat_max)
         (plot.x_range.start, plot.x_range.end) = (lng_min, lng_max)
 
-    def get_df_corr(df, site):
-        df_corr = df
-        if site != 'Airbnb and Booking': df_corr = df_corr[df_corr.site == site]
+    # def get_df_corr(df, site):
+    #     df_corr = df
+    #     if site != 'Airbnb and Booking': df_corr = df_corr[df_corr.site == site]
 
-        try:
-            df_corr = df_corr.drop(columns=['latitude', 'longitude', 'room_id',
-                            'Unnamed: 0', 'Unnamed: 0.1',
-                            'name', 'comodities', 'host_id', 'qtd_rooms', 'qtd', 'route',
-                            'property_type', 'sublocality', 'bed_type', 'bathroom',
-                            'site', 'cluster', 'room_type', 'x', 'y','color'])
-        except:
-            df_corr = df_corr.drop(columns=['latitude', 'longitude', 'room_id',
-                            'Unnamed: 0', 'Unnamed: 0.1',
-                            'name', 'comodities', 'host_id','route',
-                            'property_type', 'sublocality', 'bathroom',
-                            'site', 'cluster', 'room_type', 'x', 'y','color'])
+    #     try:
+    #         df_corr = df_corr.drop(columns=['latitude', 'longitude', 'room_id',
+    #                         'Unnamed: 0', 'Unnamed: 0.1',
+    #                         'name', 'comodities', 'host_id', 'qtd_rooms', 'qtd', 'route',
+    #                         'property_type', 'sublocality', 'bed_type', 'bathroom',
+    #                         'site', 'cluster', 'room_type', 'x', 'y','color'])
+    #     except:
+    #         df_corr = df_corr.drop(columns=['latitude', 'longitude', 'room_id',
+    #                         'Unnamed: 0', 'Unnamed: 0.1',
+    #                         'name', 'comodities', 'host_id','route',
+    #                         'property_type', 'sublocality', 'bathroom',
+    #                         'site', 'cluster', 'room_type', 'x', 'y','color'])
 
-        df_corr = pd.get_dummies(df_corr)
-        # df_corr = df_corr.corr().sort_values(by='price')
-        columns = df_corr.index.tolist()
+    #     df_corr = pd.get_dummies(df_corr)
+    #     df_corr = df_corr.corr().sort_values(by='price')
+    #     columns = df_corr.index.tolist()
 
-        print("CORR COLUMNS", columns)
+    #     print("CORR COLUMNS", columns)
 
-        corr_plot_values = []
-        for c, x in zip(columns, df_corr['price']):
-            corr_plot_values.append((c,x,x))
-        k = pd.DataFrame(corr_plot_values, columns = ['x' , 'top', 'desc'])
-        k['site'] = [ site for x in k['x']]
+    #     corr_plot_values = []
+    #     for c, x in zip(columns, df_corr['price']):
+    #         corr_plot_values.append((c,x,x))
+    #     k = pd.DataFrame(corr_plot_values, columns = ['x' , 'top', 'desc'])
+    #     k['site'] = [ site for x in k['x']]
 
-        return k
+    #     return k
 
-    print("VEIO AQUIIIIIIIIIIII")
+    # print("VEIO AQUIIIIIIIIIIII")
 
     # armazena o que está no arquivo no redis
     # dessa forma, não é necessário fazer leitura do arquivo há todo momento
@@ -205,9 +204,9 @@ def button1_callback():
     if df is None:
         # and ub.necessidade_de_carregamento(r, inps):
         print("Filtrando dados e inserindo na cache")
-        print("O TAMANHO DO ORIGINAL:",odf['Unnamed: 0'].count())
+        # print("O TAMANHO DO ORIGINAL:",odf['Unnamed: 0'].count())
         df = ub.filter_data(odf, inps)
-        print("O TAMANHO DO FILTRADO", df['Unnamed: 0'].count())
+        # print("O TAMANHO DO FILTRADO", df['Unnamed: 0'].count())
         # ub.storeInRedis(r, ub.get_chave('df_', inps), df)
     # ub.storeNewFilterValues(r, inps)
         
@@ -252,16 +251,16 @@ def button1_callback():
     sca = None
     # se sca é none, então scb e sc também
     if sca is None:
-        print("veio fazer o store do source corr")
-        sca = get_df_corr(df, 'Airbnb')
+        print("")
+        # sca = get_df_corr(df, 'Airbnb')
         # ub.storeInRedis(r, ub.get_chave('sca_', inps), sca)
         # source_corr_airbnb.data=dict(x=sca['x'], top=sca['top'], desc=sca['desc'], site=sca['site'])
 
-        scb = get_df_corr(df, 'Booking')
+        # scb = get_df_corr(df, 'Booking')
         # ub.storeInRedis(r, ub.get_chave('scb_', inps), scb)
         # source_corr_booking.data=dict(x=scb['x'], top=scb['top'], desc=scb['desc'], site=scb['site'])
 
-        sc = get_df_corr(df, 'Airbnb and Booking')
+        # sc = get_df_corr(df, 'Airbnb and Booking')
         # ub.storeInRedis(r, ub.get_chave('sc_', inps), sc)
         # source_corr_both.data=dict(x=sc['x'], top=sc['top'], desc=sc['desc'], site=sc['site'])
 
@@ -279,7 +278,7 @@ source = ColumnDataSource(data=dict(x=[], y=[], cluster=[], price_pc=[], overall
     region=[], name=[], site=[], comodities=[], room_id=[], host_id=[], hotel_id=[], room_type=[],
     property_type=[], category=[], count_host_id=[],count_hotel_id=[],color=[]))
 source_ksite = ColumnDataSource(data=dict(valor=[3]))
-print(source_ksite.data['valor'][0])
+# print(source_ksite.data['valor'][0])
 
 # Set up widgets
 cities = Select(title="Cidade visualizada:", value="Ouro Preto",
@@ -344,7 +343,7 @@ button1.on_click(button1_callback)
 
 
 div = Div(text="""<h1 class="h3 mb-2 text-gray-800">Mapa de atuação da indústria hoteleira em Ouro Preto</h1>
-          <p class="mb-4">Pesquisa desenvolvida por Victor Martins sob orientação da professora Amanda Nascimento
+          <p class="mb-4">Pesquisa desenvolvida por Victor Martins sob orientação do professor Anderson Ferreira, da professora Amanda Nascimento
           e co-orentação do professor Rodrigo Martoni durante o período de março de 2020 à março de 2021.
           Com o intuito de analisar os impactos do Airbnb na economia e na legislação local, foram coletados
           anúncios tanto para a plataforma referida quanto para o Booking, plataforma que aqui representa a
@@ -368,17 +367,19 @@ divVariable = Div(text="""<h3>Visão geral dos dados (coluna categórica x numé
                     também, pelo site (Airbnb, Booking e a soma de ambos).
                     Passe o mouse pelos campos para observar os números.""")
 
-divCorr = Div(text="""<h3>Correlação do preço em relação às demais características</h3>
-                    Nesse gráfico, está exposta a relação da variável preço com as demais características
-                    que foram coletados. Um valor próximo de 1 indica uma relação proporcional, onde ambos
-                    crescem juntos, um valor próximo de -1 indica um decréscimo no preço a medida que a outra
-                    coluna cresce e um valor próximo de 0 indica uma relação fraca. Passe o mouse pelos
-                    campos para observar os números absolutos.""")
+# divCorr = Div(text="""<h3>Correlação do preço em relação às demais características</h3>
+#                     Nesse gráfico, está exposta a relação da variável preço com as demais características
+#                     que foram coletados. Um valor próximo de 1 indica uma relação proporcional, onde ambos
+#                     crescem juntos, um valor próximo de -1 indica um decréscimo no preço a medida que a outra
+#                     coluna cresce e um valor próximo de 0 indica uma relação fraca. Passe o mouse pelos
+#                     campos para observar os números absolutos.""")
 
 divTable = Div(text="""<h3>Os dados em si</h3>
                 Na tabela estão presentes todos os anúncios que são visualizados no mapa.""")
 
-inps = Inputs((button1, cities, kclusters, cluster, site, categorical_column, numerical_column,
+inps = Inputs((button1,
+        cities,
+        kclusters, cluster, site, categorical_column, numerical_column,
         region, room_type, category, price, consulta))
 
 plot = map_plot(source)
@@ -423,10 +424,13 @@ data_table = DataTable(
     reorderable=False,
 )
 
-inputs = column(kclusters, ksite, cities, cluster, site, categorical_column, numerical_column,
+inputs = column(kclusters, ksite,
+                # cities,
+                cluster, site, categorical_column, numerical_column,
                 region, room_type, category, price, consulta, button1)
 layout = column(div, row(inputs, column(divMapa, plot), width=1000),
                 column(divVariable, p_airbnb),
+                #  column(divCorr, p_corr),
                 column(divTable, data_table))
 curdoc().add_root(layout)
 curdoc().title = "Mapa de anúncios em Ouro Preto"
