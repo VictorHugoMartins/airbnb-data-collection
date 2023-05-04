@@ -9,4 +9,4 @@ RUN apt-get update
 RUN python -m pip install pip --upgrade
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
-CMD ["web:","bokeh", "serve", "--port=$PORT", "--address=0.0.0.0", "--allow-websocket-origin=airbnbnbookingscrap.up.railway.app", "--use-xheaders", "dashboard.py"]
+CMD ["bokeh", "serve", "--port=$PORT", "--address=0.0.0.0", "--allow-websocket-origin=airbnbnbookingscrap.up.railway.app", "--use-xheaders", "dashboard.py"]
