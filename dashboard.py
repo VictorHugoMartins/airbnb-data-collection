@@ -430,15 +430,3 @@ layout = column(div, row(inputs, column(divMapa, plot), width=1000),
                 column(divTable, data_table))
 curdoc().add_root(layout)
 curdoc().title = "Mapa de anúncios em Ouro Preto"
-
-
-
-server = Server(
-    layout,  # list of Bokeh applications
-    io_loop=loop,        # Tornado IOLoop
-    **server_kwargs      # port, num_procs, etc.
-)
-
-# start timers and services and immediately return
-server.start()
-# TALVEZ SE CRIAR DUAS VARIAVEIS E PASSAR COMO PARAMETRO E DEFINIR O VALOR DE ACORDO COM O Q FOR SELECIONADO??
