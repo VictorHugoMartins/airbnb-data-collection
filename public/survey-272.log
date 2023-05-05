@@ -1,9 +1,0 @@
-2023-04-28 19:40:24,768 INFO    ======================================================================
-2023-04-28 19:40:24,769 INFO    Survey 272, for Ouro Preto, Minas Gerais
-2023-04-28 19:40:24,770 INFO    Searching by bounding box, max_zoom=24
-2023-04-28 19:40:24,771 INFO    ----------------------------------------------------------------------
-2023-04-28 19:40:24,772 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
-2023-04-28 19:40:24,773 INFO    Searching rectangle: zoom factor = 0, node = []
-2023-04-28 19:40:25,896 INFO    Page 01 returned 18 listings
-2023-04-28 19:40:26,931 INFO    Page 02 returned 18 listings
-2023-04-28 19:40:27,909 INFO    Page 03 returned 18 listings

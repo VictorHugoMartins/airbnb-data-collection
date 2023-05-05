@@ -1,8 +1,0 @@
-2023-01-13 22:00:12,956 INFO    ======================================================================
-2023-01-13 22:00:12,957 INFO    Survey 4, for Ouro Preto
-2023-01-13 22:00:12,958 INFO    Searching by bounding box, max_zoom=24
-2023-01-13 22:00:12,959 INFO    ----------------------------------------------------------------------
-2023-01-13 22:00:12,959 INFO    Rectangle calculated: [-20.2519, -43.4372, -20.5229, -43.7846]
-2023-01-13 22:00:12,959 INFO    Searching rectangle: zoom factor = 0, node = []
-2023-01-13 22:00:14,904 INFO    Page 01 returned 18 listings
-2023-01-13 22:00:15,144 WARNING HTTP status 403 from web site: IP address blocked. Waiting 1.0 minutes.
