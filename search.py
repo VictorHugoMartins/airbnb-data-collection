@@ -29,7 +29,7 @@ from airbnb_survey import ABSurveyByBoundingBox
 from airbnb_listing import ABListing
 from airbnb_geocoding import BoundingBox
 from airbnb_geocoding import Location
-from airbnb_geocoding import identify_and_insert_locations
+# from airbnb_geocoding import identify_and_insert_locations
 import airbnb_ws
 from airbnb_score import airbnb_score_search
 from booking import search_booking_rooms
@@ -163,7 +163,15 @@ def select_routes(config, sublocality):
 						initial_message="Selecting routes from sublocality",
 						failure_message="Failed to search from sublocalities")
 
-def create_super_survey(config, city):
+def search_status_for_super_survey_id(config, ss_id):
+		return "PESQUISAR_SUBLOCALITY"
+		# return select_command(config,
+		# 				sql_script="""SELECT status from super_survey where ss_id = %s""",
+		# 				params=(ss_id,),
+		# 				initial_message="Selecting status from super survey",
+		# 				failure_message="Failed to select status for super survey")
+
+def create_super_survey(config, city, userId):
 		try:
 				ss_id = None
 				rowcount = -1
@@ -172,8 +180,8 @@ def create_super_survey(config, city):
 				cur = conn.cursor()
 
 
-				sql = """INSERT into super_survey(city, date) values (%s, current_date) returning ss_id"""
-				cur.execute(sql, (city,))
+				sql = """INSERT into super_survey(city, user_id, date) values (%s, %s, current_date) returning ss_id"""
+				cur.execute(sql, (city, userId if userId else None))
 				ss_id = cur.fetchone()[0]
 
 				return ss_id
@@ -217,34 +225,47 @@ def execute_search(ab_config, platform="Airbnb", search_area_name='', fill_airbn
 				airbnb_score_search(ab_config, search_area_name, 252, None)
 
 		return survey_id
-		# update_routes_geolocation(ab_config, search_area_name)
 
-def search_sublocalities(ab_config, super_survey_id, search_area_name='', fill_airbnb_with_selenium=True):
+def search_sublocalities(config, platform="Airbnb", search_area_name='', fill_airbnb_with_selenium=None, start_date=None, finish_date=None, super_survey_id=None):
 		sa_name = search_area_name.split(',')[0]
-		city_sublocalities = select_sublocalities(ab_config, search_area_name)
+		city_sublocalities = select_sublocalities(config, sa_name)
+		print(city_sublocalities)
 		for city in city_sublocalities:
 			if (city[0] is not None):
 					city_name = city[0] + ', ' + city[1]
-					survey_id = execute_search(ab_config, "Airbnb", city_name, fill_airbnb_with_selenium, super_survey_id=super_survey_id)
-					identify_and_insert_locations(ab_config, platform, survey_id)
+					execute_search(config, platform, city_name, fill_airbnb_with_selenium, start_date, finish_date, super_survey_id=super_survey_id)
 
-def search_routes(ab_config, search_area_name='', fill_airbnb_with_selenium=True, super_survey_id=None):
+def search_routes(config, platform="Airbnb", search_area_name='', fill_airbnb_with_selenium=None, start_date=None, finish_date=None, super_survey_id=None):
 		sa_name = search_area_name.split(',')[0]
-		sublocalities_routes = select_routes(ab_config, search_area_name)
-		print(sublocalities_routes)
+		sublocalities_routes = select_routes(config, sa_name)
 		for route in sublocalities_routes:
 			if (route[0] is not None):
 					route_name = route[0] + ', ' + route[1]
-					execute_search(ab_config, "Airbnb", route_name, fill_airbnb_with_selenium, super_survey_id=super_survey_id)
+					execute_search(config, platform, route_name, fill_airbnb_with_selenium, start_date, finish_date, super_survey_id=super_survey_id)
 
-def full_process(ab_config, platform="Airbnb", search_area_name='', fill_airbnb_with_selenium=None, start_date=None, finish_date=None):
-		fill_bnb_with_selenium = platform == 'Airbnb'
+def full_process(config, platform="Airbnb", search_area_name='', fill_airbnb_with_selenium=None, start_date=None, finish_date=None, user_id=None, super_survey_id=None,status_super_survey_id=0):
+		# status 0, ainda n fez nada
+		fill_bnb_with_selenium = platform != 'Booking'
 		
-		super_survey_id = create_super_survey(ab_config, search_area_name)
-		survey_id = execute_search(ab_config, platform, search_area_name, fill_bnb_with_selenium, start_date, finish_date, super_survey_id)
-		# identify_and_insert_locations(ab_config, platform, survey_id) #not necessary since is inserting locations at the same time its inserting rooms
-		search_sublocalities(ab_config, search_area_name)
-		search_routes(ab_config, search_area_name)
+		_platform = "Airbnb" if platform != 'Booking' else "Booking"
+		status_super_survey_id = "INICIAR"
+
+		if ( super_survey_id is None ): # super survey previously in progress
+				super_survey_id = create_super_survey(config, search_area_name, user_id)
+		else:
+				status_super_survey_id = search_status_for_super_survey_id(config, super_survey_id)
+		
+		# status 1: n iniciada/n continuada
+		if ( status_super_survey_id == "PESQUISAR_CIDADE"):
+				survey_id = execute_search(config, _platform, search_area_name, fill_bnb_with_selenium, start_date, finish_date, super_survey_id)
+				# identify_and_insert_locations(config, _platform, survey_id) #not necessary since is inserting locations at the same time its inserting rooms
+		elif ( status_super_survey_id == "PESQUISAR_SUBLOCALITY"):
+				search_sublocalities(config, _platform, search_area_name, True, start_date, finish_date, user_id)
+		elif ( status_super_survey_id == "PESQUISAR_ROUTE"):
+				search_routes(config, _platform, search_area_name, True, start_date, finish_date, user_id)
+
+		if platform == 'both':
+			return full_process(config,"Booking", search_area_name, False, start_date, finish_date, user_id, status_super_survey_id)
 
 
 def parse_args():
@@ -261,6 +282,13 @@ def parse_args():
 												metavar="config_file", action="store", default=None,
 												help="""explicitly set configuration file, instead of
 												using the default <username>.config""")
+		parser.add_argument('-u', '--user_id',
+										metavar='user_id', type=int,
+										help="""user id to request a survey""")
+		parser.add_argument('-css', '--continue_super_survey',
+											 metavar='super_survey_id', type=int,
+											 help="""continue super survey by route""")
+
 		# Only one argument!
 		group = parser.add_mutually_exclusive_group()
 		group.add_argument('-asa', '--addsearcharea',
@@ -310,12 +338,9 @@ def parse_args():
 		group.add_argument('-rss', '--restart_super_survey',
 											 metavar='super_survey_id', type=int,
 											 help="""restart super survey""")
-		group.add_argument('-css', '--continue_super_survey_by_sublocality',
-											 metavar='super_survey_id', type=int,
-											 help="""continue super survey by sublocality""")
-		group.add_argument('-csr', '--continue_super_survey_by_route',
-											 metavar='super_survey_id', type=int,
-											 help="""continue super survey by route""")
+		# group.add_argument('-css', '--continue_super_survey_by_sublocality',
+		# 									 metavar='super_survey_id', type=int,
+		# 									 help="""continue super survey by sublocality""")
 		group.add_argument('-fs', '--full_survey',
 											 metavar='full survey area', type=str,
 											 help="""make a full survey ininterrumptly""")
@@ -357,7 +382,7 @@ def main():
 						search_routes(ab_config, args.search_routes, fill_airbnb_with_selenium=True)
 				elif args.full_survey and args.platform:
 						print(args.full_survey, args.platform)
-						full_process(ab_config,args.platform, args.full_survey)
+						full_process(config=ab_config,platform=args.platform, search_area_name=args.full_survey, user_id=args.user_id, super_survey_id=args.continue_super_survey)
 				else:
 						parser.print_help()
 		except (SystemExit, KeyboardInterrupt):

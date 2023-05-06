@@ -420,11 +420,11 @@ def search_booking_rooms(config, area, start_date, finish_date, survey_id, searc
 
 	checkin_date = start_date
 	if checkin_date is None:
-		checkin_date = dt.date.today() + dt.timedelta(days=7)
+		checkin_date = dt.date.today() + dt.timedelta(days=15)
 
 	checkout_date = finish_date
 	if checkout_date is None:
-		checkout_date = dt.date.today() + dt.timedelta(days=8)
+		checkout_date = dt.date.today() + dt.timedelta(days=16)
 
 	url = "https://www.booking.com/searchresults.pt-br.html?ss={}&ssne={}&ssne_untouched={}&checkin={}&checkout={}".format(
 					city, city, city, checkin_date, checkout_date)

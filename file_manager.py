@@ -43,19 +43,6 @@ def export_airbnb_room(config, sql_command, city, project, format, start_date):
         cur.close()
         conn.close()
 
-        # pd.read_sql(sql,cnxn).to_excel(directory, sheet_name="Total Listings")
-
-        # data = pd.read_excel(directory)
-    
-        # # update the file inserting the region
-
-        # region = [ define_region(sub, lat, lng) for sub, lat, lng in zip(data['sublocality'], data['latitude'], data['longitude']) ]
-        
-        # #region = ['Centro' if x in centro else 'Entorno' if x in entorno else 'Distrito' if x in distrito else x for x in data['sublocality']]
-        # data.insert(16, "region", region)
-        # data = data.drop(columns=['Unnamed: 0']) #, 'host_id', 'room_type'
-        # data.to_excel(directory, sheet_name="Total Listings")
-
         logging.info("Finishing export")
 
         return directory
@@ -76,6 +63,9 @@ def main():
     parser.add_argument('-c', '--city',
                         metavar='city', action='store',
                         help="""set the city""")
+    parser.add_argument('-ss', '--ss_id',
+                        metavar='city', action='store',
+                        help="""id of super_survey to export""")
     parser.add_argument('-la', '--listings_airbnb',
                         action='store_true', default=False,
                         help="export the listings from airbnb")
@@ -162,3 +152,27 @@ if __name__ == "__main__":
 #         booking_room
 #       GROUP BY
 #         room_id;
+
+
+# perguntar plataformas (airbnb/booking/both)
+  # se incluir booking, PODE incluir start and finish date
+# perguntar cidade
+# perguntar se é pra incluir sublocality/route
+# perguntar campos para exportação
+# perguntar se exporta todas as super_surveys juntas
+  # p cada pesquisa especifica, pergunta se exporta todos (incluindo repetidos), se media, maior ou menor
+
+
+# preciso definir como exportar uma ss_id especifica e todas as ss_ids do usuários
+  # -1 para todas, N para especifica?
+# como vai exportar airbnb e booking juntos?? e revisar booking sozinho kk
+
+# quer continuar pesquisa q terminou em status diferente de "totalmente concluída? passe o ss_id"
+
+
+# TELAS INTERESSANTES
+  # cadastro
+  # login
+  # listagem (verificar andamento, cancelar, continuar)
+  # iniciar nova pesquisa
+  # editar/remover dados

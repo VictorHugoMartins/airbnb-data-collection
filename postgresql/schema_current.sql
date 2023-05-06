@@ -350,3 +350,23 @@ CREATE TABLE public.address
 WITH (
   OIDS=FALSE
 );
+
+CREATE SEQUENCE user_id_seq
+                START WITH 1
+                INCREMENT BY 1
+                NO MINVALUE
+                NO MAXVALUE
+                CACHE 1;
+
+CREATE TABLE public.city
+(
+  user_id integer NOT NULL DEFAULT nextval('user_id_seq'::regclass),
+  name character varying(255),
+  email character varying(255),
+  login character varying(255),
+  password character varying(255),
+  CONSTRAINT user_pkey PRIMARY KEY (user_id)
+)
+WITH (
+  OIDS=FALSE
+);

@@ -60,7 +60,7 @@ def update_comodities(config, driver, city, room_id, survey_id):
         cur.execute(sql, update_args)
         conn.commit()
 
-        logging.info("Comodities of room ", room_id, " updated for ", comodities)
+        logging.info("Comodities of room " + str(room_id) " updated for " + str(comodities))
         return True
     except selenium.common.exceptions.NoSuchElementException:
         logging.info("Unable to find comodities")
@@ -88,7 +88,7 @@ def update_overall_satisfaction(config, driver, city, room_id):
         cur.execute(sql, update_args)
         conn.commit()
 
-        logging.info("Overall satisfaction of room ", room_id, " updated for ", score)
+        logging.info("Overall satisfaction of room " + str(room_id) + " updated for " + str(score))
         return True
     except selenium.common.exceptions.NoSuchElementException:
         logging.info("Unable to find overall satisfaction")
@@ -116,7 +116,7 @@ def update_bathroom(config, driver, city, room_id, survey_id):
         cur.execute(sql, update_args)
         conn.commit()
 
-        logging.info("Bathroom of room ", room_id, " updated for ", bathroom)
+        logging.info("Bathroom of room " + str(room_id) + " updated for " + str(bathroom))
         return True
     except selenium.common.exceptions.NoSuchElementException:
         logging.info("Unable to find element")
@@ -144,7 +144,7 @@ def update_price(config, driver, city, room_id):
         cur.execute(sql, update_args)
         conn.commit()
 
-        logging.info("Price of room ", room_id, " updated for ", price)
+        logging.info("Price of room " + str(room_id) + " updated for " + str(price))
         return True
     except selenium.common.exceptions.NoSuchElementException:
         logging.info("Unable to find element")
@@ -166,7 +166,7 @@ def update_with_preexistent_comodities(config, city, args):
 
         cur.execute(sql, (city,))
         rowcount = cur.rowcount
-        logging.info(rowcount, " results")
+        logging.info(str(srowcount) + " results")
 
         if rowcount > 0:
             results = cur.fetchall()
@@ -203,7 +203,7 @@ def airbnb_score_search(config, city, survey_id, args):
 
         cur.execute(sql, (survey_id,))
         rowcount = cur.rowcount
-        logging.info(rowcount, " results")
+        logging.info(str(srowcount) + " results")
 
         if rowcount > 0:
             results = cur.fetchall()
@@ -212,11 +212,11 @@ def airbnb_score_search(config, city, survey_id, args):
                 url = DOMAIN + str(result[0])
                 for i in range(config.ATTEMPTS_TO_FIND_PAGE):
                     try:
-                        logging.info("Attempt " + str(i+1) + " to find room " + room_id)
+                        logging.info("Attempt " + str(i+1) + " to find room " + str(room_id))
                         driver = prepare_driver(url)
 
                         if url not in driver.current_url:
-                            logging.info("Room ", room_id, " has been removed")
+                            logging.info("Room " + str(room_id) + " has been removed")
                             save_as_deleted(config, room_id)
                             driver.quit()
                             break
