@@ -14,7 +14,6 @@ from bokeh.models.widgets.tables import (
 from bokeh.embed import components
 from bokeh import events
 from bokeh.plotting import figure
-from login import LoginPage
 # import datetime as dt
 
 import utils_bokeh as ub
@@ -81,7 +80,35 @@ def variable_plot(source_airbnb, source_booking, source_both):
     p.vbar(x=dodge('x', 0.25, range=p.x_range), top='top', width=0.2, source=source_both,
         color="purple")
 
+    '''labels15=LabelSet(x=dodge('x', -0.25, range=p.x_range),y='top',text='desc',source=source_airbnb,text_align='center')
+    labels16=LabelSet(x=dodge('x', 0.0, range=p.x_range),y='top',text='desc',source=source_booking,text_align='center')
+    labels17=LabelSet(x=dodge('x', 0.25, range=p.x_range),y='top',text='desc',source=source_both,text_align='center')
+    
+    p.add_layout(labels15)
+    p.add_layout(labels16)
+    p.add_layout(labels17)'''
     return p
+
+# Plot with price correlation values, grouped by distinct sites
+# def corr_plot(source_airbnb, source_booking, source_both):
+#     TOOLTIPS = [
+#         ('site', '@site'),
+#         ('valor categórico', '@x'),
+#         ('valor numérico', '@{desc}{0.3f}')
+#     ]
+
+#     pc=figure(x_range=[],
+#         y_range=(0, 100), min_width=1300, min_height=600,
+#         tooltips=TOOLTIPS)
+#     pc.vbar(x=dodge('x', -0.25, range=pc.x_range), top='top', width=0.2, source=source_airbnb,
+#         color="blue")
+#     pc.vbar(x=dodge('x', 0.0, range=pc.x_range), top='top', width=0.2, source=source_booking,
+#         color="red")
+#     pc.vbar(x=dodge('x', 0.25, range=pc.x_range), top='top', width=0.2, source=source_both,
+#         color="purple")
+
+#     pc.xaxis.major_label_orientation = 3.1415/4
+#     return pc
 
 # Set up callbacks
 def button1_callback():
@@ -101,13 +128,54 @@ def button1_callback():
         df = ub.dataframe_for_vbar(df, site, categorical_column.value, numerical_column.value)
         return df
 
+    # def update_corr_plot_range(pc, df, site):
+    #     pc.x_range.factors = [] # <-- This is the trick, make the x_rage empty first, before assigning new value
+    #     pc.x_range.factors = ub.get_corr_columns(df, site)
+    #     (pc.y_range.start, pc.y_range.end) = (-1.5, 1.5)
+
     def update_map_plot_range(plot, city):
         (lat_max, lat_min, lng_max, lng_min) = ub.get_coordinates(city)
 
         (plot.y_range.start, plot.y_range.end) = (lat_min, lat_max)
         (plot.x_range.start, plot.x_range.end) = (lng_min, lng_max)
 
+    # def get_df_corr(df, site):
+    #     df_corr = df
+    #     if site != 'Airbnb and Booking': df_corr = df_corr[df_corr.site == site]
+
+    #     try:
+    #         df_corr = df_corr.drop(columns=['latitude', 'longitude', 'room_id',
+    #                         'Unnamed: 0', 'Unnamed: 0.1',
+    #                         'name', 'comodities', 'host_id', 'qtd_rooms', 'qtd', 'route',
+    #                         'property_type', 'sublocality', 'bed_type', 'bathroom',
+    #                         'site', 'cluster', 'room_type', 'x', 'y','color'])
+    #     except:
+    #         df_corr = df_corr.drop(columns=['latitude', 'longitude', 'room_id',
+    #                         'Unnamed: 0', 'Unnamed: 0.1',
+    #                         'name', 'comodities', 'host_id','route',
+    #                         'property_type', 'sublocality', 'bathroom',
+    #                         'site', 'cluster', 'room_type', 'x', 'y','color'])
+
+    #     df_corr = pd.get_dummies(df_corr)
+    #     df_corr = df_corr.corr().sort_values(by='price')
+    #     columns = df_corr.index.tolist()
+
+    #     print("CORR COLUMNS", columns)
+
+    #     corr_plot_values = []
+    #     for c, x in zip(columns, df_corr['price']):
+    #         corr_plot_values.append((c,x,x))
+    #     k = pd.DataFrame(corr_plot_values, columns = ['x' , 'top', 'desc'])
+    #     k['site'] = [ site for x in k['x']]
+
+    #     return k
+
+    # print("VEIO AQUIIIIIIIIIIII")
+
+    # armazena o que está no arquivo no redis
+    # dessa forma, não é necessário fazer leitura do arquivo há todo momento
     odf = None
+    # ub.loadFromRedis(r, 'odf_' + cities.value + str(kclusters.value))
     if odf is None:
         print("Realizando carregamento inicial dos dados")
         fdf = pd.ExcelFile('bokeh_plataform/files/dados preparados em até 3 clusters_2020-12-05.xlsx')
@@ -120,10 +188,27 @@ def button1_callback():
                 odf['color'] = [ ub.colors[x] for x in odf['cluster'] ]
                 # ub.storeInRedis(r, 'odf_' + ct + str(i), odf)
 
+    # odf = ub.loadFromRedis(r, 'odf_' + cities.value + str(kclusters.value))
+    
+    # verifica se o df tá armazenado, se não tiver, lê ele e armazena
+    # chave_temp_data = ub.get_chave('df_', inps)
+    # df = ub.loadFromRedis(r, chave_temp_data)
+    
+    ''' na primeira vez, sempre haverá necessidade de carregamento
+    já que não haverá nada armazenado no redis'''
+
+    ''' nem sempre é necessário filtrar a data porque os filtros de coluna catégoria e numérica
+    não alteram os dados em si, apenas a visualização dos gráficos '''
+    
     df = None
     if df is None:
+        # and ub.necessidade_de_carregamento(r, inps):
         print("Filtrando dados e inserindo na cache")
+        # print("O TAMANHO DO ORIGINAL:",odf['Unnamed: 0'].count())
         df = ub.filter_data(odf, inps)
+        # print("O TAMANHO DO FILTRADO", df['Unnamed: 0'].count())
+        # ub.storeInRedis(r, ub.get_chave('df_', inps), df)
+    # ub.storeNewFilterValues(r, inps)
         
     source.data = dict(
         x=df['x'], y=df['y'], cluster=df['cluster'],
@@ -135,14 +220,19 @@ def button1_callback():
         count_host_id=df['count_host_id'], count_hotel_id=df['count_hotel_id'],color=df["color"]
     )
 
+    # dva = ub.loadFromRedis(r, ub.get_chave('dva_', inps))
     dva = None
+    # se dva é none, então dvb e dv também
     if dva is None:
         dva = get_variable_source(p_airbnb, df, 'Airbnb')
+        # ub.storeInRedis(r, ub.get_chave('dva_', inps), dva)
         
         dvb = get_variable_source(p_airbnb, df, 'Booking')
+        # ub.storeInRedis(r, ub.get_chave('dvb_', inps), dvb)
         
         dv = get_variable_source(p_airbnb, df, 'Airbnb and Booking')
-    
+        # ub.storeInRedis(r, ub.get_chave('dv_', inps), dv)
+
         source_airbnb.data = dict(
             x=dva['x'], top=dva['top'], desc=dva['desc']
         )
@@ -157,6 +247,28 @@ def button1_callback():
 
     # ATÉ A LINHA DE CIMA TÁ FUNCIONANDO
 
+    # sca = ub.loadFromRedis(r, ub.get_chave('sca_', inps))
+    sca = None
+    # se sca é none, então scb e sc também
+    if sca is None:
+        print("")
+        # sca = get_df_corr(df, 'Airbnb')
+        # ub.storeInRedis(r, ub.get_chave('sca_', inps), sca)
+        # source_corr_airbnb.data=dict(x=sca['x'], top=sca['top'], desc=sca['desc'], site=sca['site'])
+
+        # scb = get_df_corr(df, 'Booking')
+        # ub.storeInRedis(r, ub.get_chave('scb_', inps), scb)
+        # source_corr_booking.data=dict(x=scb['x'], top=scb['top'], desc=scb['desc'], site=scb['site'])
+
+        # sc = get_df_corr(df, 'Airbnb and Booking')
+        # ub.storeInRedis(r, ub.get_chave('sc_', inps), sc)
+        # source_corr_both.data=dict(x=sc['x'], top=sc['top'], desc=sc['desc'], site=sc['site'])
+
+        # print(source_corr_airbnb.data)
+        # print(source_corr_booking.data)
+        # print(source_corr_both.data)
+
+    # update_corr_plot_range(p_corr, df, 'Airbnb and Booking')
     update_map_plot_range(plot, cities.value)
 
 r = False
@@ -166,6 +278,7 @@ source = ColumnDataSource(data=dict(x=[], y=[], cluster=[], price_pc=[], overall
     region=[], name=[], site=[], comodities=[], room_id=[], host_id=[], hotel_id=[], room_type=[],
     property_type=[], category=[], count_host_id=[],count_hotel_id=[],color=[]))
 source_ksite = ColumnDataSource(data=dict(valor=[3]))
+# print(source_ksite.data['valor'][0])
 
 # Set up widgets
 cities = Select(title="Cidade visualizada:", value="Ouro Preto",
