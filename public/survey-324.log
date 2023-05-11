@@ -1,0 +1,120 @@
+2023-05-05 19:16:34,004 INFO    ======================================================================
+2023-05-05 19:16:34,004 INFO    Survey 324, for Pilar, Ouro Preto
+2023-05-05 19:16:34,005 INFO    Searching by bounding box, max_zoom=24
+2023-05-05 19:16:34,006 INFO    ----------------------------------------------------------------------
+2023-05-05 19:16:34,006 INFO    Rectangle calculated: [-43.4908186, -20.3655836, -43.5308186, -20.4055836]
+2023-05-05 19:16:34,007 INFO    Searching rectangle: zoom factor = 0, node = []
+2023-05-05 19:16:34,657 WARNING HTTP status 403 from web site: IP address blocked. Waiting 0.1 minutes.
+2023-05-05 19:16:42,073 INFO    Page 01 returned 00 listings
+2023-05-05 19:16:42,074 INFO    Final page of listings for this search
+2023-05-05 19:16:42,075 INFO    Results: 1 pages, 0 new rooms
+2023-05-05 19:16:42,080 INFO    Finishing survey 324, for Pilar, Ouro Preto
+2023-05-05 19:16:42,108 INFO    Initialing search by overall satisfactions
+2023-05-05 19:16:42,129 INFO    Attempt 1 to find room 47940589
+2023-05-05 19:16:42,272 INFO    ====== WebDriver manager ======
+2023-05-05 19:16:45,116 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-05-05 19:16:46,023 INFO    About to download new driver from https://chromedriver.storage.googleapis.com/112.0.5615.49/chromedriver_win32.zip
+2023-05-05 19:16:47,968 INFO    Driver has been saved in cache [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615]
+2023-05-05 19:17:06,191 INFO    chegou aqui depois de preparar o driver
+2023-05-05 19:17:09,265 INFO    No cookies privacy
+2023-05-05 19:17:13,022 INFO    Unable to find element
+2023-05-05 19:17:13,023 INFO    No bathroom finded
+2023-05-05 19:17:13,036 INFO    Searching for comodities
+2023-05-05 19:17:15,396 INFO    Data collected
+2023-05-05 19:17:15,398 INFO    Attempt 1 to find room 17187548
+2023-05-05 19:17:15,399 INFO    ====== WebDriver manager ======
+2023-05-05 19:17:16,559 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-05-05 19:17:17,303 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-05-05 19:17:34,742 INFO    chegou aqui depois de preparar o driver
+2023-05-05 19:17:37,813 INFO    No cookies privacy
+2023-05-05 19:17:40,844 INFO    Unable to find element
+2023-05-05 19:17:40,844 INFO    No bathroom finded
+2023-05-05 19:17:42,038 INFO    Searching for comodities
+2023-05-05 19:17:44,240 INFO    Data collected
+2023-05-05 19:17:44,242 INFO    Attempt 1 to find room 764827317529662631
+2023-05-05 19:17:44,243 INFO    ====== WebDriver manager ======
+2023-05-05 19:17:44,754 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-05-05 19:17:45,441 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-05-05 19:18:01,257 INFO    chegou aqui depois de preparar o driver
+2023-05-05 19:18:04,335 INFO    No cookies privacy
+2023-05-05 19:18:07,367 INFO    Unable to find element
+2023-05-05 19:18:07,368 INFO    No bathroom finded
+2023-05-05 19:18:07,890 INFO    Searching for comodities
+2023-05-05 19:18:10,290 INFO    Data collected
+2023-05-05 19:18:10,291 INFO    Attempt 1 to find room 46004813
+2023-05-05 19:18:10,291 INFO    ====== WebDriver manager ======
+2023-05-05 19:18:11,390 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-05-05 19:18:12,012 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-05-05 19:18:25,825 INFO    chegou aqui depois de preparar o driver
+2023-05-05 19:18:28,889 INFO    No cookies privacy
+2023-05-05 19:18:31,913 INFO    Unable to find element
+2023-05-05 19:18:31,913 INFO    No bathroom finded
+2023-05-05 19:18:32,301 INFO    Searching for comodities
+2023-05-05 19:18:34,563 INFO    Data collected
+2023-05-05 19:18:34,563 INFO    Attempt 1 to find room 32529555
+2023-05-05 19:18:34,564 INFO    ====== WebDriver manager ======
+2023-05-05 19:18:35,073 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-05-05 19:18:35,755 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-05-05 19:18:49,685 INFO    chegou aqui depois de preparar o driver
+2023-05-05 19:18:52,746 INFO    No cookies privacy
+2023-05-05 19:18:55,791 INFO    Unable to find element
+2023-05-05 19:18:55,792 INFO    No bathroom finded
+2023-05-05 19:18:56,111 INFO    Searching for comodities
+2023-05-05 19:18:58,485 INFO    Data collected
+2023-05-05 19:18:58,486 INFO    Attempt 1 to find room 17026884
+2023-05-05 19:18:58,487 INFO    ====== WebDriver manager ======
+2023-05-05 19:18:59,267 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-05-05 19:18:59,899 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-05-05 19:19:14,142 INFO    chegou aqui depois de preparar o driver
+2023-05-05 19:19:17,190 INFO    No cookies privacy
+2023-05-05 19:19:20,208 INFO    Unable to find element
+2023-05-05 19:19:20,208 INFO    No bathroom finded
+2023-05-05 19:19:20,506 INFO    Searching for comodities
+2023-05-05 19:19:22,773 INFO    Data collected
+2023-05-05 19:19:22,773 INFO    Attempt 1 to find room 34256755
+2023-05-05 19:19:22,774 INFO    ====== WebDriver manager ======
+2023-05-05 19:19:23,629 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-05-05 19:19:24,262 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-05-05 19:19:38,713 INFO    chegou aqui depois de preparar o driver
+2023-05-05 19:19:41,757 INFO    No cookies privacy
+2023-05-05 19:19:44,774 INFO    Unable to find element
+2023-05-05 19:19:44,774 INFO    No bathroom finded
+2023-05-05 19:19:45,045 INFO    Searching for comodities
+2023-05-05 19:19:47,693 INFO    Data collected
+2023-05-05 19:19:47,693 INFO    Attempt 1 to find room 815202368121595703
+2023-05-05 19:19:47,694 INFO    ====== WebDriver manager ======
+2023-05-05 19:19:49,030 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-05-05 19:19:49,649 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-05-05 19:20:04,710 INFO    chegou aqui depois de preparar o driver
+2023-05-05 19:20:07,761 INFO    No cookies privacy
+2023-05-05 19:20:10,778 INFO    Unable to find element
+2023-05-05 19:20:10,778 INFO    No bathroom finded
+2023-05-05 19:20:11,171 INFO    Searching for comodities
+2023-05-05 19:20:13,579 INFO    Data collected
+2023-05-05 19:20:13,580 INFO    Attempt 1 to find room 731014935944515463
+2023-05-05 19:20:13,581 INFO    ====== WebDriver manager ======
+2023-05-05 19:20:14,654 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-05-05 19:20:15,303 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-05-05 19:20:30,548 INFO    chegou aqui depois de preparar o driver
+2023-05-05 19:20:33,594 INFO    No cookies privacy
+2023-05-05 19:20:36,609 INFO    Unable to find element
+2023-05-05 19:20:36,609 INFO    No bathroom finded
+2023-05-05 19:20:36,984 INFO    Searching for comodities
+2023-05-05 19:20:39,319 INFO    Data collected
+2023-05-05 19:20:39,320 INFO    Attempt 1 to find room 54017898
+2023-05-05 19:20:39,321 INFO    ====== WebDriver manager ======
+2023-05-05 19:20:40,088 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-05-05 19:20:40,649 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-05-05 19:21:22,851 INFO    chegou aqui depois de preparar o driver
+2023-05-05 19:21:25,946 INFO    No cookies privacy
+2023-05-05 19:21:28,965 INFO    Unable to find element
+2023-05-05 19:21:28,966 INFO    No bathroom finded
+2023-05-05 19:21:28,984 INFO    Searching for comodities
+2023-05-05 19:21:32,722 INFO    Data collected
+2023-05-05 19:21:32,723 INFO    Attempt 1 to find room 810373860272615033
+2023-05-05 19:21:32,724 INFO    ====== WebDriver manager ======
+2023-05-05 19:21:34,076 INFO    Get LATEST chromedriver version for google-chrome 112.0.5615
+2023-05-05 19:21:35,002 INFO    Driver [C:\Users\Usuario\.wdm\drivers\chromedriver\win32\112.0.5615\chromedriver.exe] found in cache
+2023-05-05 19:21:50,082 INFO    chegou aqui depois de preparar o driver
+2023-05-05 19:21:53,161 INFO    No cookies privacy
+2023-05-05 19:21:55,224 INFO    Interrupted execution
